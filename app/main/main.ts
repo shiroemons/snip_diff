@@ -20,7 +20,7 @@ function createWindow(): void {
     minWidth: 800,
     minHeight: 600,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'),
+      preload: path.join(__dirname, '../../../preload/app/preload/preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,

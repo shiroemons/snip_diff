@@ -11,6 +11,12 @@ const App: React.FC = () => {
     // 初回セッションの作成
     initializeSession();
 
+    // Electron APIが利用可能かチェック
+    if (!window.electron) {
+      console.warn('Electron API is not available. Running in browser mode.');
+      return;
+    }
+
     // テーマの初期化
     const initTheme = async () => {
       try {
