@@ -26,6 +26,9 @@ interface DiffStore {
   swapBuffers: () => void;
   clearBuffers: () => void;
   setTheme: (theme: Theme) => void;
+  updateLeftBufferEOL: (eol: 'LF' | 'CRLF' | 'auto') => void;
+  updateRightBufferEOL: (eol: 'LF' | 'CRLF' | 'auto') => void;
+  updateBuffersLang: (lang: string) => void;
 
   // ヘルパー
   getActiveSession: () => DiffSession | undefined;
@@ -183,6 +186,58 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
 
   setTheme: (theme: Theme) => {
     set({ theme });
+  },
+
+  updateLeftBufferEOL: (eol: 'LF' | 'CRLF' | 'auto') => {
+    const activeSession = get().getActiveSession();
+    if (!activeSession) return;
+
+    const updatedSession: DiffSession = {
+      ...activeSession,
+      left: { ...activeSession.left, eol },
+      updatedAt: Date.now(),
+    };
+
+    set((state) => ({
+      sessions: state.sessions.map((s) =>
+        s.id === activeSession.id ? updatedSession : s
+      ),
+    }));
+  },
+
+  updateRightBufferEOL: (eol: 'LF' | 'CRLF' | 'auto') => {
+    const activeSession = get().getActiveSession();
+    if (!activeSession) return;
+
+    const updatedSession: DiffSession = {
+      ...activeSession,
+      right: { ...activeSession.right, eol },
+      updatedAt: Date.now(),
+    };
+
+    set((state) => ({
+      sessions: state.sessions.map((s) =>
+        s.id === activeSession.id ? updatedSession : s
+      ),
+    }));
+  },
+
+  updateBuffersLang: (lang: string) => {
+    const activeSession = get().getActiveSession();
+    if (!activeSession) return;
+
+    const updatedSession: DiffSession = {
+      ...activeSession,
+      left: { ...activeSession.left, lang },
+      right: { ...activeSession.right, lang },
+      updatedAt: Date.now(),
+    };
+
+    set((state) => ({
+      sessions: state.sessions.map((s) =>
+        s.id === activeSession.id ? updatedSession : s
+      ),
+    }));
   },
 
   getActiveSession: () => {

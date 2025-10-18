@@ -40,3 +40,38 @@
 .info {
   font-family: var(--font-mono);
 }
+
+.footer-controls {
+  gap: 8px;
+}
+
+.info-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.footer-select {
+  padding: 2px 6px;
+  font-size: 11px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-mono);
+}
+
+.footer-select:hover {
+  border-color: var(--border-secondary);
+  background-color: var(--bg-tertiary);
+}
+
+.footer-select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.footer-select-lang {
+  min-width: 100px;
+}

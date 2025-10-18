@@ -47,24 +47,6 @@ const Header: React.FC<HeaderProps> = ({ onCompare, onSwap, onClear }) => {
       </div>
 
       <div className="header-section header-controls">
-        {/* ビューモード切替 */}
-        <div className="button-group">
-          <button
-            className={activeSession?.options.viewMode === 'unified' ? 'active' : ''}
-            onClick={() => handleViewModeChange('unified')}
-            title="Unified (⌘1)"
-          >
-            Unified
-          </button>
-          <button
-            className={activeSession?.options.viewMode === 'side-by-side' ? 'active' : ''}
-            onClick={() => handleViewModeChange('side-by-side')}
-            title="Side by Side (⌘2)"
-          >
-            Side by Side
-          </button>
-        </div>
-
         {/* オプション */}
         <div className="button-group">
           <button
@@ -79,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({ onCompare, onSwap, onClear }) => {
             onClick={() => handleOptionToggle('ignoreCase')}
             title="大文字小文字を無視"
           >
-            Case無視
+            大文字小文字を無視
           </button>
           <button
             className={activeSession?.options.wordWrap ? 'active' : ''}
@@ -117,13 +99,6 @@ const Header: React.FC<HeaderProps> = ({ onCompare, onSwap, onClear }) => {
 
         {/* アクション */}
         <div className="button-group">
-          <button
-            onClick={onCompare}
-            className="compare-button"
-            title="比較を実行"
-          >
-            比較
-          </button>
           <button onClick={onSwap} title="左右を入れ替え (⌘⇧K)">
             ↔ 入替
           </button>

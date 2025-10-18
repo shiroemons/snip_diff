@@ -19,7 +19,7 @@ interface DiffEditorProps {
 }
 
 const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' }, ref) => {
-  const { getActiveSession, updateStats } = useDiffStore();
+  const { getActiveSession, updateStats, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang } = useDiffStore();
   const activeSession = getActiveSession();
   const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const leftEditorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -30,6 +30,54 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   const [comparePanelHeight, setComparePanelHeight] = useState(350);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const dragStartRef = useRef<{ y: number; height: number } | null>(null);
+  const lastHeightRef = useRef<number>(350);
+
+  // storeから言語と改行コードを取得
+  const language = activeSession?.left.lang || 'plaintext';
+  const beforeEOL = activeSession?.left.eol || 'auto';
+  const afterEOL = activeSession?.right.eol || 'auto';
+
+  // サポートする言語リスト
+  const supportedLanguages = [
+    { value: 'plaintext', label: 'Plain Text' },
+    { value: 'javascript', label: 'JavaScript' },
+    { value: 'typescript', label: 'TypeScript' },
+    { value: 'python', label: 'Python' },
+    { value: 'java', label: 'Java' },
+    { value: 'csharp', label: 'C#' },
+    { value: 'cpp', label: 'C++' },
+    { value: 'c', label: 'C' },
+    { value: 'go', label: 'Go' },
+    { value: 'rust', label: 'Rust' },
+    { value: 'php', label: 'PHP' },
+    { value: 'ruby', label: 'Ruby' },
+    { value: 'swift', label: 'Swift' },
+    { value: 'kotlin', label: 'Kotlin' },
+    { value: 'html', label: 'HTML' },
+    { value: 'css', label: 'CSS' },
+    { value: 'scss', label: 'SCSS' },
+    { value: 'json', label: 'JSON' },
+    { value: 'xml', label: 'XML' },
+    { value: 'yaml', label: 'YAML' },
+    { value: 'markdown', label: 'Markdown' },
+    { value: 'sql', label: 'SQL' },
+    { value: 'shell', label: 'Shell' },
+  ];
+
+  // 改行コード変換関数
+  const convertEOL = (text: string, eolType: 'LF' | 'CRLF' | 'auto'): string => {
+    if (eolType === 'auto') return text;
+
+    // 統一してから変換
+    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+    if (eolType === 'CRLF') {
+      return normalized.replace(/\n/g, '\r\n');
+    }
+    return normalized; // LF
+  };
 
   // 比較を実行する関数
   const handleCompare = () => {
@@ -63,6 +111,19 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   // 全画面表示の切り替え
   const handleToggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+  };
+
+  // 最小化の切り替え
+  const handleToggleMinimize = () => {
+    if (isMinimized) {
+      // 復元
+      setComparePanelHeight(lastHeightRef.current);
+      setIsMinimized(false);
+    } else {
+      // 最小化
+      lastHeightRef.current = comparePanelHeight;
+      setIsMinimized(true);
+    }
   };
 
   // 左右を入れ替え
@@ -126,25 +187,34 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   // リサイズハンドルのマウスダウン
   const handleResizeMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
+    dragStartRef.current = {
+      y: e.clientY,
+      height: comparePanelHeight,
+    };
     setIsResizing(true);
     document.body.classList.add('resizing-panel');
   };
 
   // リサイズ中のマウス移動処理
   useEffect(() => {
-    if (!isResizing) return;
+    if (!isResizing || !dragStartRef.current) return;
 
     let animationFrameId: number | null = null;
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (!dragStartRef.current) return;
+
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
 
       animationFrameId = requestAnimationFrame(() => {
-        const containerHeight = window.innerHeight - 100; // ヘッダーとフッターを除く
-        const newHeight = containerHeight - e.clientY;
+        if (!dragStartRef.current) return;
 
+        const deltaY = dragStartRef.current.y - e.clientY;
+        const newHeight = dragStartRef.current.height + deltaY;
+
+        const containerHeight = window.innerHeight - 100; // ヘッダーとフッターを除く
         // 最小200px、最大80%に制限
         const minHeight = 200;
         const maxHeight = containerHeight * 0.8;
@@ -156,6 +226,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
 
     const handleMouseUp = () => {
       setIsResizing(false);
+      dragStartRef.current = null;
       document.body.classList.remove('resizing-panel');
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
@@ -269,7 +340,11 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
       <div
         className={`input-editor-section ${isResizing ? 'resizing' : ''}`}
         style={{
-          height: showComparePanel ? `calc(100% - ${comparePanelHeight}px)` : '100%',
+          height: showComparePanel
+            ? isMinimized
+              ? 'calc(100% - 40px)'
+              : `calc(100% - ${comparePanelHeight}px)`
+            : '100%',
         }}
       >
         <div className="editor-labels">
@@ -316,7 +391,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
           <div className="editor-pane">
             <MonacoEditor
               defaultValue={leftContent}
-              language="plaintext"
+              language={language}
               theme={theme === 'light' ? 'vs' : 'vs-dark'}
               onMount={handleLeftEditorDidMount}
               options={commonEditorOptions}
@@ -326,7 +401,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
           <div className="editor-pane">
             <MonacoEditor
               defaultValue={rightContent}
-              language="plaintext"
+              language={language}
               theme={theme === 'light' ? 'vs' : 'vs-dark'}
               onMount={handleRightEditorDidMount}
               options={commonEditorOptions}
@@ -338,11 +413,11 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
       {/* 下部: 比較パネル */}
       {showComparePanel && (
         <div
-          className={`compare-panel ${isFullscreen ? 'fullscreen' : ''} ${isResizing ? 'resizing' : ''}`}
-          style={{ height: isFullscreen ? '100%' : `${comparePanelHeight}px` }}
+          className={`compare-panel ${isFullscreen ? 'fullscreen' : ''} ${isMinimized ? 'minimized' : ''} ${isResizing ? 'resizing' : ''}`}
+          style={{ height: isFullscreen ? '100%' : isMinimized ? '40px' : `${comparePanelHeight}px` }}
         >
           {/* リサイズハンドル */}
-          {!isFullscreen && (
+          {!isFullscreen && !isMinimized && (
             <div
               className={`resize-handle ${isResizing ? 'resizing' : ''}`}
               onMouseDown={handleResizeMouseDown}
@@ -353,35 +428,60 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
 
           <div className="compare-panel-header">
             <span className="compare-panel-title">差分表示</span>
-            <div className="compare-panel-actions">
-              <button
-                className="panel-action-button"
-                onClick={handleToggleFullscreen}
-                title={isFullscreen ? '元のサイズに戻す' : '全画面表示'}
-              >
-                {isFullscreen ? '⊡' : '⛶'}
-              </button>
-              <button className="close-panel-button" onClick={handleCloseComparePanel}>
-                ✕
-              </button>
+            <div className="compare-panel-controls">
+              {/* ビューモード切替 */}
+              <div className="view-mode-toggle">
+                <button
+                  className={activeSession?.options.viewMode === 'unified' ? 'active' : ''}
+                  onClick={() => useDiffStore.getState().updateOptions({ viewMode: 'unified' })}
+                  title="Unified (⌘1)"
+                >
+                  Unified
+                </button>
+                <button
+                  className={activeSession?.options.viewMode === 'side-by-side' ? 'active' : ''}
+                  onClick={() => useDiffStore.getState().updateOptions({ viewMode: 'side-by-side' })}
+                  title="Side by Side (⌘2)"
+                >
+                  Side by Side
+                </button>
+              </div>
+              <div className="compare-panel-actions">
+                <button
+                  className="panel-action-button"
+                  onClick={handleToggleMinimize}
+                  title={isMinimized ? 'パネルを復元' : 'パネルを最小化'}
+                >
+                  {isMinimized ? '▲' : '▼'}
+                </button>
+                <button
+                  className="panel-action-button"
+                  onClick={handleToggleFullscreen}
+                  title={isFullscreen ? '元のサイズに戻す' : '全画面表示'}
+                >
+                  {isFullscreen ? '⊡' : '⛶'}
+                </button>
+              </div>
             </div>
           </div>
-          <div className="compare-panel-content">
-            <MonacoDiffEditor
-              original={leftContent}
-              modified={rightContent}
-              language="plaintext"
-              theme={theme === 'light' ? 'vs' : 'vs-dark'}
-              onMount={handleDiffEditorDidMount}
-              options={{
-                readOnly: true,
-                renderSideBySide: activeSession?.options.viewMode === 'side-by-side' ?? true,
-                ignoreTrimWhitespace: activeSession?.options.ignoreWhitespace ?? false,
-                originalEditable: false,
-                automaticLayout: true,
-              }}
-            />
-          </div>
+          {!isMinimized && (
+            <div className="compare-panel-content">
+              <MonacoDiffEditor
+                original={leftContent}
+                modified={rightContent}
+                language={language}
+                theme={theme === 'light' ? 'vs' : 'vs-dark'}
+                onMount={handleDiffEditorDidMount}
+                options={{
+                  readOnly: true,
+                  renderSideBySide: activeSession?.options.viewMode === 'side-by-side' ?? true,
+                  ignoreTrimWhitespace: activeSession?.options.ignoreWhitespace ?? false,
+                  originalEditable: false,
+                  automaticLayout: true,
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

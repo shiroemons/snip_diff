@@ -48,10 +48,11 @@ export function normalizeText(
 /**
  * バッファを作成
  */
-export function createBuffer(content: string): Buffer {
+export function createBuffer(content: string, lang: string = 'plaintext'): Buffer {
   return {
     id: generateId(),
     content,
+    lang,
     eol: detectEOL(content),
   };
 }
