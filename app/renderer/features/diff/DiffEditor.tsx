@@ -91,6 +91,38 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
     });
   };
 
+  // 左エディタに貼り付け
+  const handlePasteLeft = async () => {
+    if (!window.electron) return;
+    try {
+      const text = await window.electron.clipboard.read();
+      leftEditorRef.current?.setValue(text);
+    } catch (error) {
+      console.error('Failed to paste to left editor:', error);
+    }
+  };
+
+  // 右エディタに貼り付け
+  const handlePasteRight = async () => {
+    if (!window.electron) return;
+    try {
+      const text = await window.electron.clipboard.read();
+      rightEditorRef.current?.setValue(text);
+    } catch (error) {
+      console.error('Failed to paste to right editor:', error);
+    }
+  };
+
+  // 左エディタをクリア
+  const handleClearLeft = () => {
+    leftEditorRef.current?.setValue('');
+  };
+
+  // 右エディタをクリア
+  const handleClearRight = () => {
+    rightEditorRef.current?.setValue('');
+  };
+
   // リサイズハンドルのマウスダウン
   const handleResizeMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -241,8 +273,44 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
         }}
       >
         <div className="editor-labels">
-          <div className="editor-label editor-label-left">Before</div>
-          <div className="editor-label editor-label-right">After</div>
+          <div className="editor-label editor-label-left">
+            <span className="editor-label-text">Before</span>
+            <div className="editor-label-actions">
+              <button
+                className="editor-label-button"
+                onClick={handlePasteLeft}
+                title="クリップボードから貼り付け (⌘V)"
+              >
+                📋
+              </button>
+              <button
+                className="editor-label-button"
+                onClick={handleClearLeft}
+                title="クリア"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+          <div className="editor-label editor-label-right">
+            <span className="editor-label-text">After</span>
+            <div className="editor-label-actions">
+              <button
+                className="editor-label-button"
+                onClick={handlePasteRight}
+                title="クリップボードから貼り付け (⌘V)"
+              >
+                📋
+              </button>
+              <button
+                className="editor-label-button"
+                onClick={handleClearRight}
+                title="クリア"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
         </div>
         <div className="dual-editor-container">
           <div className="editor-pane">
