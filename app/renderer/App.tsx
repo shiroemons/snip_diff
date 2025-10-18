@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useDiffStore } from './stores/diffStore';
 import Header from './components/Header';
 import DiffEditor, { DiffEditorRef } from './features/diff/DiffEditor';
 import Footer from './components/Footer';
 
 const App: React.FC = () => {
-  const { initializeSession, theme } = useDiffStore();
+  const { initializeSession, theme, updateOptions } = useDiffStore();
   const diffEditorRef = useRef<DiffEditorRef>(null);
 
   useEffect(() => {
@@ -53,6 +53,45 @@ const App: React.FC = () => {
   const handleClear = () => {
     diffEditorRef.current?.clear();
   };
+
+  // キーボードショートカット
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // macOSのCmd (metaKey) をチェック
+      if (!e.metaKey) return;
+
+      // ⌘K: クリア
+      if (e.key === 'k' && !e.shiftKey) {
+        e.preventDefault();
+        diffEditorRef.current?.clear();
+        return;
+      }
+
+      // ⌘⇧K: スワップ
+      if (e.key === 'K' && e.shiftKey) {
+        e.preventDefault();
+        diffEditorRef.current?.swap();
+        return;
+      }
+
+      // ⌘1: Unified モード
+      if (e.key === '1') {
+        e.preventDefault();
+        updateOptions({ viewMode: 'unified' });
+        return;
+      }
+
+      // ⌘2: Side-by-side モード
+      if (e.key === '2') {
+        e.preventDefault();
+        updateOptions({ viewMode: 'side-by-side' });
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [updateOptions]);
 
   return (
     <div className={`app ${theme}`}>
