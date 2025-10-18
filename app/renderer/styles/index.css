@@ -1,0 +1,138 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Light theme colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f8fa;
+  --bg-tertiary: #ffffff;
+  --text-primary: #24292f;
+  --text-secondary: #57606a;
+  --border-primary: #d0d7de;
+  --border-secondary: #d8dee4;
+
+  /* Diff colors */
+  --diff-add-bg: #e6ffec;
+  --diff-add-border: #34d058;
+  --diff-add-text: #116329;
+  --diff-del-bg: #ffebe9;
+  --diff-del-border: #d73a49;
+  --diff-del-text: #82071e;
+
+  /* UI colors */
+  --accent-primary: #0969da;
+  --accent-hover: #0550ae;
+
+  /* Font */
+  --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+.app.dark {
+  /* Dark theme colors */
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --border-primary: #30363d;
+  --border-secondary: #21262d;
+
+  /* Diff colors */
+  --diff-add-bg: #1c2d20;
+  --diff-add-border: #238636;
+  --diff-add-text: #3fb950;
+  --diff-del-bg: #2d1519;
+  --diff-del-border: #da3633;
+  --diff-del-text: #f85149;
+
+  /* UI colors */
+  --accent-primary: #58a6ff;
+  --accent-hover: #79c0ff;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.main-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Button styles */
+button {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+button:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.primary {
+  background-color: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+button.primary:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
