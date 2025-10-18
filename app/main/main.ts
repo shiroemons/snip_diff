@@ -19,6 +19,7 @@ function createWindow(): void {
     height: 900,
     minWidth: 800,
     minHeight: 600,
+    title: 'SnipDiff',
     webPreferences: {
       preload: path.join(__dirname, '../../../preload/app/preload/preload.js'),
       contextIsolation: true,
@@ -59,6 +60,20 @@ function createWindow(): void {
  * アプリケーション起動時の処理
  */
 app.whenReady().then(() => {
+  // アプリケーション名を設定
+  app.setName('SnipDiff');
+
+  // Aboutパネルの情報をカスタマイズ（macOS）
+  if (process.platform === 'darwin') {
+    app.setAboutPanelOptions({
+      applicationName: 'SnipDiff',
+      applicationVersion: '2025.10.0',
+      version: 'v2025.10.0',
+      copyright: '© 2025',
+      credits: 'GitHub-like diff viewer for unsaved text',
+    });
+  }
+
   createWindow();
 
   app.on('activate', () => {
