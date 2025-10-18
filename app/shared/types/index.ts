@@ -95,6 +95,8 @@ export const IPC_CHANNELS = {
   WINDOW_CLOSE: 'window:close',
   WINDOW_MINIMIZE: 'window:minimize',
   WINDOW_MAXIMIZE: 'window:maximize',
+  WINDOW_MAXIMIZED_CHANGED: 'window:maximized:changed',
+  WINDOW_IS_MAXIMIZED: 'window:is-maximized',
 
   // テーマ
   THEME_CHANGED: 'theme:changed',

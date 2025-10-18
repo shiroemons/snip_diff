@@ -40,6 +40,19 @@ function createWindow(): void {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  // ウィンドウの最大化状態の変更を監視
+  mainWindow.on('maximize', () => {
+    mainWindow?.webContents.send(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED, {
+      isMaximized: true,
+    });
+  });
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow?.webContents.send(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED, {
+      isMaximized: false,
+    });
+  });
 }
 
 /**
@@ -218,6 +231,10 @@ function registerIpcHandlers(): void {
     } else {
       mainWindow?.maximize();
     }
+  });
+
+  ipcMain.handle(IPC_CHANNELS.WINDOW_IS_MAXIMIZED, async () => {
+    return mainWindow?.isMaximized() ?? false;
   });
 }
 

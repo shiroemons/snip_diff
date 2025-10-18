@@ -22,6 +22,8 @@ const IPC_CHANNELS = {
   WINDOW_CLOSE: 'window:close',
   WINDOW_MINIMIZE: 'window:minimize',
   WINDOW_MAXIMIZE: 'window:maximize',
+  WINDOW_MAXIMIZED_CHANGED: 'window:maximized:changed',
+  WINDOW_IS_MAXIMIZED: 'window:is-maximized',
 
   // テーマ
   THEME_CHANGED: 'theme:changed',
@@ -95,6 +97,16 @@ const electronAPI = {
       ipcRenderer.invoke(IPC_CHANNELS.WINDOW_MINIMIZE),
     maximize: (): Promise<void> =>
       ipcRenderer.invoke(IPC_CHANNELS.WINDOW_MAXIMIZE),
+    isMaximized: (): Promise<boolean> =>
+      ipcRenderer.invoke(IPC_CHANNELS.WINDOW_IS_MAXIMIZED),
+    onMaximizedChanged: (callback: (state: { isMaximized: boolean }) => void) => {
+      ipcRenderer.on(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED, (_event, state) => {
+        callback(state);
+      });
+    },
+    removeMaximizedListener: () => {
+      ipcRenderer.removeAllListeners(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED);
+    },
   },
 
   // システム情報
