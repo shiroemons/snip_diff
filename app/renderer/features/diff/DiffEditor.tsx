@@ -10,6 +10,8 @@ loader.config({ monaco });
 
 export interface DiffEditorRef {
   compare: () => void;
+  swap: () => void;
+  clear: () => void;
 }
 
 const DiffEditor = forwardRef<DiffEditorRef>((props, ref) => {
@@ -57,6 +59,32 @@ const DiffEditor = forwardRef<DiffEditorRef>((props, ref) => {
   // 全画面表示の切り替え
   const handleToggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+  };
+
+  // 左右を入れ替え
+  const handleSwap = () => {
+    const leftValue = leftEditorRef.current?.getValue() || '';
+    const rightValue = rightEditorRef.current?.getValue() || '';
+
+    leftEditorRef.current?.setValue(rightValue);
+    rightEditorRef.current?.setValue(leftValue);
+  };
+
+  // クリア
+  const handleClear = () => {
+    leftEditorRef.current?.setValue('');
+    rightEditorRef.current?.setValue('');
+
+    setLeftContent('');
+    setRightContent('');
+
+    updateStats({
+      adds: 0,
+      dels: 0,
+      hunks: 0,
+      leftLines: 0,
+      rightLines: 0,
+    });
   };
 
   // リサイズハンドルのマウスダウン
@@ -114,6 +142,8 @@ const DiffEditor = forwardRef<DiffEditorRef>((props, ref) => {
   // 外部から呼び出せるようにメソッドを公開
   useImperativeHandle(ref, () => ({
     compare: handleCompare,
+    swap: handleSwap,
+    clear: handleClear,
   }));
 
   // 左エディタのマウント処理

@@ -4,10 +4,12 @@ import './Header.css';
 
 interface HeaderProps {
   onCompare?: () => void;
+  onSwap?: () => void;
+  onClear?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onCompare }) => {
-  const { getActiveSession, updateOptions, swapBuffers, clearBuffers } = useDiffStore();
+const Header: React.FC<HeaderProps> = ({ onCompare, onSwap, onClear }) => {
+  const { getActiveSession, updateOptions } = useDiffStore();
   const activeSession = getActiveSession();
 
   const handleViewModeChange = (mode: 'unified' | 'side-by-side') => {
@@ -30,19 +32,6 @@ const Header: React.FC<HeaderProps> = ({ onCompare }) => {
       case 'wordWrap':
         updateOptions({ wordWrap: !activeSession.options.wordWrap });
         break;
-    }
-  };
-
-  const handleExport = async () => {
-    if (!activeSession) return;
-
-    // TODO: Unified Diff形式で出力
-    const content = `Left:\n${activeSession.left.content}\n\nRight:\n${activeSession.right.content}`;
-
-    try {
-      await window.electron.file.save(content, 'diff.patch');
-    } catch (error) {
-      console.error('Failed to export:', error);
     }
   };
 
@@ -105,14 +94,11 @@ const Header: React.FC<HeaderProps> = ({ onCompare }) => {
           >
             比較
           </button>
-          <button onClick={swapBuffers} title="左右を入れ替え (⌘⇧K)">
+          <button onClick={onSwap} title="左右を入れ替え (⌘⇧K)">
             ↔ 入替
           </button>
-          <button onClick={clearBuffers} title="クリア (⌘K)">
+          <button onClick={onClear} title="クリア (⌘K)">
             クリア
-          </button>
-          <button onClick={handleExport} className="primary" title="エクスポート (⌘⇧S)">
-            Export
           </button>
         </div>
       </div>

@@ -46,9 +46,21 @@ const App: React.FC = () => {
     diffEditorRef.current?.compare();
   };
 
+  const handleSwap = () => {
+    diffEditorRef.current?.swap();
+  };
+
+  const handleClear = () => {
+    diffEditorRef.current?.clear();
+  };
+
   return (
     <div className={`app ${theme}`}>
-      <Header onCompare={handleCompare} />
+      <Header
+        onCompare={handleCompare}
+        onSwap={handleSwap}
+        onClear={handleClear}
+      />
       <main className="main-content">
         <DiffEditor ref={diffEditorRef} />
       </main>
