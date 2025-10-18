@@ -50,6 +50,7 @@
     "typescript": "^5.3.3",
     "vite": "^5.0.12",
     "vite-plugin-electron": "^0.28.2",
+    "vite-plugin-monaco-editor": "^1.1.0",
     "vitest": "^1.2.1",
     "wait-on": "^7.2.0"
   },

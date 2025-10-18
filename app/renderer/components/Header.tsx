@@ -2,7 +2,11 @@ import React from 'react';
 import { useDiffStore } from '../stores/diffStore';
 import './Header.css';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onCompare?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onCompare }) => {
   const { getActiveSession, updateOptions, swapBuffers, clearBuffers } = useDiffStore();
   const activeSession = getActiveSession();
 
@@ -94,6 +98,13 @@ const Header: React.FC = () => {
 
         {/* アクション */}
         <div className="button-group">
+          <button
+            onClick={onCompare}
+            className="compare-button"
+            title="比較を実行"
+          >
+            比較
+          </button>
           <button onClick={swapBuffers} title="左右を入れ替え (⌘⇧K)">
             ↔ 入替
           </button>

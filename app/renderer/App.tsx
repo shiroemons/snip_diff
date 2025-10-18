@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDiffStore } from './stores/diffStore';
 import Header from './components/Header';
-import DiffEditor from './features/diff/DiffEditor';
+import DiffEditor, { DiffEditorRef } from './features/diff/DiffEditor';
 import Footer from './components/Footer';
 
 const App: React.FC = () => {
   const { initializeSession, theme } = useDiffStore();
+  const diffEditorRef = useRef<DiffEditorRef>(null);
 
   useEffect(() => {
     // 初回セッションの作成
@@ -41,11 +42,15 @@ const App: React.FC = () => {
     };
   }, [initializeSession]);
 
+  const handleCompare = () => {
+    diffEditorRef.current?.compare();
+  };
+
   return (
     <div className={`app ${theme}`}>
-      <Header />
+      <Header onCompare={handleCompare} />
       <main className="main-content">
-        <DiffEditor />
+        <DiffEditor ref={diffEditorRef} />
       </main>
       <Footer />
     </div>

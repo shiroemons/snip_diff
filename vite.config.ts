@@ -9,6 +9,13 @@ export default defineConfig({
   build: {
     outDir: '../../dist/renderer',
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          monaco: ['monaco-editor'],
+        },
+      },
+    },
   },
   resolve: {
     alias: {
@@ -19,5 +26,11 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+  },
+  optimizeDeps: {
+    include: ['monaco-editor'],
+    esbuildOptions: {
+      target: 'es2020',
+    },
   },
 });

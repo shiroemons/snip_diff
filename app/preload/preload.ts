@@ -1,5 +1,32 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { IPC_CHANNELS } from '../shared/types';
+
+/**
+ * IPC通信チャンネル定義
+ */
+const IPC_CHANNELS = {
+  // クリップボード
+  CLIPBOARD_READ: 'clipboard:read',
+  CLIPBOARD_WRITE: 'clipboard:write',
+  CLIPBOARD_HISTORY_GET: 'clipboard:history:get',
+  CLIPBOARD_HISTORY_ADD: 'clipboard:history:add',
+
+  // ファイル操作
+  FILE_SAVE: 'file:save',
+  FILE_OPEN: 'file:open',
+
+  // 設定
+  SETTINGS_GET: 'settings:get',
+  SETTINGS_SET: 'settings:set',
+
+  // ウィンドウ
+  WINDOW_CLOSE: 'window:close',
+  WINDOW_MINIMIZE: 'window:minimize',
+  WINDOW_MAXIMIZE: 'window:maximize',
+
+  // テーマ
+  THEME_CHANGED: 'theme:changed',
+  THEME_GET: 'theme:get',
+} as const;
 
 /**
  * Electron APIをレンダラープロセスに公開

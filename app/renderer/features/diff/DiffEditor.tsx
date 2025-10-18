@@ -1,124 +1,94 @@
-import React, { useEffect, useRef } from 'react';
-import { DiffEditor as MonacoDiffEditor } from '@monaco-editor/react';
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { DiffEditor as MonacoDiffEditor, Editor as MonacoEditor, loader } from '@monaco-editor/react';
 import { useDiffStore } from '../../stores/diffStore';
-import { debounce } from '@shared/utils';
 import type { editor } from 'monaco-editor';
+import * as monaco from 'monaco-editor';
 import './DiffEditor.css';
 
-const DiffEditor: React.FC = () => {
-  const { getActiveSession, updateLeftBuffer, updateRightBuffer, updateStats } = useDiffStore();
+// Monaco Editor のローダー設定 - ローカルから読み込み
+loader.config({ monaco });
+
+export interface DiffEditorRef {
+  compare: () => void;
+}
+
+const DiffEditor = forwardRef<DiffEditorRef>((props, ref) => {
+  const { getActiveSession, updateStats } = useDiffStore();
   const activeSession = getActiveSession();
-  const editorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
+  const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
+  const leftEditorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const rightEditorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const [showComparePanel, setShowComparePanel] = useState(true);
+  const [leftContent, setLeftContent] = useState('');
+  const [rightContent, setRightContent] = useState('');
+  const [comparePanelHeight, setComparePanelHeight] = useState(350);
 
-  // デバウンス付きの更新関数
-  const debouncedUpdateStats = useRef(
-    debounce((leftContent: string, rightContent: string) => {
-      // 簡易統計計算（後でWeb Workerに移行）
-      const leftLines = leftContent.split('\n').length;
-      const rightLines = rightContent.split('\n').length;
+  // 比較を実行する関数
+  const handleCompare = () => {
+    const leftValue = leftEditorRef.current?.getValue() || '';
+    const rightValue = rightEditorRef.current?.getValue() || '';
 
-      updateStats({
-        adds: Math.max(0, rightLines - leftLines),
-        dels: Math.max(0, leftLines - rightLines),
-        hunks: 1,
-        leftLines,
-        rightLines,
-      });
-    }, 120)
-  ).current;
+    setLeftContent(leftValue);
+    setRightContent(rightValue);
 
-  // エディタマウント時の処理
-  const handleEditorDidMount = (editor: editor.IStandaloneDiffEditor) => {
-    editorRef.current = editor;
+    // 統計を計算
+    const leftLines = leftValue.split('\n').length;
+    const rightLines = rightValue.split('\n').length;
 
-    // エディタオプションの設定
-    const editorOptions: editor.IDiffEditorOptions = {
-      readOnly: false,
-      renderSideBySide: activeSession?.options.viewMode === 'side-by-side',
-      ignoreTrimWhitespace: activeSession?.options.ignoreWhitespace ?? false,
-      renderIndicators: true,
-      originalEditable: true,
-      automaticLayout: true,
-    };
-
-    editor.updateOptions(editorOptions);
-
-    // 各エディタのオプションを個別に設定
-    const commonEditorOptions: editor.IEditorOptions = {
-      minimap: { enabled: true },
-      scrollbar: {
-        vertical: 'visible',
-        horizontal: 'visible',
-        useShadows: false,
-      },
-      lineNumbers: 'on',
-      glyphMargin: true,
-      folding: true,
-      wordWrap: activeSession?.options.wordWrap ? 'on' : 'off',
-      fontSize: activeSession?.options.fontSize ?? 14,
-    };
-
-    editor.getOriginalEditor().updateOptions(commonEditorOptions);
-    editor.getModifiedEditor().updateOptions(commonEditorOptions);
-
-    // 変更イベントのリスナーとタブサイズ設定
-    const originalModel = editor.getOriginalEditor().getModel();
-    const modifiedModel = editor.getModifiedEditor().getModel();
-    const tabSize = activeSession?.options.tabSize ?? 4;
-
-    // タブサイズはモデルレベルで設定
-    if (originalModel) {
-      originalModel.updateOptions({ tabSize });
-    }
-    if (modifiedModel) {
-      modifiedModel.updateOptions({ tabSize });
-    }
-
-    if (originalModel) {
-      originalModel.onDidChangeContent(() => {
-        const content = originalModel.getValue();
-        updateLeftBuffer(content);
-        debouncedUpdateStats(content, modifiedModel?.getValue() ?? '');
-      });
-    }
-
-    if (modifiedModel) {
-      modifiedModel.onDidChangeContent(() => {
-        const content = modifiedModel.getValue();
-        updateRightBuffer(content);
-        debouncedUpdateStats(originalModel?.getValue() ?? '', content);
-      });
-    }
-  };
-
-  // セッションのオプションが変更された時にエディタを更新
-  useEffect(() => {
-    if (!editorRef.current || !activeSession) return;
-
-    editorRef.current.updateOptions({
-      renderSideBySide: activeSession.options.viewMode === 'side-by-side',
-      ignoreTrimWhitespace: activeSession.options.ignoreWhitespace,
+    updateStats({
+      adds: Math.max(0, rightLines - leftLines),
+      dels: Math.max(0, leftLines - rightLines),
+      hunks: 1,
+      leftLines,
+      rightLines,
     });
 
-    const commonEditorOptions: editor.IEditorOptions = {
-      wordWrap: activeSession.options.wordWrap ? 'on' : 'off',
-      fontSize: activeSession.options.fontSize,
-    };
+    // 比較パネルを表示
+    setShowComparePanel(true);
+  };
 
-    editorRef.current.getOriginalEditor().updateOptions(commonEditorOptions);
-    editorRef.current.getModifiedEditor().updateOptions(commonEditorOptions);
+  // 比較パネルを閉じる
+  const handleCloseComparePanel = () => {
+    setShowComparePanel(false);
+  };
 
-    // タブサイズはモデルレベルで設定
-    const originalModel = editorRef.current.getOriginalEditor().getModel();
-    const modifiedModel = editorRef.current.getModifiedEditor().getModel();
+  // 外部から呼び出せるようにメソッドを公開
+  useImperativeHandle(ref, () => ({
+    compare: handleCompare,
+  }));
 
-    if (originalModel) {
-      originalModel.updateOptions({ tabSize: activeSession.options.tabSize });
-    }
-    if (modifiedModel) {
-      modifiedModel.updateOptions({ tabSize: activeSession.options.tabSize });
-    }
-  }, [activeSession?.options]);
+  // 左エディタのマウント処理
+  const handleLeftEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
+    leftEditorRef.current = editor;
+  };
+
+  // 右エディタのマウント処理
+  const handleRightEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
+    rightEditorRef.current = editor;
+  };
+
+  // Diffエディタのマウント処理
+  const handleDiffEditorDidMount = (editor: editor.IStandaloneDiffEditor) => {
+    diffEditorRef.current = editor;
+  };
+
+  // 共通エディタオプション
+  const commonEditorOptions: editor.IEditorOptions = {
+    minimap: { enabled: true },
+    scrollbar: {
+      vertical: 'visible',
+      horizontal: 'visible',
+      useShadows: false,
+    },
+    lineNumbers: 'on',
+    glyphMargin: true,
+    folding: true,
+    wordWrap: activeSession?.options.wordWrap ? 'on' : 'off',
+    fontSize: activeSession?.options.fontSize ?? 14,
+    tabSize: activeSession?.options.tabSize ?? 4,
+    automaticLayout: true,
+  };
+
 
   if (!activeSession) {
     return (
@@ -130,20 +100,74 @@ const DiffEditor: React.FC = () => {
 
   return (
     <div className="diff-editor-container">
-      <MonacoDiffEditor
-        original={activeSession.left.content}
-        modified={activeSession.right.content}
-        language={activeSession.left.lang || 'plaintext'}
-        theme="vs-dark"
-        onMount={handleEditorDidMount}
-        options={{
-          readOnly: false,
-          renderSideBySide: activeSession.options.viewMode === 'side-by-side',
-          ignoreTrimWhitespace: activeSession.options.ignoreWhitespace,
+      {/* 上部: 入力エディタ */}
+      <div
+        className="input-editor-section"
+        style={{
+          height: showComparePanel ? `calc(100% - ${comparePanelHeight}px)` : '100%',
         }}
-      />
+      >
+        <div className="editor-labels">
+          <div className="editor-label editor-label-left">Before</div>
+          <div className="editor-label editor-label-right">After</div>
+        </div>
+        <div className="dual-editor-container">
+          <div className="editor-pane">
+            <MonacoEditor
+              defaultValue={leftContent}
+              language="plaintext"
+              theme="vs-dark"
+              onMount={handleLeftEditorDidMount}
+              options={commonEditorOptions}
+            />
+          </div>
+          <div className="editor-divider"></div>
+          <div className="editor-pane">
+            <MonacoEditor
+              defaultValue={rightContent}
+              language="plaintext"
+              theme="vs-dark"
+              onMount={handleRightEditorDidMount}
+              options={commonEditorOptions}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 下部: 比較パネル */}
+      {showComparePanel && (
+        <div
+          className="compare-panel"
+          style={{ height: `${comparePanelHeight}px` }}
+        >
+          <div className="compare-panel-header">
+            <span className="compare-panel-title">差分表示</span>
+            <button className="close-panel-button" onClick={handleCloseComparePanel}>
+              ✕
+            </button>
+          </div>
+          <div className="compare-panel-content">
+            <MonacoDiffEditor
+              original={leftContent}
+              modified={rightContent}
+              language="plaintext"
+              theme="vs-dark"
+              onMount={handleDiffEditorDidMount}
+              options={{
+                readOnly: true,
+                renderSideBySide: activeSession?.options.viewMode === 'side-by-side' ?? true,
+                ignoreTrimWhitespace: activeSession?.options.ignoreWhitespace ?? false,
+                originalEditable: false,
+                automaticLayout: true,
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
-};
+});
+
+DiffEditor.displayName = 'DiffEditor';
 
 export default DiffEditor;

@@ -6,7 +6,7 @@
     <!-- CSP is relaxed for development; tighten for production -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* ws://localhost:* data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:*; style-src 'self' 'unsafe-inline' http://localhost:*; img-src 'self' data: blob: http://localhost:*; font-src 'self' data:; connect-src 'self' ws://localhost:* http://localhost:*; worker-src 'self' blob:;"
+      content="default-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* ws://localhost:* https://cdn.jsdelivr.net data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' http://localhost:* https://cdn.jsdelivr.net; img-src 'self' data: blob: http://localhost:*; font-src 'self' data:; connect-src 'self' ws://localhost:* http://localhost:* https://cdn.jsdelivr.net; worker-src 'self' blob:;"
     />
     <title>SnipDiff</title>
   </head>

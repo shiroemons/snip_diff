@@ -50,3 +50,15 @@
   color: white;
   border-color: var(--accent-primary);
 }
+
+.button-group button.compare-button {
+  background-color: #238636;
+  color: white;
+  border-color: #238636;
+  font-weight: 600;
+}
+
+.button-group button.compare-button:hover {
+  background-color: #2ea043;
+  border-color: #2ea043;
+}
