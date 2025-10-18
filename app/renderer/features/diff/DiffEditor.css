@@ -13,7 +13,11 @@
   overflow: hidden;
   position: relative;
   padding-top: 40px;
-  transition: height 0.3s ease;
+}
+
+.input-editor-section.resizing {
+  transition: none;
+  user-select: none;
 }
 
 .editor-labels {
@@ -72,6 +76,50 @@
   border-top: 2px solid #30363d;
   background-color: #0d1117;
   overflow: hidden;
+  position: relative;
+}
+
+.compare-panel.resizing {
+  transition: none;
+  user-select: none;
+}
+
+.compare-panel.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  border-top: none;
+}
+
+.resize-handle {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resize-handle:hover .resize-handle-bar,
+.resize-handle.resizing .resize-handle-bar {
+  background-color: #1f6feb;
+  height: 3px;
+}
+
+.resize-handle-bar {
+  width: 60px;
+  height: 2px;
+  background-color: #30363d;
+  border-radius: 2px;
+  transition: all 0.2s;
+  pointer-events: none;
 }
 
 .compare-panel-header {
@@ -81,6 +129,7 @@
   padding: 8px 12px;
   background-color: #161b22;
   border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
 }
 
 .compare-panel-title {
@@ -89,6 +138,13 @@
   color: #c9d1d9;
 }
 
+.compare-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.panel-action-button,
 .close-panel-button {
   padding: 4px 8px;
   background-color: transparent;
@@ -101,6 +157,7 @@
   line-height: 1;
 }
 
+.panel-action-button:hover,
 .close-panel-button:hover {
   background-color: #30363d;
   color: #c9d1d9;

@@ -71,6 +71,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body.resizing-panel {
+  cursor: ns-resize !important;
+  user-select: none !important;
+}
+
+body.resizing-panel * {
+  cursor: ns-resize !important;
+  user-select: none !important;
+}
+
 .app {
   display: flex;
   flex-direction: column;
