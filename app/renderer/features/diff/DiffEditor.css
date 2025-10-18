@@ -36,9 +36,9 @@
   padding: 10px 16px;
   font-size: 12px;
   font-weight: 600;
-  color: #c9d1d9;
-  background-color: #161b22;
-  border-bottom: 1px solid #30363d;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
   display: flex;
   align-items: center;
 }
@@ -66,15 +66,15 @@
 
 .editor-divider {
   width: 1px;
-  background-color: #30363d;
+  background-color: var(--border-primary);
   flex-shrink: 0;
 }
 
 .compare-panel {
   display: flex;
   flex-direction: column;
-  border-top: 2px solid #30363d;
-  background-color: #0d1117;
+  border-top: 2px solid var(--border-primary);
+  background-color: var(--bg-primary);
   overflow: hidden;
   position: relative;
 }
@@ -116,7 +116,7 @@
 .resize-handle-bar {
   width: 60px;
   height: 2px;
-  background-color: #30363d;
+  background-color: var(--border-primary);
   border-radius: 2px;
   transition: all 0.2s;
   pointer-events: none;
@@ -127,15 +127,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  background-color: #161b22;
-  border-bottom: 1px solid #30363d;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
   flex-shrink: 0;
 }
 
 .compare-panel-title {
   font-size: 13px;
   font-weight: 600;
-  color: #c9d1d9;
+  color: var(--text-primary);
 }
 
 .compare-panel-actions {
@@ -148,7 +148,7 @@
 .close-panel-button {
   padding: 4px 8px;
   background-color: transparent;
-  color: #8b949e;
+  color: var(--text-secondary);
   border: none;
   border-radius: 4px;
   font-size: 16px;
@@ -159,8 +159,8 @@
 
 .panel-action-button:hover,
 .close-panel-button:hover {
-  background-color: #30363d;
-  color: #c9d1d9;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .compare-panel-content {

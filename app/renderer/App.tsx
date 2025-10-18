@@ -5,8 +5,9 @@ import DiffEditor, { DiffEditorRef } from './features/diff/DiffEditor';
 import Footer from './components/Footer';
 
 const App: React.FC = () => {
-  const { initializeSession, theme, updateOptions } = useDiffStore();
+  const { initializeSession, theme, updateOptions, setTheme } = useDiffStore();
   const diffEditorRef = useRef<DiffEditorRef>(null);
+  const [actualTheme, setActualTheme] = React.useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
     // 初回セッションの作成
@@ -22,8 +23,11 @@ const App: React.FC = () => {
     const initTheme = async () => {
       try {
         const themeInfo = await window.electron.theme.get();
-        // テーマ情報を取得してストアに反映
         console.log('Initial theme:', themeInfo);
+        // Autoモードの場合はシステムテーマを適用
+        if (theme === 'auto') {
+          setActualTheme(themeInfo.shouldUseDarkColors ? 'dark' : 'light');
+        }
       } catch (error) {
         console.error('Failed to get initial theme:', error);
       }
@@ -34,13 +38,26 @@ const App: React.FC = () => {
     // テーマ変更のリスナー
     window.electron.theme.onChanged((themeInfo) => {
       console.log('Theme changed:', themeInfo);
-      // TODO: テーマをストアに反映
+      // Autoモードの場合のみシステムテーマを適用
+      if (theme === 'auto') {
+        setActualTheme(themeInfo.shouldUseDarkColors ? 'dark' : 'light');
+      }
     });
 
     return () => {
       window.electron.theme.removeListener();
     };
-  }, [initializeSession]);
+  }, [initializeSession, theme, setTheme]);
+
+  // テーマの適用
+  useEffect(() => {
+    if (theme === 'auto') {
+      // actualThemeを使用（システム設定に従う）
+    } else {
+      // 明示的に選択されたテーマを使用
+      setActualTheme(theme);
+    }
+  }, [theme]);
 
   const handleCompare = () => {
     diffEditorRef.current?.compare();
@@ -94,14 +111,14 @@ const App: React.FC = () => {
   }, [updateOptions]);
 
   return (
-    <div className={`app ${theme}`}>
+    <div className={`app ${actualTheme}`}>
       <Header
         onCompare={handleCompare}
         onSwap={handleSwap}
         onClear={handleClear}
       />
       <main className="main-content">
-        <DiffEditor ref={diffEditorRef} />
+        <DiffEditor ref={diffEditorRef} theme={actualTheme} />
       </main>
       <Footer />
     </div>

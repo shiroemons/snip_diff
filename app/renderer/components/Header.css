@@ -62,3 +62,38 @@
   background-color: #2ea043;
   border-color: #2ea043;
 }
+
+/* セグメントコントロール風のテーマボタン */
+.theme-toggle-group {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+.theme-toggle-group button {
+  border: none;
+  border-radius: 0;
+  border-right: 1px solid var(--border-primary);
+  background-color: transparent;
+  padding: 4px 12px;
+  min-width: 60px;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle-group button:last-child {
+  border-right: none;
+}
+
+.theme-toggle-group button:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.theme-toggle-group button.active {
+  background-color: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}

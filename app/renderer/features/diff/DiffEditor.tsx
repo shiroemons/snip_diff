@@ -14,7 +14,11 @@ export interface DiffEditorRef {
   clear: () => void;
 }
 
-const DiffEditor = forwardRef<DiffEditorRef>((props, ref) => {
+interface DiffEditorProps {
+  theme?: 'light' | 'dark';
+}
+
+const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' }, ref) => {
   const { getActiveSession, updateStats } = useDiffStore();
   const activeSession = getActiveSession();
   const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
@@ -245,7 +249,7 @@ const DiffEditor = forwardRef<DiffEditorRef>((props, ref) => {
             <MonacoEditor
               defaultValue={leftContent}
               language="plaintext"
-              theme="vs-dark"
+              theme={theme === 'light' ? 'vs' : 'vs-dark'}
               onMount={handleLeftEditorDidMount}
               options={commonEditorOptions}
             />
@@ -255,7 +259,7 @@ const DiffEditor = forwardRef<DiffEditorRef>((props, ref) => {
             <MonacoEditor
               defaultValue={rightContent}
               language="plaintext"
-              theme="vs-dark"
+              theme={theme === 'light' ? 'vs' : 'vs-dark'}
               onMount={handleRightEditorDidMount}
               options={commonEditorOptions}
             />
@@ -299,7 +303,7 @@ const DiffEditor = forwardRef<DiffEditorRef>((props, ref) => {
               original={leftContent}
               modified={rightContent}
               language="plaintext"
-              theme="vs-dark"
+              theme={theme === 'light' ? 'vs' : 'vs-dark'}
               onMount={handleDiffEditorDidMount}
               options={{
                 readOnly: true,
