@@ -432,7 +432,8 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                   ignoreTrimWhitespace: activeSession?.options.ignoreWhitespace ?? false,
                   originalEditable: false,
                   automaticLayout: true,
-                }}
+                  fontSize: activeSession?.options.fontSize ?? 14,
+                } as editor.IDiffEditorConstructionOptions}
               />
             </div>
           )}
