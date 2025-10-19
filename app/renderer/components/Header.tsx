@@ -1,6 +1,5 @@
 import React from 'react';
 import { useDiffStore } from '../stores/diffStore';
-import type { Theme } from '@shared/types';
 import { SUPPORTED_LANGUAGES } from '@shared/constants';
 import './Header.css';
 
@@ -11,7 +10,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onSwap, onClear }) => {
-  const { getActiveSession, updateOptions, theme, setTheme, updateBuffersLang } = useDiffStore();
+  const { getActiveSession, updateOptions, updateBuffersLang } = useDiffStore();
   const activeSession = getActiveSession();
 
   const handleOptionToggle = (option: string) => {
@@ -31,10 +30,6 @@ const Header: React.FC<HeaderProps> = ({ onSwap, onClear }) => {
         updateOptions({ wordWrap: !activeSession.options.wordWrap });
         break;
     }
-  };
-
-  const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme);
   };
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -86,31 +81,6 @@ const Header: React.FC<HeaderProps> = ({ onSwap, onClear }) => {
             title="折り返し"
           >
             折り返し
-          </button>
-        </div>
-
-        {/* テーマ切替 */}
-        <div className="theme-toggle-group">
-          <button
-            className={theme === 'light' ? 'active' : ''}
-            onClick={() => handleThemeChange('light')}
-            title="Light テーマ"
-          >
-            ☀️
-          </button>
-          <button
-            className={theme === 'dark' ? 'active' : ''}
-            onClick={() => handleThemeChange('dark')}
-            title="Dark テーマ"
-          >
-            🌙
-          </button>
-          <button
-            className={theme === 'auto' ? 'active' : ''}
-            onClick={() => handleThemeChange('auto')}
-            title="Auto（システム設定に従う）"
-          >
-            Auto
           </button>
         </div>
 

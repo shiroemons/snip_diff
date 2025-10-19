@@ -1,9 +1,10 @@
 import React from 'react';
 import { useDiffStore } from '../stores/diffStore';
+import type { Theme } from '@shared/types';
 import './Footer.css';
 
 const Footer: React.FC = () => {
-  const { getActiveSession, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang } = useDiffStore();
+  const { getActiveSession, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang, theme, setTheme } = useDiffStore();
   const activeSession = getActiveSession();
 
   if (!activeSession) return null;
@@ -40,6 +41,10 @@ const Footer: React.FC = () => {
     { value: 'shell', label: 'Shell' },
   ];
 
+  const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTheme(e.target.value as Theme);
+  };
+
   return (
     <footer className="app-footer">
       <div className="footer-section">
@@ -53,6 +58,20 @@ const Footer: React.FC = () => {
       </div>
 
       <div className="footer-section footer-controls">
+        <span className="info-label">Theme:</span>
+        <select
+          className="footer-select"
+          value={theme}
+          onChange={handleThemeChange}
+          title="テーマ"
+        >
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="auto">Auto</option>
+        </select>
+
+        <span className="separator">|</span>
+
         <span className="info-label">Before:</span>
         <select
           className="footer-select"
