@@ -354,11 +354,15 @@
   background-color: transparent !important;
 }
 
-/* 文字レベルのデフォルト背景を無効化（後段で装飾を付与） */
-.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.char-insert,
-.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.char-delete {
-  background-color: transparent !important;
-  background: none !important;
+/* 文字レベルの差分にハイライトを適用（Unifiedモードのview-zone対応） */
+.compare-panel-content.compact-mode .monaco-diff-editor .char-insert {
+  background-color: #3fb95080 !important;
+  border-radius: 2px;
+}
+
+.compare-panel-content.compact-mode .monaco-diff-editor .char-delete {
+  background-color: #f8514980 !important;
+  border-radius: 2px;
 }
 
 /* 文字レベルの差分のみハイライト - 追加 */

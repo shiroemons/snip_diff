@@ -61,9 +61,9 @@ const defineCompactThemes = () => {
     inherit: true,
     rules: [],
     colors: {
-      // 文字レベルの差分ハイライト
-      'diffEditor.insertedTextBackground': '#3fb95080',  // 追加文字のハイライト（明るい緑、50%透明度）
-      'diffEditor.removedTextBackground': '#f8514980',   // 削除文字のハイライト（明るい赤、50%透明度）
+      // 文字レベルの差分ハイライトを完全に透明化（カスタムdecorationのみを使用）
+      'diffEditor.insertedTextBackground': '#00000000',
+      'diffEditor.removedTextBackground': '#00000000',
 
       // 行レベルの背景を完全に透明化
       'diffEditor.insertedLineBackground': '#00000000',
@@ -89,9 +89,9 @@ const defineCompactThemes = () => {
     inherit: true,
     rules: [],
     colors: {
-      // 文字レベルの差分ハイライト
-      'diffEditor.insertedTextBackground': '#acf2bd60',  // 追加文字のハイライト（明るい緑、40%透明度）
-      'diffEditor.removedTextBackground': '#ffeef060',   // 削除文字のハイライト（明るい赤、40%透明度）
+      // 文字レベルの差分ハイライトを完全に透明化（カスタムdecorationのみを使用）
+      'diffEditor.insertedTextBackground': '#00000000',
+      'diffEditor.removedTextBackground': '#00000000',
 
       // 行レベルの背景を完全に透明化
       'diffEditor.insertedLineBackground': '#00000000',
@@ -131,9 +131,12 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const leftEditorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const rightEditorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-  const compactDecorationsRef = useRef<{ original: string[]; modified: string[] }>({
-    original: [],
-    modified: [],
+  const compactDecorationsRef = useRef<{
+    original: editor.IEditorDecorationsCollection | null;
+    modified: editor.IEditorDecorationsCollection | null
+  }>({
+    original: null,
+    modified: null,
   });
   const [showComparePanel, setShowComparePanel] = useState(true);
   const [leftContent, setLeftContent] = useState('');
@@ -389,25 +392,99 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   };
 
   const clearCompactDecorations = useCallback(() => {
+    if (compactDecorationsRef.current.original) {
+      compactDecorationsRef.current.original.clear();
+      compactDecorationsRef.current.original = null;
+    }
+    if (compactDecorationsRef.current.modified) {
+      compactDecorationsRef.current.modified.clear();
+      compactDecorationsRef.current.modified = null;
+    }
+  }, []);
+
+  // Unifiedモードのview-zone内のchar-deleteクラスを修正
+  const fixUnifiedModeCharHighlights = useCallback(() => {
+    if (activeSession?.options.viewMode !== 'unified') return;
+    if (!activeSession?.options.compactMode) return;
+
     const diffEditor = diffEditorRef.current;
     if (!diffEditor) return;
 
-    const originalEditor = diffEditor.getOriginalEditor();
-    const modifiedEditor = diffEditor.getModifiedEditor();
+    const originalModel = diffEditor.getOriginalEditor()?.getModel();
+    const modifiedModel = diffEditor.getModifiedEditor()?.getModel();
+    if (!originalModel || !modifiedModel) return;
 
-    if (originalEditor && compactDecorationsRef.current.original.length > 0) {
-      compactDecorationsRef.current.original = originalEditor.deltaDecorations(
-        compactDecorationsRef.current.original,
-        [],
-      );
-    }
-    if (modifiedEditor && compactDecorationsRef.current.modified.length > 0) {
-      compactDecorationsRef.current.modified = modifiedEditor.deltaDecorations(
-        compactDecorationsRef.current.modified,
-        [],
-      );
-    }
-  }, []);
+    const lineChanges = diffEditor.getLineChanges();
+    if (!lineChanges) return;
+
+    // DOMを直接操作して、char-deleteクラスを正しい範囲だけに適用
+    setTimeout(() => {
+      const editorElement = diffEditor.getContainerDomNode();
+      const viewZones = editorElement.querySelectorAll('.view-lines.line-delete');
+
+      lineChanges.forEach((lineChange) => {
+        if (!lineChange?.charChanges) return;
+
+        lineChange.charChanges.forEach((charChange) => {
+          const originalText = getTextFromModel(
+            originalModel,
+            charChange.originalStartLineNumber,
+            charChange.originalStartColumn,
+            charChange.originalEndLineNumber,
+            charChange.originalEndColumn,
+          );
+          const modifiedText = getTextFromModel(
+            modifiedModel,
+            charChange.modifiedStartLineNumber,
+            charChange.modifiedStartColumn,
+            charChange.modifiedEndLineNumber,
+            charChange.modifiedEndColumn,
+          );
+
+          const charDiffs = diffChars(originalText, modifiedText);
+
+          // このcharChange全体を含むchar-delete要素を探す
+          viewZones.forEach((viewZone) => {
+            const charDeleteSpans = viewZone.querySelectorAll('.char-delete');
+
+            charDeleteSpans.forEach((span) => {
+              const spanText = span.textContent || '';
+
+              // このspanがoriginalTextと一致するか確認（改行を除いて比較）
+              if (spanText === originalText || spanText === originalText.replace(/\n/g, '')) {
+                // このspanを細かく分割してハイライトを適用
+                const parent = span.parentNode;
+                if (!parent) return;
+
+                // 新しい要素を作成
+                const fragment = document.createDocumentFragment();
+
+                charDiffs.forEach((part) => {
+                  if (part.removed) {
+                    // 削除部分: char-deleteクラス付きのspanを作成
+                    const newSpan = document.createElement('span');
+                    newSpan.className = span.className;
+                    newSpan.textContent = part.value;
+                    fragment.appendChild(newSpan);
+                  } else if (!part.added) {
+                    // 共通部分: char-deleteクラスなしのspanを作成
+                    const newSpan = document.createElement('span');
+                    newSpan.className = span.className.replace('char-delete', '').trim();
+                    newSpan.textContent = part.value;
+                    fragment.appendChild(newSpan);
+                  }
+                  // added部分はスキップ（削除行には表示されない）
+                });
+
+                // 元のspanを新しい要素で置き換え
+                parent.replaceChild(fragment, span);
+              }
+            });
+          });
+        });
+      });
+    }, 100); // Monaco側のレンダリングを待つため少し遅延
+  }, [activeSession?.options.viewMode, activeSession?.options.compactMode]);
 
   const updateCompactDecorations = useCallback(() => {
     const diffEditor = diffEditorRef.current;
@@ -614,15 +691,21 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
       });
     });
 
-    compactDecorationsRef.current.original = originalEditor.deltaDecorations(
-      compactDecorationsRef.current.original,
-      originalDecorations,
-    );
-    compactDecorationsRef.current.modified = modifiedEditor.deltaDecorations(
-      compactDecorationsRef.current.modified,
-      modifiedDecorations,
-    );
-  }, [activeSession?.id, activeSession?.options.compactMode, activeSession?.options.ignoreWhitespace, clearCompactDecorations]);
+    // 既存のdecorationsをクリア
+    if (compactDecorationsRef.current.original) {
+      compactDecorationsRef.current.original.clear();
+    }
+    if (compactDecorationsRef.current.modified) {
+      compactDecorationsRef.current.modified.clear();
+    }
+
+    // 新しいdecorationsを設定
+    compactDecorationsRef.current.original = originalEditor.createDecorationsCollection(originalDecorations);
+    compactDecorationsRef.current.modified = modifiedEditor.createDecorationsCollection(modifiedDecorations);
+
+    // UnifiedモードのDOMを修正
+    fixUnifiedModeCharHighlights();
+  }, [activeSession?.id, activeSession?.options.compactMode, activeSession?.options.ignoreWhitespace, clearCompactDecorations, fixUnifiedModeCharHighlights]);
 
   useEffect(() => {
     const diffEditor = diffEditorRef.current;
