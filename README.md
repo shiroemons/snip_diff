@@ -291,19 +291,25 @@ IPC ハンドラを追加する場合:
 
 新しいバージョンをリリースする際は、以下の手順に従ってください：
 
-1. **3箇所のバージョン情報を更新**
-   - `package.json` の `version` フィールド
+1. **package.json と package-lock.json のバージョンを更新**
+   ```bash
+   npm version {VERSION} --no-git-tag-version
+   # 例: npm version 2025.10.2 --no-git-tag-version
+   ```
+   このコマンドで `package.json` と `package-lock.json` の両方が自動更新されます
+
+2. **README.md と app/main/main.ts のバージョンを更新**
    - `README.md` のバージョンバッジ (例: `version-2025.10.2`)
    - `app/main/main.ts` の `app.setAboutPanelOptions` 内の `applicationVersion` と `version`
 
-2. **変更をコミット**
+3. **変更をコミット**
    ```bash
-   git add package.json README.md app/main/main.ts
+   git add package.json package-lock.json README.md app/main/main.ts
    git commit -m "chore: bump version to {VERSION}"
    # 例: git commit -m "chore: bump version to 2025.10.2"
    ```
 
-3. **タグを作成してプッシュ**
+4. **タグを作成してプッシュ**
    ```bash
    git tag v{VERSION}
    git push origin main --tags
