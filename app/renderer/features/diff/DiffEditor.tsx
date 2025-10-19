@@ -19,7 +19,7 @@ interface DiffEditorProps {
 }
 
 const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' }, ref) => {
-  const { getActiveSession, updateStats, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang } = useDiffStore();
+  const { getActiveSession, updateStats } = useDiffStore();
   const activeSession = getActiveSession();
   const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const leftEditorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -34,50 +34,8 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   const dragStartRef = useRef<{ y: number; height: number } | null>(null);
   const lastHeightRef = useRef<number>(350);
 
-  // storeから言語と改行コードを取得
+  // storeから言語を取得
   const language = activeSession?.left.lang || 'plaintext';
-  const beforeEOL = activeSession?.left.eol || 'auto';
-  const afterEOL = activeSession?.right.eol || 'auto';
-
-  // サポートする言語リスト
-  const supportedLanguages = [
-    { value: 'plaintext', label: 'Plain Text' },
-    { value: 'javascript', label: 'JavaScript' },
-    { value: 'typescript', label: 'TypeScript' },
-    { value: 'python', label: 'Python' },
-    { value: 'java', label: 'Java' },
-    { value: 'csharp', label: 'C#' },
-    { value: 'cpp', label: 'C++' },
-    { value: 'c', label: 'C' },
-    { value: 'go', label: 'Go' },
-    { value: 'rust', label: 'Rust' },
-    { value: 'php', label: 'PHP' },
-    { value: 'ruby', label: 'Ruby' },
-    { value: 'swift', label: 'Swift' },
-    { value: 'kotlin', label: 'Kotlin' },
-    { value: 'html', label: 'HTML' },
-    { value: 'css', label: 'CSS' },
-    { value: 'scss', label: 'SCSS' },
-    { value: 'json', label: 'JSON' },
-    { value: 'xml', label: 'XML' },
-    { value: 'yaml', label: 'YAML' },
-    { value: 'markdown', label: 'Markdown' },
-    { value: 'sql', label: 'SQL' },
-    { value: 'shell', label: 'Shell' },
-  ];
-
-  // 改行コード変換関数
-  const convertEOL = (text: string, eolType: 'LF' | 'CRLF' | 'auto'): string => {
-    if (eolType === 'auto') return text;
-
-    // 統一してから変換
-    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-    if (eolType === 'CRLF') {
-      return normalized.replace(/\n/g, '\r\n');
-    }
-    return normalized; // LF
-  };
 
   // 比較を実行する関数
   const handleCompare = () => {
@@ -101,11 +59,6 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
 
     // 比較パネルを表示
     setShowComparePanel(true);
-  };
-
-  // 比較パネルを閉じる
-  const handleCloseComparePanel = () => {
-    setShowComparePanel(false);
   };
 
   // 全画面表示の切り替え
@@ -321,7 +274,6 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
     folding: true,
     wordWrap: activeSession?.options.wordWrap ? 'on' : 'off',
     fontSize: activeSession?.options.fontSize ?? 14,
-    tabSize: activeSession?.options.tabSize ?? 4,
     automaticLayout: true,
   };
 
@@ -474,7 +426,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                 onMount={handleDiffEditorDidMount}
                 options={{
                   readOnly: true,
-                  renderSideBySide: activeSession?.options.viewMode === 'side-by-side' ?? true,
+                  renderSideBySide: activeSession?.options.viewMode === 'side-by-side',
                   ignoreTrimWhitespace: activeSession?.options.ignoreWhitespace ?? false,
                   originalEditable: false,
                   automaticLayout: true,

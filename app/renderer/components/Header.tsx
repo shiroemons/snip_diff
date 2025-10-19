@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDiffStore } from '../stores/diffStore';
 import type { Theme } from '@shared/types';
+import { SUPPORTED_LANGUAGES } from '@shared/constants';
 import './Header.css';
 
 interface HeaderProps {
@@ -9,13 +10,9 @@ interface HeaderProps {
   onClear?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onCompare, onSwap, onClear }) => {
-  const { getActiveSession, updateOptions, theme, setTheme } = useDiffStore();
+const Header: React.FC<HeaderProps> = ({ onSwap, onClear }) => {
+  const { getActiveSession, updateOptions, theme, setTheme, updateBuffersLang } = useDiffStore();
   const activeSession = getActiveSession();
-
-  const handleViewModeChange = (mode: 'unified' | 'side-by-side') => {
-    updateOptions({ viewMode: mode });
-  };
 
   const handleOptionToggle = (option: string) => {
     if (!activeSession) return;
@@ -40,6 +37,10 @@ const Header: React.FC<HeaderProps> = ({ onCompare, onSwap, onClear }) => {
     setTheme(newTheme);
   };
 
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateBuffersLang(e.target.value);
+  };
+
   return (
     <header className="app-header">
       <div className="header-section">
@@ -47,6 +48,22 @@ const Header: React.FC<HeaderProps> = ({ onCompare, onSwap, onClear }) => {
       </div>
 
       <div className="header-section header-controls">
+        {/* 言語選択 */}
+        <div className="language-selector">
+          <select
+            value={activeSession?.left.lang || 'plaintext'}
+            onChange={handleLanguageChange}
+            title="シンタックスハイライトの言語を選択"
+            className="language-select"
+          >
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <option key={lang.value} value={lang.value}>
+                {lang.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* オプション */}
         <div className="button-group">
           <button

@@ -100,3 +100,33 @@
   color: white;
   border-color: var(--accent-primary);
 }
+
+/* 言語選択ドロップダウン */
+.language-selector {
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+
+.language-select {
+  font-size: 13px;
+  padding: 4px 8px;
+  min-width: 120px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.language-select:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+}
+
+.language-select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(46, 160, 67, 0.1);
+}
