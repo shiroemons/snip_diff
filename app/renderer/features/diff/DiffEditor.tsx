@@ -10,6 +10,7 @@ import { DiffEditor as MonacoDiffEditor, Editor as MonacoEditor, loader } from '
 import { useDiffStore } from '../../stores/diffStore';
 import type { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
+import { diffChars } from 'diff';
 import './DiffEditor.css';
 
 // Monaco Editor のローダー設定 - ローカルから読み込み
@@ -28,63 +29,6 @@ const getTextFromModel = (
   }
   return model.getValueInRange(
     new monaco.Range(startLine, startColumn, endLine, endColumn),
-  );
-};
-
-const computeCommonPrefixLength = (a: string, b: string) => {
-  const max = Math.min(a.length, b.length);
-  let index = 0;
-  while (index < max && a[index] === b[index]) {
-    index += 1;
-  }
-  return index;
-};
-
-const computeCommonSuffixLength = (a: string, b: string, prefixLength: number) => {
-  const aRemaining = a.length - prefixLength;
-  const bRemaining = b.length - prefixLength;
-  const max = Math.min(aRemaining, bRemaining);
-  let index = 0;
-  while (
-    index < max
-    && a[a.length - 1 - index] === b[b.length - 1 - index]
-  ) {
-    index += 1;
-  }
-  return index;
-};
-
-const computeTrimmedRange = (
-  model: editor.ITextModel | null,
-  startLine: number,
-  startColumn: number,
-  text: string,
-  prefixLength: number,
-  suffixLength: number,
-) => {
-  if (!model) return undefined;
-  if (startLine <= 0 || startColumn <= 0) return undefined;
-
-  const trimmedLength = text.length - prefixLength - suffixLength;
-  if (trimmedLength <= 0) return undefined;
-
-  const startPosition = new monaco.Position(startLine, startColumn);
-  const startOffset = model.getOffsetAt(startPosition);
-  const trimmedStartOffset = startOffset + prefixLength;
-  const trimmedEndOffset = startOffset + text.length - suffixLength;
-
-  if (trimmedEndOffset <= trimmedStartOffset) {
-    return undefined;
-  }
-
-  const trimmedStartPosition = model.getPositionAt(trimmedStartOffset);
-  const trimmedEndPosition = model.getPositionAt(trimmedEndOffset);
-
-  return new monaco.Range(
-    trimmedStartPosition.lineNumber,
-    trimmedStartPosition.column,
-    trimmedEndPosition.lineNumber,
-    trimmedEndPosition.column,
   );
 };
 
@@ -570,93 +514,103 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
           charChange.modifiedEndColumn,
         );
 
-        const prefixLength = computeCommonPrefixLength(originalText, modifiedText);
-        const suffixLength = computeCommonSuffixLength(
-          originalText,
-          modifiedText,
-          prefixLength,
-        );
+        // diffCharsで文字単位の詳細な差分を計算(中間の共通部分も除外)
+        const charDiffs = diffChars(originalText, modifiedText);
 
-        const trimmedOriginalRange = computeTrimmedRange(
-          originalModel,
-          charChange.originalStartLineNumber,
-          charChange.originalStartColumn,
-          originalText,
-          prefixLength,
-          suffixLength,
-        );
-        const trimmedModifiedRange = computeTrimmedRange(
-          modifiedModel,
-          charChange.modifiedStartLineNumber,
-          charChange.modifiedStartColumn,
-          modifiedText,
-          prefixLength,
-          suffixLength,
-        );
+        let originalOffset = 0;
+        let modifiedOffset = 0;
 
-        if (trimmedOriginalRange) {
-          const ranges = splitRangeToSingleLine(originalModel, trimmedOriginalRange);
-          ranges.forEach((range) => {
-            originalDecorations.push({
-              range,
-              options: {
-                inlineClassName: 'compact-diff-delete',
-                stickiness:
-                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
-              },
-            });
-          });
-        } else if (originalText.length > 0) {
-          const fallbackRange = new monaco.Range(
-            charChange.originalStartLineNumber,
-            charChange.originalStartColumn,
-            charChange.originalEndLineNumber,
-            charChange.originalEndColumn,
-          );
-          const ranges = splitRangeToSingleLine(originalModel, fallbackRange);
-          ranges.forEach((range) => {
-            originalDecorations.push({
-              range,
-              options: {
-                inlineClassName: 'compact-diff-delete',
-                stickiness:
-                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
-              },
-            });
-          });
-        }
+        charDiffs.forEach((part) => {
+          if (part.removed) {
+            // 削除された部分をハイライト
+            const startPos = originalModel.getPositionAt(
+              originalModel.getOffsetAt(
+                new monaco.Position(
+                  charChange.originalStartLineNumber,
+                  charChange.originalStartColumn,
+                ),
+              ) + originalOffset,
+            );
+            const endPos = originalModel.getPositionAt(
+              originalModel.getOffsetAt(
+                new monaco.Position(
+                  charChange.originalStartLineNumber,
+                  charChange.originalStartColumn,
+                ),
+              ) +
+                originalOffset +
+                part.value.length,
+            );
 
-        if (trimmedModifiedRange) {
-          const ranges = splitRangeToSingleLine(modifiedModel, trimmedModifiedRange);
-          ranges.forEach((range) => {
-            modifiedDecorations.push({
-              range,
-              options: {
-                inlineClassName: 'compact-diff-insert',
-                stickiness:
-                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
-              },
+            const range = new monaco.Range(
+              startPos.lineNumber,
+              startPos.column,
+              endPos.lineNumber,
+              endPos.column,
+            );
+
+            const ranges = splitRangeToSingleLine(originalModel, range);
+            ranges.forEach((r) => {
+              originalDecorations.push({
+                range: r,
+                options: {
+                  inlineClassName: 'compact-diff-delete',
+                  stickiness:
+                    monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+                },
+              });
             });
-          });
-        } else if (modifiedText.length > 0) {
-          const fallbackRange = new monaco.Range(
-            charChange.modifiedStartLineNumber,
-            charChange.modifiedStartColumn,
-            charChange.modifiedEndLineNumber,
-            charChange.modifiedEndColumn,
-          );
-          const ranges = splitRangeToSingleLine(modifiedModel, fallbackRange);
-          ranges.forEach((range) => {
-            modifiedDecorations.push({
-              range,
-              options: {
-                inlineClassName: 'compact-diff-insert',
-                stickiness:
-                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
-              },
+          }
+
+          if (part.added) {
+            // 追加された部分をハイライト
+            const startPos = modifiedModel.getPositionAt(
+              modifiedModel.getOffsetAt(
+                new monaco.Position(
+                  charChange.modifiedStartLineNumber,
+                  charChange.modifiedStartColumn,
+                ),
+              ) + modifiedOffset,
+            );
+            const endPos = modifiedModel.getPositionAt(
+              modifiedModel.getOffsetAt(
+                new monaco.Position(
+                  charChange.modifiedStartLineNumber,
+                  charChange.modifiedStartColumn,
+                ),
+              ) +
+                modifiedOffset +
+                part.value.length,
+            );
+
+            const range = new monaco.Range(
+              startPos.lineNumber,
+              startPos.column,
+              endPos.lineNumber,
+              endPos.column,
+            );
+
+            const ranges = splitRangeToSingleLine(modifiedModel, range);
+            ranges.forEach((r) => {
+              modifiedDecorations.push({
+                range: r,
+                options: {
+                  inlineClassName: 'compact-diff-insert',
+                  stickiness:
+                    monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+                },
+              });
             });
-          });
-        }
+          }
+
+          // オフセットを更新(共通部分も含む)
+          if (!part.added) {
+            originalOffset += part.value.length;
+          }
+          if (!part.removed) {
+            modifiedOffset += part.value.length;
+          }
+        });
       });
     });
 
