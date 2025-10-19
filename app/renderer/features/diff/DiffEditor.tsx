@@ -656,6 +656,8 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
     tabSize: activeSession?.options.tabSize ?? 4,
     insertSpaces: activeSession?.options.insertSpaces ?? true,
     automaticLayout: true,
+    scrollBeyondLastLine: false,  // 最後の行を超えてスクロールしない
+    scrollBeyondLastColumn: 0,     // 最後の列を超えてスクロールしない
   };
 
 
@@ -826,6 +828,8 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                   renderIndicators: !activeSession?.options.compactMode,  // Compactモードの時はインジケーターを非表示
                   renderWhitespace: 'none',
                   renderOverviewRuler: !activeSession?.options.compactMode,  // Compactモードの時はOverview Rulerを非表示
+                  scrollBeyondLastLine: false,  // 最後の行を超えてスクロールしない
+                  scrollBeyondLastColumn: 0,     // 最後の列を超えてスクロールしない
                   hideUnchangedRegions:
                     activeSession?.options.compactMode ||
                     activeSession?.options.hideUnchangedRegions
