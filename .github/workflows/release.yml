@@ -79,3 +79,70 @@ jobs:
             release/*.dmg
             release/*.zip
           retention-days: 7
+
+      - name: Calculate SHA256
+        id: sha256
+        run: |
+          DMG_FILE=$(ls release/*.dmg | head -n 1)
+          SHA256=$(shasum -a 256 "$DMG_FILE" | awk '{print $1}')
+          echo "sha256=$SHA256" >> $GITHUB_OUTPUT
+          echo "dmg_file=$DMG_FILE" >> $GITHUB_OUTPUT
+          echo "SHA256: $SHA256"
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Generate Homebrew Cask
+        run: |
+          mkdir -p /tmp/cask
+          cat > /tmp/cask/snip-diff.rb << 'EOF'
+          cask "snip-diff" do
+            version "${{ steps.version.outputs.version }}"
+            sha256 "${{ steps.sha256.outputs.sha256 }}"
+
+            url "https://github.com/shiroemons/snip_diff/releases/download/v#{version}/SnipDiff-#{version}-universal.dmg"
+            name "SnipDiff"
+            desc "GitHub-like diff viewer for unsaved text"
+            homepage "https://github.com/shiroemons/snip_diff"
+
+            livecheck do
+              url :url
+              strategy :github_latest
+            end
+
+            app "SnipDiff.app"
+
+            zap trash: [
+              "~/Library/Application Support/SnipDiff",
+              "~/Library/Preferences/com.snipdiff.app.plist",
+              "~/Library/Saved Application State/com.snipdiff.app.savedState",
+            ]
+          end
+          EOF
+          cat /tmp/cask/snip-diff.rb
+
+      - name: Update Homebrew Tap
+        env:
+          GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Clone tap repository
+          git clone https://x-access-token:${GITHUB_TOKEN}@github.com/shiroemons/homebrew-tap.git /tmp/homebrew-tap
+          cd /tmp/homebrew-tap
+
+          # Create Casks directory if it doesn't exist
+          mkdir -p Casks
+
+          # Copy cask file
+          cp /tmp/cask/snip-diff.rb Casks/snip-diff.rb
+
+          # Commit and push
+          git add Casks/snip-diff.rb
+          git commit -m "chore: update snip-diff to ${{ steps.version.outputs.version }}" || echo "No changes to commit"
+          git push origin main

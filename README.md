@@ -54,7 +54,17 @@
 
 ## インストール
 
-### 配布パッケージから (推奨)
+### Homebrew経由 (推奨)
+
+```bash
+# Tapを追加
+brew tap shiroemons/tap
+
+# インストール
+brew install --cask snip-diff
+```
+
+### 配布パッケージから
 
 1. [Releases](../../releases) ページから最新の `.dmg` ファイルをダウンロード
 2. `.dmg` を開き、`SnipDiff.app` を Applications フォルダにドラッグ&ドロップ
