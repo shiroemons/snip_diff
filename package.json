@@ -55,6 +55,7 @@
   "build": {
     "appId": "com.snipdiff.app",
     "productName": "SnipDiff",
+    "publish": null,
     "files": [
       "dist/**/*",
       "package.json"

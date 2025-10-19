@@ -38,6 +38,8 @@ jobs:
       - name: Build and package
         run: npm run dist:mac
         env:
+          # electron-builderの自動publish機能を無効化
+          GH_TOKEN: ''
           # Code signing環境変数 (必要に応じて設定)
           # CSC_LINK: ${{ secrets.CSC_LINK }}
           # CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
@@ -45,6 +47,16 @@ jobs:
           # APPLE_ID: ${{ secrets.APPLE_ID }}
           # APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Verify build artifacts
+        run: |
+          echo "Checking for build artifacts in release directory..."
+          ls -lh release/
+          if [ ! -f release/*.dmg ]; then
+            echo "Error: No .dmg file found in release directory"
+            exit 1
+          fi
+          echo "Build artifacts verified successfully"
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
