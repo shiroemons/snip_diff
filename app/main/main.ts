@@ -17,6 +17,11 @@ const MAX_HISTORY_SIZE = 50;
  * メインウィンドウを作成
  */
 function createWindow(): void {
+  // preloadスクリプトのパスを設定
+  const preloadPath = isDev
+    ? path.join(__dirname, '../../../preload/app/preload/preload.js')
+    : path.join(app.getAppPath(), 'dist/preload/app/preload/preload.js');
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -24,7 +29,7 @@ function createWindow(): void {
     minHeight: 600,
     title: 'SnipDiff',
     webPreferences: {
-      preload: path.join(__dirname, '../../../preload/app/preload/preload.js'),
+      preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -38,7 +43,9 @@ function createWindow(): void {
     mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../../dist/renderer/index.html'));
+    // 本番モード: asarパッケージ内のindex.htmlを読み込む
+    const rendererPath = path.join(app.getAppPath(), 'dist/renderer/index.html');
+    mainWindow.loadFile(rendererPath);
   }
 
   mainWindow.on('closed', () => {
