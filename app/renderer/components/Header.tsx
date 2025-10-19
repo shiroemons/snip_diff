@@ -19,9 +19,6 @@ const Header: React.FC<HeaderProps> = ({ onSwap, onClear }) => {
       case 'ignoreWhitespace':
         updateOptions({ ignoreWhitespace: !activeSession.options.ignoreWhitespace });
         break;
-      case 'ignoreCase':
-        updateOptions({ ignoreCase: !activeSession.options.ignoreCase });
-        break;
       case 'normalizeEOL':
         updateOptions({ normalizeEOL: !activeSession.options.normalizeEOL });
         break;
@@ -46,13 +43,6 @@ const Header: React.FC<HeaderProps> = ({ onSwap, onClear }) => {
             title="空白を無視"
           >
             空白無視
-          </button>
-          <button
-            className={activeSession?.options.ignoreCase ? 'active' : ''}
-            onClick={() => handleOptionToggle('ignoreCase')}
-            title="大文字小文字を無視"
-          >
-            大文字小文字を無視
           </button>
           <button
             className={activeSession?.options.wordWrap ? 'active' : ''}

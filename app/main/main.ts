@@ -213,7 +213,6 @@ function registerIpcHandlers(): void {
       theme: 'auto',
       defaultOptions: {
         ignoreWhitespace: false,
-        ignoreCase: false,
         normalizeEOL: true,
         viewMode: 'side-by-side',
         wordWrap: false,

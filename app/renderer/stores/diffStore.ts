@@ -36,7 +36,6 @@ interface DiffStore {
 
 const defaultOptions: DiffOptions = {
   ignoreWhitespace: false,
-  ignoreCase: false,
   normalizeEOL: true,
   viewMode: 'side-by-side',
   wordWrap: false,

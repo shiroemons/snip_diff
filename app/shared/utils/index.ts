@@ -24,7 +24,6 @@ export function normalizeText(
   text: string,
   options: {
     ignoreWhitespace?: boolean;
-    ignoreCase?: boolean;
     normalizeEOL?: boolean;
   }
 ): string {
@@ -36,10 +35,6 @@ export function normalizeText(
 
   if (options.ignoreWhitespace) {
     result = result.replace(/[ \t]+$/gm, ''); // 行末の空白を削除
-  }
-
-  if (options.ignoreCase) {
-    result = result.toLowerCase();
   }
 
   return result;

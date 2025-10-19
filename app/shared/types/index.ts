@@ -13,7 +13,6 @@ export interface Buffer {
  */
 export interface DiffOptions {
   ignoreWhitespace: boolean;
-  ignoreCase: boolean;
   normalizeEOL: boolean;
   viewMode: 'unified' | 'side-by-side';
   wordWrap: boolean;
