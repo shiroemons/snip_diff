@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useCallback,
+} from 'react';
 import { DiffEditor as MonacoDiffEditor, Editor as MonacoEditor, loader } from '@monaco-editor/react';
 import { useDiffStore } from '../../stores/diffStore';
 import type { editor } from 'monaco-editor';
@@ -7,6 +14,100 @@ import './DiffEditor.css';
 
 // Monaco Editor のローダー設定 - ローカルから読み込み
 loader.config({ monaco });
+
+const getTextFromModel = (
+  model: editor.ITextModel | null,
+  startLine: number,
+  startColumn: number,
+  endLine: number,
+  endColumn: number,
+) => {
+  if (!model) return '';
+  if (startLine <= 0 || startColumn <= 0 || endLine <= 0 || endColumn <= 0) {
+    return '';
+  }
+  return model.getValueInRange(
+    new monaco.Range(startLine, startColumn, endLine, endColumn),
+  );
+};
+
+const computeCommonPrefixLength = (a: string, b: string) => {
+  const max = Math.min(a.length, b.length);
+  let index = 0;
+  while (index < max && a[index] === b[index]) {
+    index += 1;
+  }
+  return index;
+};
+
+const computeCommonSuffixLength = (a: string, b: string, prefixLength: number) => {
+  const aRemaining = a.length - prefixLength;
+  const bRemaining = b.length - prefixLength;
+  const max = Math.min(aRemaining, bRemaining);
+  let index = 0;
+  while (
+    index < max
+    && a[a.length - 1 - index] === b[b.length - 1 - index]
+  ) {
+    index += 1;
+  }
+  return index;
+};
+
+const computeTrimmedRange = (
+  model: editor.ITextModel | null,
+  startLine: number,
+  startColumn: number,
+  text: string,
+  prefixLength: number,
+  suffixLength: number,
+) => {
+  if (!model) return undefined;
+  if (startLine <= 0 || startColumn <= 0) return undefined;
+
+  const trimmedLength = text.length - prefixLength - suffixLength;
+  if (trimmedLength <= 0) return undefined;
+
+  const startPosition = new monaco.Position(startLine, startColumn);
+  const startOffset = model.getOffsetAt(startPosition);
+  const trimmedStartOffset = startOffset + prefixLength;
+  const trimmedEndOffset = startOffset + text.length - suffixLength;
+
+  if (trimmedEndOffset <= trimmedStartOffset) {
+    return undefined;
+  }
+
+  const trimmedStartPosition = model.getPositionAt(trimmedStartOffset);
+  const trimmedEndPosition = model.getPositionAt(trimmedEndOffset);
+
+  return new monaco.Range(
+    trimmedStartPosition.lineNumber,
+    trimmedStartPosition.column,
+    trimmedEndPosition.lineNumber,
+    trimmedEndPosition.column,
+  );
+};
+
+const splitRangeToSingleLine = (model: editor.ITextModel, range: monaco.Range) => {
+  if (range.startLineNumber === range.endLineNumber) {
+    if (range.startColumn === range.endColumn) {
+      return [];
+    }
+    return [range];
+  }
+
+  const ranges: monaco.Range[] = [];
+  for (let line = range.startLineNumber; line <= range.endLineNumber; line += 1) {
+    const startColumn = line === range.startLineNumber ? range.startColumn : 1;
+    const endColumn =
+      line === range.endLineNumber
+        ? range.endColumn
+        : model.getLineMaxColumn(line);
+    if (startColumn === endColumn) continue;
+    ranges.push(new monaco.Range(line, startColumn, line, endColumn));
+  }
+  return ranges;
+};
 
 // Compactモード用のカスタムテーマを定義（行背景なし、文字ハイライトのみ）
 const defineCompactThemes = () => {
@@ -86,6 +187,10 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const leftEditorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const rightEditorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const compactDecorationsRef = useRef<{ original: string[]; modified: string[] }>({
+    original: [],
+    modified: [],
+  });
   const [showComparePanel, setShowComparePanel] = useState(true);
   const [leftContent, setLeftContent] = useState('');
   const [rightContent, setRightContent] = useState('');
@@ -338,6 +443,248 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   const handleDiffEditorDidMount = (editor: editor.IStandaloneDiffEditor) => {
     diffEditorRef.current = editor;
   };
+
+  const clearCompactDecorations = useCallback(() => {
+    const diffEditor = diffEditorRef.current;
+    if (!diffEditor) return;
+
+    const originalEditor = diffEditor.getOriginalEditor();
+    const modifiedEditor = diffEditor.getModifiedEditor();
+
+    if (originalEditor && compactDecorationsRef.current.original.length > 0) {
+      compactDecorationsRef.current.original = originalEditor.deltaDecorations(
+        compactDecorationsRef.current.original,
+        [],
+      );
+    }
+    if (modifiedEditor && compactDecorationsRef.current.modified.length > 0) {
+      compactDecorationsRef.current.modified = modifiedEditor.deltaDecorations(
+        compactDecorationsRef.current.modified,
+        [],
+      );
+    }
+  }, []);
+
+  const updateCompactDecorations = useCallback(() => {
+    const diffEditor = diffEditorRef.current;
+    if (!diffEditor) return;
+
+    const originalEditor = diffEditor.getOriginalEditor();
+    const modifiedEditor = diffEditor.getModifiedEditor();
+    const originalModel = originalEditor?.getModel() ?? null;
+    const modifiedModel = modifiedEditor?.getModel() ?? null;
+
+    if (!activeSession?.options.compactMode) {
+      clearCompactDecorations();
+      return;
+    }
+
+    if (!originalEditor || !modifiedEditor || !originalModel || !modifiedModel) {
+      clearCompactDecorations();
+      return;
+    }
+
+    const lineChanges = diffEditor.getLineChanges();
+    if (!lineChanges) {
+      clearCompactDecorations();
+      return;
+    }
+
+    const originalDecorations: monaco.editor.IModelDeltaDecoration[] = [];
+    const modifiedDecorations: monaco.editor.IModelDeltaDecoration[] = [];
+
+    lineChanges.forEach((lineChange) => {
+      if (!lineChange) {
+        return;
+      }
+
+      if (!lineChange.charChanges || lineChange.charChanges.length === 0) {
+        for (
+          let line = lineChange.originalStartLineNumber;
+          line <= lineChange.originalEndLineNumber;
+          line += 1
+        ) {
+          if (line <= 0) continue;
+          const maxColumn = originalModel.getLineMaxColumn(line);
+          if (maxColumn > 1) {
+            originalDecorations.push({
+              range: new monaco.Range(line, 1, line, maxColumn),
+              options: {
+                inlineClassName: 'compact-diff-delete',
+                stickiness:
+                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+              },
+            });
+          } else {
+            originalDecorations.push({
+              range: new monaco.Range(line, 1, line, 1),
+              options: {
+                className: 'compact-diff-empty-line-delete',
+                isWholeLine: true,
+              },
+            });
+          }
+        }
+        for (
+          let line = lineChange.modifiedStartLineNumber;
+          line <= lineChange.modifiedEndLineNumber;
+          line += 1
+        ) {
+          if (line <= 0) continue;
+          const maxColumn = modifiedModel.getLineMaxColumn(line);
+          if (maxColumn > 1) {
+            modifiedDecorations.push({
+              range: new monaco.Range(line, 1, line, maxColumn),
+              options: {
+                inlineClassName: 'compact-diff-insert',
+                stickiness:
+                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+              },
+            });
+          } else {
+            modifiedDecorations.push({
+              range: new monaco.Range(line, 1, line, 1),
+              options: {
+                className: 'compact-diff-empty-line-insert',
+                isWholeLine: true,
+              },
+            });
+          }
+        }
+        return;
+      }
+
+      lineChange.charChanges.forEach((charChange) => {
+        const originalText = getTextFromModel(
+          originalModel,
+          charChange.originalStartLineNumber,
+          charChange.originalStartColumn,
+          charChange.originalEndLineNumber,
+          charChange.originalEndColumn,
+        );
+        const modifiedText = getTextFromModel(
+          modifiedModel,
+          charChange.modifiedStartLineNumber,
+          charChange.modifiedStartColumn,
+          charChange.modifiedEndLineNumber,
+          charChange.modifiedEndColumn,
+        );
+
+        const prefixLength = computeCommonPrefixLength(originalText, modifiedText);
+        const suffixLength = computeCommonSuffixLength(
+          originalText,
+          modifiedText,
+          prefixLength,
+        );
+
+        const trimmedOriginalRange = computeTrimmedRange(
+          originalModel,
+          charChange.originalStartLineNumber,
+          charChange.originalStartColumn,
+          originalText,
+          prefixLength,
+          suffixLength,
+        );
+        const trimmedModifiedRange = computeTrimmedRange(
+          modifiedModel,
+          charChange.modifiedStartLineNumber,
+          charChange.modifiedStartColumn,
+          modifiedText,
+          prefixLength,
+          suffixLength,
+        );
+
+        if (trimmedOriginalRange) {
+          const ranges = splitRangeToSingleLine(originalModel, trimmedOriginalRange);
+          ranges.forEach((range) => {
+            originalDecorations.push({
+              range,
+              options: {
+                inlineClassName: 'compact-diff-delete',
+                stickiness:
+                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+              },
+            });
+          });
+        } else if (originalText.length > 0) {
+          const fallbackRange = new monaco.Range(
+            charChange.originalStartLineNumber,
+            charChange.originalStartColumn,
+            charChange.originalEndLineNumber,
+            charChange.originalEndColumn,
+          );
+          const ranges = splitRangeToSingleLine(originalModel, fallbackRange);
+          ranges.forEach((range) => {
+            originalDecorations.push({
+              range,
+              options: {
+                inlineClassName: 'compact-diff-delete',
+                stickiness:
+                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+              },
+            });
+          });
+        }
+
+        if (trimmedModifiedRange) {
+          const ranges = splitRangeToSingleLine(modifiedModel, trimmedModifiedRange);
+          ranges.forEach((range) => {
+            modifiedDecorations.push({
+              range,
+              options: {
+                inlineClassName: 'compact-diff-insert',
+                stickiness:
+                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+              },
+            });
+          });
+        } else if (modifiedText.length > 0) {
+          const fallbackRange = new monaco.Range(
+            charChange.modifiedStartLineNumber,
+            charChange.modifiedStartColumn,
+            charChange.modifiedEndLineNumber,
+            charChange.modifiedEndColumn,
+          );
+          const ranges = splitRangeToSingleLine(modifiedModel, fallbackRange);
+          ranges.forEach((range) => {
+            modifiedDecorations.push({
+              range,
+              options: {
+                inlineClassName: 'compact-diff-insert',
+                stickiness:
+                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+              },
+            });
+          });
+        }
+      });
+    });
+
+    compactDecorationsRef.current.original = originalEditor.deltaDecorations(
+      compactDecorationsRef.current.original,
+      originalDecorations,
+    );
+    compactDecorationsRef.current.modified = modifiedEditor.deltaDecorations(
+      compactDecorationsRef.current.modified,
+      modifiedDecorations,
+    );
+  }, [activeSession?.id, activeSession?.options.compactMode, clearCompactDecorations]);
+
+  useEffect(() => {
+    const diffEditor = diffEditorRef.current;
+    if (!diffEditor) return;
+
+    const listener = diffEditor.onDidUpdateDiff(() => {
+      updateCompactDecorations();
+    });
+
+    updateCompactDecorations();
+
+    return () => {
+      listener.dispose();
+      clearCompactDecorations();
+    };
+  }, [updateCompactDecorations, clearCompactDecorations]);
 
   // 共通エディタオプション
   const commonEditorOptions: editor.IStandaloneEditorConstructionOptions = {

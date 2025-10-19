@@ -354,15 +354,33 @@
   background-color: transparent !important;
 }
 
-/* 文字レベルの差分のみハイライト - 緑（追加） */
-.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.char-insert {
+/* 文字レベルのデフォルト背景を無効化（後段で装飾を付与） */
+.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.char-insert,
+.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.char-delete {
+  background-color: transparent !important;
+  background: none !important;
+}
+
+/* 文字レベルの差分のみハイライト - 追加 */
+.compare-panel-content.compact-mode .compact-diff-insert {
   background-color: #3fb95080 !important;
   border-radius: 2px;
 }
 
-/* 文字レベルの差分のみハイライト - 赤（削除） */
-.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.char-delete {
+/* 文字レベルの差分のみハイライト - 削除 */
+.compare-panel-content.compact-mode .compact-diff-delete {
   background-color: #f8514980 !important;
+  border-radius: 2px;
+}
+
+/* 空行の追加・削除も視認できるように行全体をハイライト */
+.compare-panel-content.compact-mode .compact-diff-empty-line-insert {
+  background-color: #3fb95040 !important;
+  border-radius: 2px;
+}
+
+.compare-panel-content.compact-mode .compact-diff-empty-line-delete {
+  background-color: #f8514940 !important;
   border-radius: 2px;
 }
 
@@ -373,16 +391,11 @@
 }
 
 /* Side-by-Sideモード専用の設定 */
-/* 左側（original）エディタの文字レベル差分 */
-.compare-panel-content.compact-mode .monaco-diff-editor .original-in-monaco-diff-editor .view-overlays .cdr.char-delete {
-  background-color: #f8514980 !important;
-  border-radius: 2px;
-}
-
-/* 右側（modified）エディタの文字レベル差分 */
+/* 左右どちらのエディタでもデフォルト装飾を抑制 */
+.compare-panel-content.compact-mode .monaco-diff-editor .original-in-monaco-diff-editor .view-overlays .cdr.char-delete,
 .compare-panel-content.compact-mode .monaco-diff-editor .modified-in-monaco-diff-editor .view-overlays .cdr.char-insert {
-  background-color: #3fb95080 !important;
-  border-radius: 2px;
+  background-color: transparent !important;
+  background: none !important;
 }
 
 /* Side-by-Sideモードの行レベル背景も無効化 */
