@@ -622,7 +622,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
       compactDecorationsRef.current.modified,
       modifiedDecorations,
     );
-  }, [activeSession?.id, activeSession?.options.compactMode, clearCompactDecorations]);
+  }, [activeSession?.id, activeSession?.options.compactMode, activeSession?.options.ignoreWhitespace, clearCompactDecorations]);
 
   useEffect(() => {
     const diffEditor = diffEditorRef.current;
@@ -820,7 +820,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                 options={{
                   readOnly: true,
                   renderSideBySide: activeSession?.options.viewMode === 'side-by-side',
-                  ignoreTrimWhitespace: true,  // 常に行末の空白を無視
+                  ignoreTrimWhitespace: activeSession?.options.ignoreWhitespace ?? false,  // 空白無視オプションに基づいて行末の空白を制御
                   originalEditable: false,
                   automaticLayout: true,
                   fontSize: activeSession?.options.fontSize ?? 14,
