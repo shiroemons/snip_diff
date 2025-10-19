@@ -268,6 +268,44 @@ IPC ハンドラを追加する場合:
 - 開発者ツールのコンソールでエラーを確認
 - `npm run build` を実行して再ビルド
 
+## リリース
+
+### バージョンアップ手順
+
+**バージョン番号の形式**: `YYYY.MM.PATCH`
+- `YYYY`: 年（例: 2025）
+- `MM`: 月（例: 10）
+- `PATCH`: パッチ番号（例: 0, 1, 2...）
+- 例: `2025.10.0`, `2025.10.1`, `2025.10.2`
+
+新しいバージョンをリリースする際は、以下の手順に従ってください：
+
+1. **3箇所のバージョン情報を更新**
+   - `package.json` の `version` フィールド
+   - `README.md` のバージョンバッジ (例: `version-2025.10.2`)
+   - `app/main/main.ts` の `app.setAboutPanelOptions` 内の `applicationVersion` と `version`
+
+2. **変更をコミット**
+   ```bash
+   git add package.json README.md app/main/main.ts
+   git commit -m "chore: bump version to {VERSION}"
+   # 例: git commit -m "chore: bump version to 2025.10.2"
+   ```
+
+3. **タグを作成してプッシュ**
+   ```bash
+   git tag v{VERSION}
+   git push origin main --tags
+   # 例: git tag v2025.10.2
+   ```
+
+4. **GitHub Actionsによる自動リリース**
+   - タグがプッシュされると自動的にビルド・リリースが実行されます
+   - `.dmg` ファイルの作成とGitHubリリースへのアップロード
+   - Homebrewへの自動配信
+
+詳細は [CLAUDE.md](./CLAUDE.md#バージョンアップ手順) を参照してください。
+
 ## コントリビューション
 
 バグ報告や機能提案は [Issues](../../issues) でお願いします。
