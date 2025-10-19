@@ -2,70 +2,302 @@
 
 未保存テキスト差分ビューア - GitHub-like diff viewer for unsaved text
 
+<div align="center">
+
+![Version](https://img.shields.io/badge/version-2025.10.0-blue.svg)
+![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+</div>
+
 ## 概要
 
-SnipDiffは、保存していないテキスト同士の差分を、GitHubのdiffに近いUIで高速・安全・オフラインに確認できるmacOSデスクトップアプリケーションです。
+**SnipDiff**は、保存していないテキスト同士の差分を、GitHubのdiffに近いUIで高速・安全・オフラインに確認できるmacOSデスクトップアプリケーションです。
+
+コードレビュー、ドキュメント比較、設定ファイルの差分確認など、ファイルとして保存する前にテキストの差分を素早く確認したいシーンで活躍します。
 
 ## 主な機能
 
-- **未保存テキストの差分表示**: クリップボードやドラッグ&ドロップで簡単に差分を確認
-- **GitHubライクなUI**: Unified/Side-by-sideの2モードをサポート
-- **高速動作**: 起動から差分表示まで1秒未満
-- **オフライン動作**: ネットワーク接続不要、完全にローカルで動作
-- **Monaco Editor**: VS Codeと同じエディタエンジンを使用
-- **柔軟なオプション**: 空白無視、改行コード差異の無視、ケース無視など
+### ✨ コア機能
 
-## セットアップ
+- **リアルタイム差分表示**: 2つのテキストを左右のエディタに入力し、即座に差分を確認
+- **2つの表示モード**:
+  - **Unified**: GitHubスタイルの一体型表示
+  - **Side-by-side**: 左右並列の詳細表示
+- **Monaco Editor搭載**: VS Codeと同じエディタエンジンで快適な編集体験
+- **オフライン動作**: ネットワーク接続不要、完全にローカルで動作
+- **高速起動**: アプリ起動から差分表示まで1秒未満
+
+### 🎨 カスタマイズ機能
+
+- **テーマ**: Light / Dark / Auto (システムテーマに自動追従)
+- **シンタックスハイライト**: 23言語をサポート
+  - JavaScript, TypeScript, Python, Java, C#, C++, C, Go, Rust, PHP, Ruby, Swift, Kotlin
+  - HTML, CSS, SCSS, JSON, XML, YAML, Markdown, SQL, Shell, Plain Text
+- **改行コード指定**: 左右それぞれでLF/CRLF/Autoを選択可能
+- **差分オプション**:
+  - 空白無視
+  - 折り返し表示
+
+### 📊 統計情報
+
+- 追加行数 / 削除行数
+- Hunks数
+- 各エディタの総行数
+
+### 🎯 ユーザビリティ
+
+- **リサイズ可能な比較パネル**: ドラッグで高さ調整
+- **最小化/全画面表示**: 作業領域を柔軟に調整
+- **左右スワップ**: ワンクリックでBefore/Afterを入れ替え
+- **キーボードショートカット**: 主要操作をキーボードで素早く実行
+
+## インストール
+
+### 配布パッケージから (推奨)
+
+1. [Releases](../../releases) ページから最新の `.dmg` ファイルをダウンロード
+2. `.dmg` を開き、`SnipDiff.app` を Applications フォルダにドラッグ&ドロップ
+3. アプリケーションを起動
+
+### ソースからビルド
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/shiroemons/snip_diff.git
+cd snip_diff
+
+# 依存関係をインストール
+npm install
+
+# ビルド & パッケージング
+npm run dist:mac
+
+# release/SnipDiff-2025.10.0-universal.dmg が生成されます
+```
+
+## 使い方
+
+### 基本的なワークフロー
+
+1. **テキスト入力**: 左側のエディタに「Before」、右側に「After」のテキストを入力
+2. **比較実行**: ヘッダーの「比較」ボタンをクリック、または自動で差分が表示されます
+3. **差分確認**: 下部の比較パネルで差分を確認
+4. **モード切替**: `⌘1` (Unified) / `⌘2` (Side-by-side) で表示を切り替え
+
+### オプション設定
+
+#### ヘッダーのオプション
+
+- **空白無視**: 空白文字の差異を無視して比較
+- **折り返し**: 長い行を折り返して表示
+
+#### フッターの設定
+
+- **Theme**: Light / Dark / Auto から選択
+- **Before / After の改行コード**: それぞれ LF / CRLF / Auto を指定
+- **言語選択**: シンタックスハイライトの言語を選択
+
+### キーボードショートカット
+
+| ショートカット | 機能 |
+|--------------|------|
+| `⌘K` | 両側のエディタをクリア |
+| `⌘⇧K` | 左右のテキストを入れ替え |
+| `⌘1` | Unifiedモードに切り替え |
+| `⌘2` | Side-by-sideモードに切り替え |
+
+## 開発
 
 ### 必要要件
 
-- Node.js 18以上
-- macOS (Apple Silicon/Intel)
+- **Node.js**: 18以上
+- **macOS**: Apple Silicon / Intel 両対応
+- **npm**: 8以上
 
-### インストール
+### セットアップ
 
 ```bash
+# 依存関係をインストール
 npm install
-```
 
-### 開発
-
-```bash
+# 開発モードで起動 (Hot Reload有効)
 npm run dev
 ```
 
-### ビルド
+### 開発コマンド
 
 ```bash
+# 開発モード起動 (Vite dev server + Electron)
+npm run dev
+
+# ビルド (全プロセス)
 npm run build
-npm run dist:mac
+
+# 個別ビルド
+npm run build:renderer  # React アプリ (Vite)
+npm run build:main      # メインプロセス (TypeScript)
+npm run build:preload   # プリロードスクリプト (TypeScript)
+
+# 配布パッケージ作成
+npm run dist:mac        # .dmg (Universal Binary)
+
+# 型チェック
+npm run type-check      # 全 tsconfig の型チェック
+
+# リント & フォーマット
+npm run lint            # Biome でリント
+npm run lint:fix        # 自動修正
+npm run format          # フォーマット
+npm run check           # リント + フォーマット一括実行
+
+# テスト
+npm run test            # Vitest 実行
 ```
 
-## 技術スタック
+### プロジェクト構造
 
-- **Electron**: デスクトップアプリケーションフレームワーク
-- **React**: UIフレームワーク
-- **TypeScript**: 型安全な開発
-- **Vite**: 高速ビルドツール
-- **Monaco Editor**: コードエディタ
-- **Zustand**: 状態管理
+```
+app/
+├── main/           # Electron メインプロセス (Node.js 環境)
+│   └── main.ts     # アプリケーションエントリーポイント、IPC ハンドラ
+├── preload/        # IPC ブリッジ (contextIsolation 対応)
+│   └── preload.ts  # レンダラーとメインプロセス間の安全な通信
+├── renderer/       # React アプリケーション (ブラウザ環境)
+│   ├── components/ # 再利用可能な UI コンポーネント
+│   ├── features/   # 機能別コンポーネント (DiffEditor など)
+│   ├── stores/     # Zustand 状態管理
+│   └── App.tsx     # ルートコンポーネント
+└── shared/         # 型定義・ユーティリティ (全プロセス共有)
+    └── types/      # TypeScript 型定義
+```
 
-## キーボードショートカット
+### 技術スタック
 
-- `⌘N`: 新規セッション（タブ）
-- `⌘V`: 左右にペースト
-- `⌘⌥V`: クリップボード履歴から挿入
-- `⌘1`: Unifiedモード
-- `⌘2`: Side-by-sideモード
-- `F7`/`Shift+F7`: 次/前のhunkへジャンプ
-- `⌘⇧S`: Unified Diffでエクスポート
-- `⌘K`: クリア
-- `⌘⇧K`: 左右スワップ
+| カテゴリ | 技術 |
+|---------|------|
+| **フレームワーク** | Electron 28 |
+| **UI** | React 18 |
+| **言語** | TypeScript 5 |
+| **ビルドツール** | Vite 5 |
+| **エディタ** | Monaco Editor (VS Code engine) |
+| **状態管理** | Zustand 4 |
+| **リント/フォーマット** | Biome |
+| **テスト** | Vitest |
+| **パッケージング** | electron-builder |
+
+### アーキテクチャ
+
+#### セキュリティ重視の設計
+
+- `contextIsolation: true` - レンダラーとメインプロセスの完全分離
+- `sandbox: true` - サンドボックス環境で実行
+- `nodeIntegration: false` - Node.js API への直接アクセスを禁止
+- `contextBridge` - 安全な IPC 通信のみを公開
+
+#### ビルド出力
+
+- **開発時**: `dist/` にコンパイル結果 + Vite dev server (port 5173)
+- **本番時**: `dist/` にバンドル + `app.getAppPath()` でパス解決
+
+#### IPC 通信
+
+主要なチャネル:
+
+- `clipboard:*` - クリップボード読み書き、履歴管理
+- `file:*` - ファイル保存/開くダイアログ
+- `settings:*` - 設定の読み書き
+- `window:*` - ウィンドウ制御 (最小化/最大化/閉じる)
+- `theme:*` - システムテーマ取得、変更監視
+
+### 新機能の追加
+
+IPC ハンドラを追加する場合:
+
+1. `app/shared/types/index.ts` にチャネル名を定義
+2. `app/preload/preload.ts` で `contextBridge` 経由の API を追加
+3. `app/main/main.ts` で `ipcMain.handle` を実装
+4. `app/renderer/types/global.d.ts` の `Window.electron` 型を更新
+
+### デバッグ
+
+- **メインプロセス**: ターミナルに出力されるログを確認
+- **レンダラープロセス**: 開発モードで自動的に開く DevTools を使用
+- **ビルドエラー**: 個別ビルドコマンドで原因を特定
+
+## パフォーマンス
+
+### 目標値
+
+- 起動 → 差分表示: **< 1秒**
+- 2 × 20,000行の差分計算:
+  - 初回: **< 1.5秒**
+  - 再計算: **< 800ms**
+- メモリ使用量: **< 400MB** (2 × 20k行時)
+
+## 今後の予定
+
+- [ ] タブ機能の実装 (複数セッション対応)
+- [ ] Unified Diff 形式 (.patch) でのエクスポート
+- [ ] クリップボード履歴の永続化
+- [ ] 設定の永続化
+- [ ] Web Worker による差分計算のオフロード
+- [ ] ファイルのドラッグ&ドロップ対応
+- [ ] より詳細な差分オプション (正規表現フィルタなど)
+
+## トラブルシューティング
+
+### アプリが起動しない
+
+- macOS のセキュリティ設定を確認してください
+- `システム設定 > プライバシーとセキュリティ` で「このまま開く」を選択
+
+### 差分が表示されない
+
+- 両方のエディタにテキストが入力されているか確認
+- 比較ボタンをクリックして手動で比較を実行
+
+### Monaco Editor が表示されない
+
+- 開発者ツールのコンソールでエラーを確認
+- `npm run build` を実行して再ビルド
+
+## コントリビューション
+
+バグ報告や機能提案は [Issues](../../issues) でお願いします。
+
+プルリクエストも歓迎します:
+
+1. このリポジトリをフォーク
+2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'feat: add amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. プルリクエストを作成
+
+### コミット規約
+
+[Conventional Commits](https://www.conventionalcommits.org/) を使用:
+
+- `feat:` 新機能
+- `fix:` バグ修正
+- `refactor:` リファクタリング
+- `chore:` ビルド・設定変更
+- `docs:` ドキュメント
+- `test:` テスト
 
 ## ライセンス
 
-MIT
+[MIT License](./LICENSE)
 
-## 開発状況
+## 関連リンク
 
-現在開発中です。詳細は [spec.md](./spec.md) を参照してください。
+- [仕様書 (spec.md)](./spec.md)
+- [開発者向けガイド (CLAUDE.md)](./CLAUDE.md)
+
+---
+
+<div align="center">
+
+Made with ❤️ for developers who love clean diffs
+
+</div>
