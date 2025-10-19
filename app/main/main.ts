@@ -6,6 +6,9 @@ import { IPC_CHANNELS } from '../shared/types';
 let mainWindow: BrowserWindow | null = null;
 const isDev = process.env.NODE_ENV === 'development';
 
+// アプリケーション名を早期に設定（メニューバー表示用）
+app.setName('SnipDiff');
+
 // クリップボード履歴（メモリ内のみ）
 const clipboardHistory: Array<{ id: string; content: string; timestamp: number }> = [];
 const MAX_HISTORY_SIZE = 50;
@@ -60,9 +63,6 @@ function createWindow(): void {
  * アプリケーション起動時の処理
  */
 app.whenReady().then(() => {
-  // アプリケーション名を設定
-  app.setName('SnipDiff');
-
   // Aboutパネルの情報をカスタマイズ（macOS）
   if (process.platform === 'darwin') {
     app.setAboutPanelOptions({
