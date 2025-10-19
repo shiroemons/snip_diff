@@ -4,7 +4,7 @@ import type { Theme } from '@shared/types';
 import './Footer.css';
 
 const Footer: React.FC = () => {
-  const { getActiveSession, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang, theme, setTheme } = useDiffStore();
+  const { getActiveSession, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang, updateOptions, theme, setTheme } = useDiffStore();
   const activeSession = getActiveSession();
 
   if (!activeSession) return null;
@@ -13,6 +13,9 @@ const Footer: React.FC = () => {
   const leftEOL = activeSession.left.eol;
   const rightEOL = activeSession.right.eol;
   const language = activeSession.left.lang || 'plaintext';
+  const fontSize = activeSession.options.fontSize;
+  const insertSpaces = activeSession.options.insertSpaces;
+  const tabSize = activeSession.options.tabSize;
 
   // サポートする言語リスト
   const supportedLanguages = [
@@ -45,6 +48,18 @@ const Footer: React.FC = () => {
     setTheme(e.target.value as Theme);
   };
 
+  const handleFontSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateOptions({ fontSize: Number(e.target.value) });
+  };
+
+  const handleIndentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateOptions({ insertSpaces: e.target.value === 'spaces' });
+  };
+
+  const handleTabSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateOptions({ tabSize: Number(e.target.value) });
+  };
+
   return (
     <footer className="app-footer">
       <div className="footer-section">
@@ -68,6 +83,52 @@ const Footer: React.FC = () => {
           <option value="light">Light</option>
           <option value="dark">Dark</option>
           <option value="auto">Auto</option>
+        </select>
+
+        <span className="separator">|</span>
+
+        <span className="info-label">Font Size:</span>
+        <select
+          className="footer-select"
+          value={fontSize}
+          onChange={handleFontSizeChange}
+          title="フォントサイズ"
+        >
+          <option value="10">10</option>
+          <option value="12">12</option>
+          <option value="14">14</option>
+          <option value="16">16</option>
+          <option value="18">18</option>
+          <option value="20">20</option>
+          <option value="22">22</option>
+          <option value="24">24</option>
+        </select>
+
+        <span className="separator">|</span>
+
+        <span className="info-label">Indent:</span>
+        <select
+          className="footer-select"
+          value={insertSpaces ? 'spaces' : 'tabs'}
+          onChange={handleIndentChange}
+          title="インデント方式"
+        >
+          <option value="spaces">Spaces</option>
+          <option value="tabs">Tabs</option>
+        </select>
+
+        <span className="separator">|</span>
+
+        <span className="info-label">Tab Size:</span>
+        <select
+          className="footer-select"
+          value={tabSize}
+          onChange={handleTabSizeChange}
+          title="タブサイズ"
+        >
+          <option value="2">2</option>
+          <option value="4">4</option>
+          <option value="8">8</option>
         </select>
 
         <span className="separator">|</span>

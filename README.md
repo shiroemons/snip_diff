@@ -118,6 +118,9 @@ npm run dist:mac
 #### フッターの設定
 
 - **Theme**: Light / Dark / Auto から選択
+- **Font Size**: エディタのフォントサイズを 10〜24px の範囲で選択（デフォルト: 14px）
+- **Indent**: インデント方式を Spaces / Tabs から選択（デフォルト: Spaces）
+- **Tab Size**: タブ幅を 2 / 4 / 8 スペースから選択（デフォルト: 4）
 - **Before / After の改行コード**: それぞれ LF / CRLF / Auto を指定
 - **言語選択**: シンタックスハイライトの言語を選択
 

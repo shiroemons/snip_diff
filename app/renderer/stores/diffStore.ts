@@ -41,6 +41,7 @@ const defaultOptions: DiffOptions = {
   wordWrap: false,
   tabSize: 4,
   fontSize: 14,
+  insertSpaces: true,
 };
 
 const createEmptySession = (): DiffSession => ({

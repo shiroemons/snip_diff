@@ -18,6 +18,7 @@ export interface DiffOptions {
   wordWrap: boolean;
   tabSize: number;
   fontSize: number;
+  insertSpaces: boolean;
 }
 
 /**

@@ -262,7 +262,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   };
 
   // 共通エディタオプション
-  const commonEditorOptions: editor.IEditorOptions = {
+  const commonEditorOptions: editor.IStandaloneEditorConstructionOptions = {
     minimap: { enabled: true },
     scrollbar: {
       vertical: 'visible',
@@ -274,6 +274,8 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
     folding: true,
     wordWrap: activeSession?.options.wordWrap ? 'on' : 'off',
     fontSize: activeSession?.options.fontSize ?? 14,
+    tabSize: activeSession?.options.tabSize ?? 4,
+    insertSpaces: activeSession?.options.insertSpaces ?? true,
     automaticLayout: true,
   };
 
