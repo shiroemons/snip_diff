@@ -8,6 +8,68 @@ import './DiffEditor.css';
 // Monaco Editor のローダー設定 - ローカルから読み込み
 loader.config({ monaco });
 
+// Compactモード用のカスタムテーマを定義（行背景なし、文字ハイライトのみ）
+const defineCompactThemes = () => {
+  // ダークテーマ - 視認性を向上させた色設定
+  monaco.editor.defineTheme('compact-dark', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [],
+    colors: {
+      // 文字レベルの差分ハイライト
+      'diffEditor.insertedTextBackground': '#3fb95080',  // 追加文字のハイライト（明るい緑、50%透明度）
+      'diffEditor.removedTextBackground': '#f8514980',   // 削除文字のハイライト（明るい赤、50%透明度）
+
+      // 行レベルの背景を完全に透明化
+      'diffEditor.insertedLineBackground': '#00000000',
+      'diffEditor.removedLineBackground': '#00000000',
+
+      // Gutterの背景も透明化
+      'diffEditorGutter.insertedLineBackground': '#00000000',
+      'diffEditorGutter.removedLineBackground': '#00000000',
+
+      // Overview rulerも透明化
+      'diffEditorOverview.insertedForeground': '#00000000',
+      'diffEditorOverview.removedForeground': '#00000000',
+
+      // その他の境界線等も透明化
+      'diffEditor.border': '#00000000',
+      'diffEditor.diagonalFill': '#00000000',
+    },
+  });
+
+  // ライトテーマ - より明確な色設定
+  monaco.editor.defineTheme('compact-light', {
+    base: 'vs',
+    inherit: true,
+    rules: [],
+    colors: {
+      // 文字レベルの差分ハイライト
+      'diffEditor.insertedTextBackground': '#acf2bd60',  // 追加文字のハイライト（明るい緑、40%透明度）
+      'diffEditor.removedTextBackground': '#ffeef060',   // 削除文字のハイライト（明るい赤、40%透明度）
+
+      // 行レベルの背景を完全に透明化
+      'diffEditor.insertedLineBackground': '#00000000',
+      'diffEditor.removedLineBackground': '#00000000',
+
+      // Gutterの背景も透明化
+      'diffEditorGutter.insertedLineBackground': '#00000000',
+      'diffEditorGutter.removedLineBackground': '#00000000',
+
+      // Overview rulerも透明化
+      'diffEditorOverview.insertedForeground': '#00000000',
+      'diffEditorOverview.removedForeground': '#00000000',
+
+      // その他の境界線等も透明化
+      'diffEditor.border': '#00000000',
+      'diffEditor.diagonalFill': '#00000000',
+    },
+  });
+};
+
+// テーマを一度だけ定義
+let themesInitialized = false;
+
 export interface DiffEditorRef {
   compare: () => void;
   swap: () => void;
@@ -36,6 +98,22 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
 
   // storeから言語を取得
   const language = activeSession?.left.lang || 'plaintext';
+
+  // Compactテーマの初期化
+  useEffect(() => {
+    if (!themesInitialized) {
+      defineCompactThemes();
+      themesInitialized = true;
+    }
+  }, []);
+
+  // compactModeに応じたテーマ名を取得
+  const getThemeName = () => {
+    if (activeSession?.options.compactMode) {
+      return theme === 'light' ? 'compact-light' : 'compact-dark';
+    }
+    return theme === 'light' ? 'vs' : 'vs-dark';
+  };
 
   // 比較を実行する関数
   const handleCompare = () => {
@@ -400,6 +478,16 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                   Side by Side
                 </button>
               </div>
+              {/* Compactモードチェックボックス */}
+              <label className="compact-mode-checkbox">
+                <input
+                  type="checkbox"
+                  checked={activeSession?.options.compactMode ?? false}
+                  onChange={(e) => useDiffStore.getState().updateOptions({ compactMode: e.target.checked })}
+                  title="Compact Mode (⌘3)"
+                />
+                <span>Compact</span>
+              </label>
               <div className="compare-panel-actions">
                 <button
                   className="panel-action-button"
@@ -419,20 +507,34 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
             </div>
           </div>
           {!isMinimized && (
-            <div className="compare-panel-content">
+            <div className={`compare-panel-content ${activeSession?.options.compactMode ? 'compact-mode' : ''}`}>
               <MonacoDiffEditor
                 original={leftContent}
                 modified={rightContent}
                 language={language}
-                theme={theme === 'light' ? 'vs' : 'vs-dark'}
+                theme={getThemeName()}
                 onMount={handleDiffEditorDidMount}
                 options={{
                   readOnly: true,
                   renderSideBySide: activeSession?.options.viewMode === 'side-by-side',
-                  ignoreTrimWhitespace: activeSession?.options.ignoreWhitespace ?? false,
+                  ignoreTrimWhitespace: true,  // 常に行末の空白を無視
                   originalEditable: false,
                   automaticLayout: true,
                   fontSize: activeSession?.options.fontSize ?? 14,
+                  diffAlgorithm: 'advanced',
+                  renderIndicators: !activeSession?.options.compactMode,  // Compactモードの時はインジケーターを非表示
+                  renderWhitespace: 'none',
+                  renderOverviewRuler: !activeSession?.options.compactMode,  // Compactモードの時はOverview Rulerを非表示
+                  hideUnchangedRegions:
+                    activeSession?.options.compactMode ||
+                    activeSession?.options.hideUnchangedRegions
+                      ? {
+                          enabled: true,
+                          revealLineCount: 3,
+                          minimumLineCount: 3,
+                          contextLineCount: 3,
+                        }
+                      : undefined,
                 } as editor.IDiffEditorConstructionOptions}
               />
             </div>

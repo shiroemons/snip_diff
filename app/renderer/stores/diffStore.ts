@@ -38,10 +38,13 @@ const defaultOptions: DiffOptions = {
   ignoreWhitespace: false,
   normalizeEOL: true,
   viewMode: 'side-by-side',
+  compactMode: false,
   wordWrap: false,
   tabSize: 4,
   fontSize: 14,
   insertSpaces: true,
+  diffAlgorithm: 'advanced',
+  hideUnchangedRegions: false,
 };
 
 const createEmptySession = (): DiffSession => ({

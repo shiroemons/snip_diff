@@ -239,6 +239,34 @@
   border-color: var(--accent-primary);
 }
 
+.compact-mode-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.compact-mode-checkbox:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.compact-mode-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.compact-mode-checkbox span {
+  font-weight: 500;
+}
+
 .language-selector {
   display: flex;
   align-items: center;
@@ -309,4 +337,63 @@
   height: 100%;
   color: var(--text-secondary);
   font-size: 16px;
+}
+
+/* Compactモードの時だけ: 行末のハイライトを無効化（変更された文字だけをハイライト） */
+
+/* 行レベルの背景色を完全に無効化（Compactモードのみ） */
+.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.line-insert,
+.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.line-delete {
+  background-color: transparent !important;
+  background: none !important;
+}
+
+/* Gutterの背景色も無効化 */
+.compare-panel-content.compact-mode .monaco-diff-editor .margin-view-overlays .cmdr.gutter-insert,
+.compare-panel-content.compact-mode .monaco-diff-editor .margin-view-overlays .cmdr.gutter-delete {
+  background-color: transparent !important;
+}
+
+/* 文字レベルの差分のみハイライト - 緑（追加） */
+.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.char-insert {
+  background-color: #3fb95080 !important;
+  border-radius: 2px;
+}
+
+/* 文字レベルの差分のみハイライト - 赤（削除） */
+.compare-panel-content.compact-mode .monaco-diff-editor .view-overlays .cdr.char-delete {
+  background-color: #f8514980 !important;
+  border-radius: 2px;
+}
+
+/* diagonal-fillも透明化 */
+.compare-panel-content.compact-mode .monaco-diff-editor .view-zones .diagonal-fill {
+  background-color: transparent !important;
+  background: none !important;
+}
+
+/* Side-by-Sideモード専用の設定 */
+/* 左側（original）エディタの文字レベル差分 */
+.compare-panel-content.compact-mode .monaco-diff-editor .original-in-monaco-diff-editor .view-overlays .cdr.char-delete {
+  background-color: #f8514980 !important;
+  border-radius: 2px;
+}
+
+/* 右側（modified）エディタの文字レベル差分 */
+.compare-panel-content.compact-mode .monaco-diff-editor .modified-in-monaco-diff-editor .view-overlays .cdr.char-insert {
+  background-color: #3fb95080 !important;
+  border-radius: 2px;
+}
+
+/* Side-by-Sideモードの行レベル背景も無効化 */
+.compare-panel-content.compact-mode .monaco-diff-editor .original-in-monaco-diff-editor .view-overlays .cdr.line-delete,
+.compare-panel-content.compact-mode .monaco-diff-editor .modified-in-monaco-diff-editor .view-overlays .cdr.line-insert {
+  background-color: transparent !important;
+  background: none !important;
+}
+
+/* Side-by-SideモードのGutter背景も無効化 */
+.compare-panel-content.compact-mode .monaco-diff-editor .original-in-monaco-diff-editor .margin-view-overlays .cmdr.gutter-delete,
+.compare-panel-content.compact-mode .monaco-diff-editor .modified-in-monaco-diff-editor .margin-view-overlays .cmdr.gutter-insert {
+  background-color: transparent !important;
 }

@@ -15,10 +15,13 @@ export interface DiffOptions {
   ignoreWhitespace: boolean;
   normalizeEOL: boolean;
   viewMode: 'unified' | 'side-by-side';
+  compactMode: boolean;
   wordWrap: boolean;
   tabSize: number;
   fontSize: number;
   insertSpaces: boolean;
+  diffAlgorithm: 'legacy' | 'advanced';
+  hideUnchangedRegions: boolean;
 }
 
 /**

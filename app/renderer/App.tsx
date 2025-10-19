@@ -104,6 +104,14 @@ const App: React.FC = () => {
         updateOptions({ viewMode: 'side-by-side' });
         return;
       }
+
+      // ⌘3: Compact モードのトグル
+      if (e.key === '3') {
+        e.preventDefault();
+        const currentCompactMode = useDiffStore.getState().getActiveSession()?.options.compactMode ?? false;
+        updateOptions({ compactMode: !currentCompactMode });
+        return;
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
