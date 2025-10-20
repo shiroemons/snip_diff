@@ -163,7 +163,7 @@ npm run dev
 ```
 
 > **Note:** `npm install` を実行すると、pre-push フックが自動的にセットアップされます。
-> これにより、`git push` する前に自動的にlintとテストが実行され、問題がある場合はpushがブロックされます。
+> これにより、`git push` する前に自動的に型チェック、lint、テストが実行され、問題がある場合はpushがブロックされます。
 
 #### Git Hooks (pre-push)
 
@@ -171,11 +171,12 @@ npm run dev
 
 **自動実行される処理:**
 - `git push` 実行時に以下が自動実行されます：
-  1. `npm run lint` - Biomeによるコードチェック
-  2. `npm run test -- --run` - 全テストの実行
+  1. `npm run type-check` - TypeScript型チェック（全プロセス）
+  2. `npm run lint` - Biomeによるコードチェック
+  3. `npm run test -- --run` - 全テストの実行
 
 **エラーが発生した場合:**
-- Lintエラーまたはテストの失敗がある場合、pushは中止されます
+- 型エラー、Lintエラー、またはテストの失敗がある場合、pushは中止されます
 - エラーを修正してから再度pushしてください
 
 **フックをスキップする方法:**

@@ -49,11 +49,34 @@ vi.mock('./features/diff/DiffEditor', async () => {
 
 // Mock Electron API
 const mockElectronAPI = {
+  clipboard: {
+    read: vi.fn().mockResolvedValue(''),
+    write: vi.fn().mockResolvedValue(true),
+    getHistory: vi.fn().mockResolvedValue([]),
+    addToHistory: vi.fn().mockResolvedValue({ id: '1', content: '', timestamp: Date.now() }),
+  },
+  file: {
+    save: vi.fn().mockResolvedValue({ success: true }),
+    open: vi.fn().mockResolvedValue({ success: true }),
+  },
+  settings: {
+    get: vi.fn().mockResolvedValue({}),
+    set: vi.fn().mockResolvedValue({ success: true }),
+  },
   theme: {
     get: vi.fn(),
     onChanged: vi.fn(),
     removeListener: vi.fn(),
   },
+  window: {
+    close: vi.fn().mockResolvedValue(undefined),
+    minimize: vi.fn().mockResolvedValue(undefined),
+    maximize: vi.fn().mockResolvedValue(undefined),
+    isMaximized: vi.fn().mockResolvedValue(false),
+    onMaximizedChanged: vi.fn(),
+    removeMaximizedListener: vi.fn(),
+  },
+  platform: 'darwin' as NodeJS.Platform,
 };
 
 describe('App', () => {
@@ -172,7 +195,6 @@ describe('App', () => {
         if (themeChangeCallback) {
           themeChangeCallback({
             shouldUseDarkColors: false,
-            theme: 'light',
           });
         }
       });
@@ -197,7 +219,8 @@ describe('App', () => {
     });
 
     it('should handle missing Electron API gracefully', async () => {
-      delete (global.window as Window & typeof globalThis).electron;
+      // @ts-expect-error - Temporarily removing electron for testing
+      (global.window as Window & typeof globalThis).electron = undefined;
 
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 

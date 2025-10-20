@@ -105,6 +105,6 @@
     }
   },
   "simple-git-hooks": {
-    "pre-push": "npm run lint && npm run test -- --run"
+    "pre-push": "npm run type-check && npm run lint && npm run test -- --run"
   }
 }
