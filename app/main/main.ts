@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, clipboard, dialog, nativeTheme } from 'electron';
-import * as path from 'path';
-import * as fs from 'fs/promises';
+import * as path from 'node:path';
+import * as fs from 'node:fs/promises';
 import { IPC_CHANNELS } from '../shared/types';
 
 let mainWindow: BrowserWindow | null = null;

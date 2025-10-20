@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { useDiffStore } from '../stores/diffStore';
 import './Header.css';
 
@@ -38,6 +38,7 @@ const Header: React.FC<HeaderProps> = ({ onSwap, onClear }) => {
         {/* オプション */}
         <div className="button-group">
           <button
+            type="button"
             className={activeSession?.options.ignoreWhitespace ? 'active' : ''}
             onClick={() => handleOptionToggle('ignoreWhitespace')}
             title="空白を無視"
@@ -45,6 +46,7 @@ const Header: React.FC<HeaderProps> = ({ onSwap, onClear }) => {
             空白無視
           </button>
           <button
+            type="button"
             className={activeSession?.options.wordWrap ? 'active' : ''}
             onClick={() => handleOptionToggle('wordWrap')}
             title="折り返し"
@@ -55,10 +57,10 @@ const Header: React.FC<HeaderProps> = ({ onSwap, onClear }) => {
 
         {/* アクション */}
         <div className="button-group">
-          <button onClick={onSwap} title="左右を入れ替え (⌘⇧K)">
+          <button type="button" onClick={onSwap} title="左右を入れ替え (⌘⇧K)">
             ↔ 入替
           </button>
-          <button onClick={onClear} title="クリア (⌘K)">
+          <button type="button" onClick={onClear} title="クリア (⌘K)">
             クリア
           </button>
         </div>

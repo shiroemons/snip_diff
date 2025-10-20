@@ -69,7 +69,7 @@ describe('generatePreview', () => {
   it('should truncate text when longer than maxLength', () => {
     const text = 'a'.repeat(150);
     const result = generatePreview(text, 100);
-    expect(result).toBe('a'.repeat(100) + '...');
+    expect(result).toBe(`${'a'.repeat(100)}...`);
   });
 
   it('should normalize whitespace', () => {
@@ -85,7 +85,7 @@ describe('generatePreview', () => {
   it('should use default maxLength of 100', () => {
     const text = 'a'.repeat(150);
     const result = generatePreview(text);
-    expect(result).toBe('a'.repeat(100) + '...');
+    expect(result).toBe(`${'a'.repeat(100)}...`);
   });
 });
 

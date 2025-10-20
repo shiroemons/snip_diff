@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDiffStore } from './stores/diffStore';
 import Header from './components/Header';
-import DiffEditor, { DiffEditorRef } from './features/diff/DiffEditor';
+import DiffEditor, { type DiffEditorRef } from './features/diff/DiffEditor';
 import Footer from './components/Footer';
 
 const App: React.FC = () => {

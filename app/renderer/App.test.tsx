@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor, act, type RenderResult } from '@testing-library/react';
 import App from './App';
 import { useDiffStore } from './stores/diffStore';
 
@@ -9,8 +9,14 @@ vi.mock('./features/diff/DiffEditor', async () => {
   const React = await import('react');
   const { useDiffStore } = await import('./stores/diffStore');
 
-  const MockDiffEditor = React.forwardRef<any, { theme: string }>(
-    ({ theme }: { theme: string }, ref: React.Ref<any>) => {
+  interface DiffEditorHandle {
+    compare: () => void;
+    swap: () => void;
+    clear: () => void;
+  }
+
+  const MockDiffEditor = React.forwardRef<DiffEditorHandle, { theme: string }>(
+    ({ theme }: { theme: string }, ref: React.Ref<DiffEditorHandle>) => {
       React.useImperativeHandle(ref, () => ({
         compare: vi.fn(),
         swap: () => {
@@ -60,7 +66,7 @@ describe('App', () => {
     });
 
     // Mock window.electron
-    (global.window as any).electron = mockElectronAPI;
+    (global.window as Window & typeof globalThis).electron = mockElectronAPI;
 
     // Reset mocks
     vi.clearAllMocks();
@@ -147,7 +153,7 @@ describe('App', () => {
     });
 
     it('should handle theme changes', async () => {
-      let themeChangeCallback: ((themeInfo: any) => void) | null = null;
+      let themeChangeCallback: ((themeInfo: { shouldUseDarkColors: boolean }) => void) | null = null;
       mockElectronAPI.theme.onChanged.mockImplementation((callback) => {
         themeChangeCallback = callback;
       });
@@ -178,7 +184,7 @@ describe('App', () => {
     });
 
     it('should cleanup theme listener on unmount', async () => {
-      let component;
+      let component: RenderResult;
       await act(async () => {
         component = render(<App />);
       });
@@ -191,7 +197,7 @@ describe('App', () => {
     });
 
     it('should handle missing Electron API gracefully', async () => {
-      delete (global.window as any).electron;
+      delete (global.window as Window & typeof globalThis).electron;
 
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -208,7 +214,7 @@ describe('App', () => {
       consoleSpy.mockRestore();
 
       // Restore for other tests
-      (global.window as any).electron = mockElectronAPI;
+      (global.window as Window & typeof globalThis).electron = mockElectronAPI;
     });
   });
 

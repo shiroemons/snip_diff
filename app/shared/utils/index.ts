@@ -1,4 +1,4 @@
-import { Buffer, DiffStats } from '../types';
+import type { Buffer, DiffStats } from '../types';
 
 /**
  * ユニークIDを生成
@@ -99,7 +99,7 @@ export function debounce<T extends (...args: any[]) => any>(
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null;
 
-  return function (...args: Parameters<T>) {
+  return (...args: Parameters<T>) => {
     if (timeout) {
       clearTimeout(timeout);
     }

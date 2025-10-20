@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { useDiffStore } from '../stores/diffStore';
 import type { Theme } from '@shared/types';
 import './Footer.css';

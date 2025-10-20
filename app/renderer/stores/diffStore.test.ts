@@ -13,7 +13,7 @@ describe('diffStore', () => {
 
   describe('initializeSession', () => {
     it('should create initial session', () => {
-      const { initializeSession, sessions, activeSessionId } = useDiffStore.getState();
+      const { initializeSession } = useDiffStore.getState();
 
       initializeSession();
 
@@ -366,7 +366,7 @@ describe('diffStore', () => {
 
       initializeSession();
       const firstId = useDiffStore.getState().activeSessionId;
-      const secondId = createNewSession();
+      const _secondId = createNewSession();
 
       setActiveSession(firstId!);
 

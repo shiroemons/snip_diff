@@ -1,4 +1,5 @@
-import React, {
+import type React from 'react';
+import {
   useEffect,
   useRef,
   useState,
@@ -706,7 +707,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
 
     // UnifiedモードのDOMを修正
     fixUnifiedModeCharHighlights();
-  }, [activeSession?.id, activeSession?.options.compactMode, activeSession?.options.ignoreWhitespace, clearCompactDecorations, fixUnifiedModeCharHighlights]);
+  }, [activeSession?.options.compactMode, clearCompactDecorations, fixUnifiedModeCharHighlights]);
 
   useEffect(() => {
     const diffEditor = diffEditorRef.current;
@@ -771,6 +772,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
             <span className="editor-label-text">Before</span>
             <div className="editor-label-actions">
               <button
+                type="button"
                 className="editor-label-button"
                 onClick={handlePasteLeft}
                 title="クリップボードから貼り付け (⌘V)"
@@ -778,6 +780,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                 <Clipboard size={16} />
               </button>
               <button
+                type="button"
                 className="editor-label-button"
                 onClick={handleClearLeft}
                 title="クリア"
@@ -790,6 +793,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
             <span className="editor-label-text">After</span>
             <div className="editor-label-actions">
               <button
+                type="button"
                 className="editor-label-button"
                 onClick={handlePasteRight}
                 title="クリップボードから貼り付け (⌘V)"
@@ -797,6 +801,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                 <Clipboard size={16} />
               </button>
               <button
+                type="button"
                 className="editor-label-button"
                 onClick={handleClearRight}
                 title="クリア"
@@ -838,6 +843,13 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
           {/* リサイズハンドル */}
           {!isFullscreen && !isMinimized && (
             <div
+              role="separator"
+              aria-label="比較パネルのリサイズハンドル"
+              aria-valuenow={comparePanelHeight}
+              aria-valuemin={100}
+              aria-valuemax={800}
+              aria-orientation="horizontal"
+              tabIndex={0}
               className={`resize-handle ${isResizing ? 'resizing' : ''}`}
               onMouseDown={handleResizeMouseDown}
             >
@@ -851,6 +863,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
               {/* ビューモード切替 */}
               <div className="view-mode-toggle">
                 <button
+                  type="button"
                   className={activeSession?.options.viewMode === 'unified' ? 'active' : ''}
                   onClick={() => useDiffStore.getState().updateOptions({ viewMode: 'unified' })}
                   title="Unified (⌘1)"
@@ -858,6 +871,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                   Unified
                 </button>
                 <button
+                  type="button"
                   className={activeSession?.options.viewMode === 'side-by-side' ? 'active' : ''}
                   onClick={() => useDiffStore.getState().updateOptions({ viewMode: 'side-by-side' })}
                   title="Side by Side (⌘2)"
@@ -877,6 +891,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
               </label>
               <div className="compare-panel-actions">
                 <button
+                  type="button"
                   className="panel-action-button"
                   onClick={handleToggleMinimize}
                   title={isMinimized ? 'パネルを復元' : 'パネルを最小化'}
@@ -884,6 +899,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                   {isMinimized ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
                 <button
+                  type="button"
                   className="panel-action-button"
                   onClick={handleToggleFullscreen}
                   title={isFullscreen ? '元のサイズに戻す' : '全画面表示'}
