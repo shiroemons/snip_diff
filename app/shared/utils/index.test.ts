@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   detectEOL,
   normalizeText,
@@ -9,6 +9,7 @@ import {
   formatTimestamp,
   createBuffer,
   generateId,
+  debounce,
 } from './index';
 
 describe('detectEOL', () => {
@@ -250,5 +251,89 @@ describe('generateId', () => {
   it('should contain timestamp and random part', () => {
     const id = generateId();
     expect(id).toMatch(/^\d+-[a-z0-9]+$/);
+  });
+});
+
+describe('debounce', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should delay function execution', () => {
+    const fn = vi.fn();
+    const debouncedFn = debounce(fn, 100);
+
+    debouncedFn();
+    expect(fn).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(100);
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('should cancel previous timeout on subsequent calls', () => {
+    const fn = vi.fn();
+    const debouncedFn = debounce(fn, 100);
+
+    debouncedFn();
+    vi.advanceTimersByTime(50);
+    debouncedFn();
+    vi.advanceTimersByTime(50);
+
+    expect(fn).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(50);
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('should pass arguments to the function', () => {
+    const fn = vi.fn();
+    const debouncedFn = debounce(fn, 100);
+
+    debouncedFn('arg1', 'arg2', 123);
+    vi.advanceTimersByTime(100);
+
+    expect(fn).toHaveBeenCalledWith('arg1', 'arg2', 123);
+  });
+
+  it('should use the most recent arguments', () => {
+    const fn = vi.fn();
+    const debouncedFn = debounce(fn, 100);
+
+    debouncedFn('first');
+    vi.advanceTimersByTime(50);
+    debouncedFn('second');
+    vi.advanceTimersByTime(100);
+
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith('second');
+  });
+
+  it('should work with multiple invocations after timeout', () => {
+    const fn = vi.fn();
+    const debouncedFn = debounce(fn, 100);
+
+    debouncedFn('first');
+    vi.advanceTimersByTime(100);
+    expect(fn).toHaveBeenCalledWith('first');
+
+    debouncedFn('second');
+    vi.advanceTimersByTime(100);
+    expect(fn).toHaveBeenCalledTimes(2);
+    expect(fn).toHaveBeenLastCalledWith('second');
+  });
+
+  it('should handle zero wait time', () => {
+    const fn = vi.fn();
+    const debouncedFn = debounce(fn, 0);
+
+    debouncedFn();
+    expect(fn).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(0);
+    expect(fn).toHaveBeenCalledTimes(1);
   });
 });
