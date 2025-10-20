@@ -1,21 +1,20 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import App from './App';
 import { useDiffStore } from './stores/diffStore';
 
 // Mock the DiffEditor module before importing
-vi.mock('./features/diff/DiffEditor', () => {
-  const React = require('react');
+vi.mock('./features/diff/DiffEditor', async () => {
+  const React = await import('react');
+  const { useDiffStore } = await import('./stores/diffStore');
 
   const MockDiffEditor = React.forwardRef<any, { theme: string }>(
     ({ theme }: { theme: string }, ref: React.Ref<any>) => {
       React.useImperativeHandle(ref, () => ({
         compare: vi.fn(),
         swap: () => {
-          // Import dynamically to avoid circular dependency
-          const { useDiffStore: store } = require('./stores/diffStore');
-          const { updateLeftBuffer, updateRightBuffer, getActiveSession } = store.getState();
+          const { updateLeftBuffer, updateRightBuffer, getActiveSession } = useDiffStore.getState();
           const session = getActiveSession();
           if (session) {
             const temp = session.left.content;
@@ -24,8 +23,7 @@ vi.mock('./features/diff/DiffEditor', () => {
           }
         },
         clear: () => {
-          const { useDiffStore: store } = require('./stores/diffStore');
-          const { updateLeftBuffer, updateRightBuffer } = store.getState();
+          const { updateLeftBuffer, updateRightBuffer } = useDiffStore.getState();
           updateLeftBuffer('');
           updateRightBuffer('');
         },
@@ -75,21 +73,29 @@ describe('App', () => {
   });
 
   describe('Rendering', () => {
-    it('should render main components', () => {
-      render(<App />);
+    it('should render main components', async () => {
+      await act(async () => {
+        render(<App />);
+      });
 
-      expect(screen.getByText('SnipDiff')).toBeTruthy();
-      expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      await waitFor(() => {
+        expect(screen.getByText('SnipDiff')).toBeTruthy();
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
     });
 
-    it('should initialize session on mount', () => {
-      render(<App />);
+    it('should initialize session on mount', async () => {
+      await act(async () => {
+        render(<App />);
+      });
 
-      const { getActiveSession } = useDiffStore.getState();
-      const session = getActiveSession();
+      await waitFor(() => {
+        const { getActiveSession } = useDiffStore.getState();
+        const session = getActiveSession();
 
-      expect(session).toBeDefined();
-      expect(session?.id).toBeTruthy();
+        expect(session).toBeDefined();
+        expect(session?.id).toBeTruthy();
+      });
     });
   });
 
@@ -100,7 +106,9 @@ describe('App', () => {
         theme: 'dark',
       });
 
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
 
       await waitFor(() => {
         const diffEditor = screen.getByTestId('diff-editor');
@@ -114,7 +122,9 @@ describe('App', () => {
         theme: 'light',
       });
 
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
 
       await waitFor(() => {
         const diffEditor = screen.getByTestId('diff-editor');
@@ -126,7 +136,9 @@ describe('App', () => {
       const { setTheme } = useDiffStore.getState();
       setTheme('light');
 
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
 
       await waitFor(() => {
         const diffEditor = screen.getByTestId('diff-editor');
@@ -140,7 +152,9 @@ describe('App', () => {
         themeChangeCallback = callback;
       });
 
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
 
       // Wait for initial render
       await waitFor(() => {
@@ -148,12 +162,14 @@ describe('App', () => {
       });
 
       // Trigger theme change
-      if (themeChangeCallback) {
-        themeChangeCallback({
-          shouldUseDarkColors: false,
-          theme: 'light',
-        });
-      }
+      await act(async () => {
+        if (themeChangeCallback) {
+          themeChangeCallback({
+            shouldUseDarkColors: false,
+            theme: 'light',
+          });
+        }
+      });
 
       await waitFor(() => {
         const diffEditor = screen.getByTestId('diff-editor');
@@ -161,24 +177,33 @@ describe('App', () => {
       });
     });
 
-    it('should cleanup theme listener on unmount', () => {
-      const { unmount } = render(<App />);
+    it('should cleanup theme listener on unmount', async () => {
+      let component;
+      await act(async () => {
+        component = render(<App />);
+      });
 
-      unmount();
+      await act(async () => {
+        component.unmount();
+      });
 
       expect(mockElectronAPI.theme.removeListener).toHaveBeenCalled();
     });
 
-    it('should handle missing Electron API gracefully', () => {
+    it('should handle missing Electron API gracefully', async () => {
       delete (global.window as any).electron;
 
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Electron API is not available. Running in browser mode.'
-      );
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'Electron API is not available. Running in browser mode.'
+        );
+      });
 
       consoleSpy.mockRestore();
 
@@ -189,15 +214,24 @@ describe('App', () => {
 
   describe('Keyboard shortcuts', () => {
     it('should switch to unified mode on Cmd+1', async () => {
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initialization
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
 
       // Trigger Cmd+1
-      const event = new KeyboardEvent('keydown', {
-        key: '1',
-        metaKey: true,
-        bubbles: true,
+      await act(async () => {
+        const event = new KeyboardEvent('keydown', {
+          key: '1',
+          metaKey: true,
+          bubbles: true,
+        });
+        window.dispatchEvent(event);
       });
-      window.dispatchEvent(event);
 
       const { getActiveSession } = useDiffStore.getState();
       const session = getActiveSession();
@@ -205,15 +239,24 @@ describe('App', () => {
     });
 
     it('should switch to side-by-side mode on Cmd+2', async () => {
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initialization
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
 
       // Trigger Cmd+2
-      const event = new KeyboardEvent('keydown', {
-        key: '2',
-        metaKey: true,
-        bubbles: true,
+      await act(async () => {
+        const event = new KeyboardEvent('keydown', {
+          key: '2',
+          metaKey: true,
+          bubbles: true,
+        });
+        window.dispatchEvent(event);
       });
-      window.dispatchEvent(event);
 
       const { getActiveSession } = useDiffStore.getState();
       const session = getActiveSession();
@@ -221,36 +264,126 @@ describe('App', () => {
     });
 
     it('should toggle compact mode on Cmd+3', async () => {
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initialization
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
 
       const { getActiveSession } = useDiffStore.getState();
       const initialCompactMode = getActiveSession()?.options.compactMode ?? false;
 
       // Trigger Cmd+3
-      const event = new KeyboardEvent('keydown', {
-        key: '3',
-        metaKey: true,
-        bubbles: true,
+      await act(async () => {
+        const event = new KeyboardEvent('keydown', {
+          key: '3',
+          metaKey: true,
+          bubbles: true,
+        });
+        window.dispatchEvent(event);
       });
-      window.dispatchEvent(event);
 
       const session = getActiveSession();
       expect(session?.options.compactMode).toBe(!initialCompactMode);
     });
 
+    it('should clear buffers on Cmd+k', async () => {
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initialization
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      const { updateLeftBuffer, updateRightBuffer, getActiveSession } = useDiffStore.getState();
+
+      // Set some content
+      await act(async () => {
+        updateLeftBuffer('left content');
+        updateRightBuffer('right content');
+      });
+
+      // Trigger Cmd+k
+      await act(async () => {
+        const event = new KeyboardEvent('keydown', {
+          key: 'k',
+          metaKey: true,
+          shiftKey: false,
+          bubbles: true,
+        });
+        window.dispatchEvent(event);
+      });
+
+      await waitFor(() => {
+        const session = getActiveSession();
+        expect(session?.left.content).toBe('');
+        expect(session?.right.content).toBe('');
+      });
+    });
+
+    it('should swap buffers on Cmd+Shift+K', async () => {
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initialization
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      const { updateLeftBuffer, updateRightBuffer, getActiveSession } = useDiffStore.getState();
+
+      // Set some content
+      await act(async () => {
+        updateLeftBuffer('left content');
+        updateRightBuffer('right content');
+      });
+
+      // Trigger Cmd+Shift+K
+      await act(async () => {
+        const event = new KeyboardEvent('keydown', {
+          key: 'K',
+          metaKey: true,
+          shiftKey: true,
+          bubbles: true,
+        });
+        window.dispatchEvent(event);
+      });
+
+      await waitFor(() => {
+        const session = getActiveSession();
+        expect(session?.left.content).toBe('right content');
+        expect(session?.right.content).toBe('left content');
+      });
+    });
+
     it('should not trigger shortcuts without Cmd key', async () => {
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initialization
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
 
       const { getActiveSession } = useDiffStore.getState();
       const initialViewMode = getActiveSession()?.options.viewMode;
 
       // Try 1 without Cmd
-      const event = new KeyboardEvent('keydown', {
-        key: '1',
-        metaKey: false,
-        bubbles: true,
+      await act(async () => {
+        const event = new KeyboardEvent('keydown', {
+          key: '1',
+          metaKey: false,
+          bubbles: true,
+        });
+        window.dispatchEvent(event);
       });
-      window.dispatchEvent(event);
 
       const session = getActiveSession();
       expect(session?.options.viewMode).toBe(initialViewMode);

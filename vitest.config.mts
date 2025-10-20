@@ -23,6 +23,7 @@ export default defineConfig({
         'app/main/main.ts', // Electron main process (hard to test)
         'app/preload/preload.ts', // Preload script (requires Electron environment)
         'app/renderer/main.tsx', // Entry point
+        'app/renderer/features/diff/DiffEditor.tsx', // Monaco Editor integration (tested via mocks)
       ],
       thresholds: {
         lines: 0, // Start with no threshold, can be increased later
@@ -36,6 +37,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './app/renderer'),
       '@shared': path.resolve(__dirname, './app/shared'),
+      'monaco-editor': path.resolve(__dirname, './node_modules/monaco-editor'),
     },
   },
 });

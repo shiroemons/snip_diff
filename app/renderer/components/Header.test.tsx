@@ -66,6 +66,18 @@ describe('Header', () => {
       expect(session?.options.wordWrap).toBe(true);
     });
 
+    it('should toggle normalizeEOL option when button exists', () => {
+      const { initializeSession, updateOptions, getActiveSession } = useDiffStore.getState();
+      initializeSession();
+
+      // Manually test the option toggle logic
+      const initialNormalizeEOL = getActiveSession()?.options.normalizeEOL ?? false;
+      updateOptions({ normalizeEOL: !initialNormalizeEOL });
+
+      const session = getActiveSession();
+      expect(session?.options.normalizeEOL).toBe(!initialNormalizeEOL);
+    });
+
     it('should add active class when ignoreWhitespace is enabled', () => {
       const { initializeSession, updateOptions } = useDiffStore.getState();
       initializeSession();
