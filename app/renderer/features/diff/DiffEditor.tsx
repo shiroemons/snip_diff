@@ -908,6 +908,8 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                   originalEditable: false,
                   automaticLayout: true,
                   fontSize: activeSession?.options.fontSize ?? 14,
+                  tabSize: activeSession?.options.tabSize ?? 4,
+                  insertSpaces: activeSession?.options.insertSpaces ?? true,
                   diffAlgorithm: 'advanced',
                   renderIndicators: !activeSession?.options.compactMode,  // Compactモードの時はインジケーターを非表示
                   renderWhitespace: 'none',

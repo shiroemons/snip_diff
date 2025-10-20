@@ -5,14 +5,17 @@ import DiffEditor, { DiffEditorRef } from './features/diff/DiffEditor';
 import Footer from './components/Footer';
 
 const App: React.FC = () => {
-  const { initializeSession, theme, updateOptions, setTheme } = useDiffStore();
+  const { initializeSession, theme, updateOptions } = useDiffStore();
   const diffEditorRef = useRef<DiffEditorRef>(null);
   const [actualTheme, setActualTheme] = React.useState<'light' | 'dark'>('dark');
 
+  // 初回セッションの作成（一度だけ実行）
   useEffect(() => {
-    // 初回セッションの作成
     initializeSession();
+  }, [initializeSession]);
 
+  // テーマの初期化と監視（themeが変更された時のみ実行）
+  useEffect(() => {
     // Electron APIが利用可能かチェック
     if (!window.electron) {
       console.warn('Electron API is not available. Running in browser mode.');
@@ -47,7 +50,7 @@ const App: React.FC = () => {
     return () => {
       window.electron.theme.removeListener();
     };
-  }, [initializeSession, theme, setTheme]);
+  }, [theme]);
 
   // テーマの適用
   useEffect(() => {
