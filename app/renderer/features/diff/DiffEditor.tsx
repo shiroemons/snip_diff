@@ -11,6 +11,7 @@ import { useDiffStore } from '../../stores/diffStore';
 import type { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
 import { diffChars } from 'diff';
+import { Clipboard, Trash2, ChevronUp, ChevronDown, Maximize2, Minimize2 } from 'lucide-react';
 import './DiffEditor.css';
 
 // Monaco Editor のローダー設定 - ローカルから読み込み
@@ -774,14 +775,14 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                 onClick={handlePasteLeft}
                 title="クリップボードから貼り付け (⌘V)"
               >
-                📋
+                <Clipboard size={16} />
               </button>
               <button
                 className="editor-label-button"
                 onClick={handleClearLeft}
                 title="クリア"
               >
-                🗑️
+                <Trash2 size={16} />
               </button>
             </div>
           </div>
@@ -793,14 +794,14 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                 onClick={handlePasteRight}
                 title="クリップボードから貼り付け (⌘V)"
               >
-                📋
+                <Clipboard size={16} />
               </button>
               <button
                 className="editor-label-button"
                 onClick={handleClearRight}
                 title="クリア"
               >
-                🗑️
+                <Trash2 size={16} />
               </button>
             </div>
           </div>
@@ -880,14 +881,14 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
                   onClick={handleToggleMinimize}
                   title={isMinimized ? 'パネルを復元' : 'パネルを最小化'}
                 >
-                  {isMinimized ? '▲' : '▼'}
+                  {isMinimized ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
                 <button
                   className="panel-action-button"
                   onClick={handleToggleFullscreen}
                   title={isFullscreen ? '元のサイズに戻す' : '全画面表示'}
                 >
-                  {isFullscreen ? '⊡' : '⛶'}
+                  {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                 </button>
               </div>
             </div>
