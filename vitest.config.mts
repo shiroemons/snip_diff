@@ -11,6 +11,26 @@ export default defineConfig({
     include: ['app/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['node_modules', 'dist'],
     passWithNoTests: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'json', 'lcov'],
+      include: ['app/**/*.{ts,tsx}'],
+      exclude: [
+        'node_modules',
+        'dist',
+        'app/**/*.{test,spec}.{ts,tsx}',
+        'app/**/*.d.ts',
+        'app/main/main.ts', // Electron main process (hard to test)
+        'app/preload/preload.ts', // Preload script (requires Electron environment)
+        'app/renderer/main.tsx', // Entry point
+      ],
+      thresholds: {
+        lines: 0, // Start with no threshold, can be increased later
+        functions: 0,
+        branches: 0,
+        statements: 0,
+      },
+    },
   },
   resolve: {
     alias: {
