@@ -22,7 +22,8 @@
     "format": "biome format --write .",
     "check": "biome check --write .",
     "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "postinstall": "simple-git-hooks"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
@@ -53,6 +54,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "jsdom": "^27.0.1",
+    "simple-git-hooks": "^2.13.1",
     "typescript": "^5.3.3",
     "vite": "^5.0.12",
     "vite-plugin-electron": "^0.28.2",
@@ -101,5 +103,8 @@
         }
       ]
     }
+  },
+  "simple-git-hooks": {
+    "pre-push": "npm run lint && npm run test -- --run"
   }
 }
