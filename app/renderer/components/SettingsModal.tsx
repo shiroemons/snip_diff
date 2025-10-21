@@ -142,9 +142,9 @@ const SettingsModal: React.FC = () => {
                 value={localTheme}
                 onChange={(e) => setLocalTheme(e.target.value as Theme)}
               >
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="auto">Auto</option>
+                <option value="light">ライトテーマ</option>
+                <option value="dark">ダークテーマ</option>
+                <option value="auto">システムテーマ</option>
               </select>
             </label>
           </div>
@@ -199,18 +199,18 @@ const SettingsModal: React.FC = () => {
               インデント方式
               <select
                 className="settings-select"
-                value={localOptions.insertSpaces ? 'spaces' : 'tabs'}
-                onChange={(e) => setLocalOptions({ ...localOptions, insertSpaces: e.target.value === 'spaces' })}
+                value={localOptions.insertSpaces ? 'スペース' : 'タブ'}
+                onChange={(e) => setLocalOptions({ ...localOptions, insertSpaces: e.target.value === 'スペース' })}
               >
-                <option value="spaces">Spaces</option>
-                <option value="tabs">Tabs</option>
+                <option value="スペース">スペース</option>
+                <option value="タブ">タブ</option>
               </select>
             </label>
           </div>
 
           <div className="settings-section">
             <label className="settings-label">
-              タブサイズ
+              インデントサイズ
               <select
                 className="settings-select"
                 value={localOptions.tabSize}
@@ -219,23 +219,6 @@ const SettingsModal: React.FC = () => {
                 <option value="2">2</option>
                 <option value="4">4</option>
                 <option value="8">8</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="settings-section">
-            <label className="settings-label">
-              デフォルト言語
-              <select
-                className="settings-select"
-                value={localLanguage}
-                onChange={(e) => setLocalLanguage(e.target.value)}
-              >
-                {supportedLanguages.map((lang) => (
-                  <option key={lang.value} value={lang.value}>
-                    {lang.label}
-                  </option>
-                ))}
               </select>
             </label>
           </div>
@@ -251,6 +234,23 @@ const SettingsModal: React.FC = () => {
                 <option value="auto">Auto</option>
                 <option value="LF">LF</option>
                 <option value="CRLF">CRLF</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="settings-section">
+            <label className="settings-label">
+              デフォルト言語モード
+              <select
+                className="settings-select"
+                value={localLanguage}
+                onChange={(e) => setLocalLanguage(e.target.value)}
+              >
+                {supportedLanguages.map((lang) => (
+                  <option key={lang.value} value={lang.value}>
+                    {lang.label}
+                  </option>
+                ))}
               </select>
             </label>
           </div>

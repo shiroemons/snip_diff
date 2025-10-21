@@ -166,6 +166,7 @@ const App: React.FC = () => {
         onCompare={handleCompare}
         onSwap={handleSwap}
         onClear={handleClear}
+        actualTheme={actualTheme}
       />
       <main className="main-content">
         <DiffEditor ref={diffEditorRef} theme={actualTheme} />

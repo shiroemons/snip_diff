@@ -76,6 +76,10 @@
   min-width: 100px;
 }
 
+.footer-select-narrow {
+  min-width: 50px;
+}
+
 .settings-icon-button {
   margin-left: 8px;
   padding: 4px 8px;

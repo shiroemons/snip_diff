@@ -15,12 +15,14 @@
   font-weight: 600;
   margin: 0;
   color: var(--text-primary);
+  -webkit-app-region: drag;
 }
 
 .header-section {
   display: flex;
   align-items: center;
   gap: 12px;
+  -webkit-app-region: no-drag;
 }
 
 .header-controls {
@@ -63,4 +65,89 @@
 .button-group button.compare-button:hover {
   background-color: #2ea043;
   border-color: #2ea043;
+}
+
+.theme-menu-container {
+  position: relative;
+  -webkit-app-region: no-drag;
+}
+
+.theme-toggle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle-button:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-primary);
+  color: var(--text-primary);
+}
+
+.theme-toggle-button[aria-expanded="true"] {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-primary);
+  color: var(--text-primary);
+}
+
+.theme-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: auto;
+  min-width: 200px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 1000;
+  animation: dropdown-fade-in 0.15s ease-out;
+}
+
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.theme-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.theme-menu-item:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.theme-menu-item.active {
+  background-color: var(--accent-bg);
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.theme-menu-item span {
+  flex: 1;
 }

@@ -47,40 +47,12 @@ describe('Footer', () => {
 
       render(<Footer />);
 
-      expect(screen.getByTitle('テーマ')).toBeTruthy();
       expect(screen.getByTitle('フォントサイズ')).toBeTruthy();
       expect(screen.getByTitle('インデント方式')).toBeTruthy();
-      expect(screen.getByTitle('タブサイズ')).toBeTruthy();
+      expect(screen.getByTitle('インデントサイズ')).toBeTruthy();
       expect(screen.getByTitle('Beforeの改行コード')).toBeTruthy();
       expect(screen.getByTitle('Afterの改行コード')).toBeTruthy();
-      expect(screen.getByTitle('シンタックスハイライトの言語')).toBeTruthy();
-    });
-  });
-
-  describe('Theme selection', () => {
-    it('should display current theme', () => {
-      const { initializeSession, setTheme } = useDiffStore.getState();
-      initializeSession();
-      setTheme('dark');
-
-      render(<Footer />);
-
-      const themeSelect = screen.getByTitle('テーマ') as HTMLSelectElement;
-      expect(themeSelect.value).toBe('dark');
-    });
-
-    it('should change theme when selected', async () => {
-      const user = userEvent.setup();
-      const { initializeSession } = useDiffStore.getState();
-      initializeSession();
-
-      render(<Footer />);
-
-      const themeSelect = screen.getByTitle('テーマ');
-      await user.selectOptions(themeSelect, 'light');
-
-      const state = useDiffStore.getState();
-      expect(state.theme).toBe('light');
+      expect(screen.getByTitle('言語モード')).toBeTruthy();
     });
   });
 
@@ -120,7 +92,7 @@ describe('Footer', () => {
       render(<Footer />);
 
       const indentSelect = screen.getByTitle('インデント方式') as HTMLSelectElement;
-      expect(indentSelect.value).toBe('spaces');
+      expect(indentSelect.value).toBe('スペース');
     });
 
     it('should display tabs when insertSpaces is false', () => {
@@ -131,7 +103,7 @@ describe('Footer', () => {
       render(<Footer />);
 
       const indentSelect = screen.getByTitle('インデント方式') as HTMLSelectElement;
-      expect(indentSelect.value).toBe('tabs');
+      expect(indentSelect.value).toBe('タブ');
     });
 
     it('should change to spaces when selected', async () => {
@@ -142,7 +114,7 @@ describe('Footer', () => {
       render(<Footer />);
 
       const indentSelect = screen.getByTitle('インデント方式');
-      await user.selectOptions(indentSelect, 'spaces');
+      await user.selectOptions(indentSelect, 'スペース');
 
       const session = getActiveSession();
       expect(session?.options.insertSpaces).toBe(true);
@@ -156,34 +128,34 @@ describe('Footer', () => {
       render(<Footer />);
 
       const indentSelect = screen.getByTitle('インデント方式');
-      await user.selectOptions(indentSelect, 'tabs');
+      await user.selectOptions(indentSelect, 'タブ');
 
       const session = getActiveSession();
       expect(session?.options.insertSpaces).toBe(false);
     });
   });
 
-  describe('Tab size selection', () => {
-    it('should display current tab size', () => {
+  describe('Indent size selection', () => {
+    it('should display current indent size', () => {
       const { initializeSession, updateOptions } = useDiffStore.getState();
       initializeSession();
       updateOptions({ tabSize: 4 });
 
       render(<Footer />);
 
-      const tabSizeSelect = screen.getByTitle('タブサイズ') as HTMLSelectElement;
-      expect(tabSizeSelect.value).toBe('4');
+      const indentSizeSelect = screen.getByTitle('インデントサイズ') as HTMLSelectElement;
+      expect(indentSizeSelect.value).toBe('4');
     });
 
-    it('should change tab size when selected', async () => {
+    it('should change indent size when selected', async () => {
       const user = userEvent.setup();
       const { initializeSession, getActiveSession } = useDiffStore.getState();
       initializeSession();
 
       render(<Footer />);
 
-      const tabSizeSelect = screen.getByTitle('タブサイズ');
-      await user.selectOptions(tabSizeSelect, '8');
+      const indentSizeSelect = screen.getByTitle('インデントサイズ');
+      await user.selectOptions(indentSizeSelect, '8');
 
       const session = getActiveSession();
       expect(session?.options.tabSize).toBe(8);
@@ -250,7 +222,7 @@ describe('Footer', () => {
 
       render(<Footer />);
 
-      const langSelect = screen.getByTitle('シンタックスハイライトの言語') as HTMLSelectElement;
+      const langSelect = screen.getByTitle('言語モード') as HTMLSelectElement;
       expect(langSelect.value).toBe('typescript');
     });
 
@@ -260,7 +232,7 @@ describe('Footer', () => {
 
       render(<Footer />);
 
-      const langSelect = screen.getByTitle('シンタックスハイライトの言語') as HTMLSelectElement;
+      const langSelect = screen.getByTitle('言語モード') as HTMLSelectElement;
       expect(langSelect.value).toBe('plaintext');
     });
 
@@ -271,7 +243,7 @@ describe('Footer', () => {
 
       render(<Footer />);
 
-      const langSelect = screen.getByTitle('シンタックスハイライトの言語');
+      const langSelect = screen.getByTitle('言語モード');
       await user.selectOptions(langSelect, 'javascript');
 
       const session = getActiveSession();
@@ -285,7 +257,7 @@ describe('Footer', () => {
 
       render(<Footer />);
 
-      const langSelect = screen.getByTitle('シンタックスハイライトの言語') as HTMLSelectElement;
+      const langSelect = screen.getByTitle('言語モード') as HTMLSelectElement;
       const options = Array.from(langSelect.options).map(opt => opt.value);
 
       // Check for some key languages

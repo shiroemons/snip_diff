@@ -35,6 +35,7 @@ describe('Header', () => {
       expect(screen.getByTitle(/左右を入れ替え/)).toBeTruthy();
       expect(screen.getByTitle(/クリア/)).toBeTruthy();
     });
+
   });
 
   describe('Option toggles', () => {
@@ -141,6 +142,67 @@ describe('Header', () => {
       await user.click(clearButton);
 
       expect(onClear).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Theme menu', () => {
+    it('should display theme toggle button', () => {
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Header />);
+
+      const themeButton = screen.getByRole('button', { name: /テーマメニュー/ });
+      expect(themeButton).toBeTruthy();
+    });
+
+    it('should open theme menu when clicking toggle button', async () => {
+      const user = userEvent.setup();
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Header />);
+
+      const themeButton = screen.getByRole('button', { name: /テーマメニュー/ });
+      await user.click(themeButton);
+
+      expect(screen.getByText('ライトテーマ')).toBeTruthy();
+      expect(screen.getByText('ダークテーマ')).toBeTruthy();
+      expect(screen.getByText('システムテーマ')).toBeTruthy();
+    });
+
+    it('should change theme when selecting from menu', async () => {
+      const user = userEvent.setup();
+      const { initializeSession, setTheme } = useDiffStore.getState();
+      initializeSession();
+      setTheme('auto');
+
+      render(<Header />);
+
+      const themeButton = screen.getByRole('button', { name: /テーマメニュー/ });
+      await user.click(themeButton);
+
+      const lightThemeOption = screen.getByText('ライトテーマ');
+      await user.click(lightThemeOption);
+
+      const state = useDiffStore.getState();
+      expect(state.theme).toBe('light');
+    });
+
+    it('should close menu after selecting theme', async () => {
+      const user = userEvent.setup();
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Header />);
+
+      const themeButton = screen.getByRole('button', { name: /テーマメニュー/ });
+      await user.click(themeButton);
+
+      const darkThemeOption = screen.getByText('ダークテーマ');
+      await user.click(darkThemeOption);
+
+      expect(screen.queryByText('ライトテーマ')).toBeNull();
     });
   });
 

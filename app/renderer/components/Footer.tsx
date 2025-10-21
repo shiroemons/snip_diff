@@ -1,10 +1,9 @@
 import type React from 'react';
 import { useDiffStore } from '../stores/diffStore';
-import type { Theme } from '@shared/types';
 import './Footer.css';
 
 const Footer: React.FC = () => {
-  const { getActiveSession, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang, updateOptions, theme, setTheme, openSettingsModal } = useDiffStore();
+  const { getActiveSession, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang, updateOptions, openSettingsModal } = useDiffStore();
   const activeSession = getActiveSession();
 
   if (!activeSession) return null;
@@ -44,19 +43,15 @@ const Footer: React.FC = () => {
     { value: 'shell', label: 'Shell' },
   ];
 
-  const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTheme(e.target.value as Theme);
-  };
-
   const handleFontSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateOptions({ fontSize: Number(e.target.value) });
   };
 
-  const handleIndentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    updateOptions({ insertSpaces: e.target.value === 'spaces' });
+  const handleIndentTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateOptions({ insertSpaces: e.target.value === 'スペース' });
   };
 
-  const handleTabSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleIndentSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateOptions({ tabSize: Number(e.target.value) });
   };
 
@@ -73,21 +68,7 @@ const Footer: React.FC = () => {
       </div>
 
       <div className="footer-section footer-controls">
-        <span className="info-label">Theme:</span>
-        <select
-          className="footer-select"
-          value={theme}
-          onChange={handleThemeChange}
-          title="テーマ"
-        >
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="auto">Auto</option>
-        </select>
-
-        <span className="separator">|</span>
-
-        <span className="info-label">Font Size:</span>
+        <span className="info-label">フォントサイズ:</span>
         <select
           className="footer-select"
           value={fontSize}
@@ -106,25 +87,20 @@ const Footer: React.FC = () => {
 
         <span className="separator">|</span>
 
-        <span className="info-label">Indent:</span>
         <select
           className="footer-select"
-          value={insertSpaces ? 'spaces' : 'tabs'}
-          onChange={handleIndentChange}
+          value={insertSpaces ? 'スペース' : 'タブ'}
+          onChange={handleIndentTypeChange}
           title="インデント方式"
         >
-          <option value="spaces">Spaces</option>
-          <option value="tabs">Tabs</option>
+          <option value="スペース">スペース</option>
+          <option value="タブ">タブ</option>
         </select>
-
-        <span className="separator">|</span>
-
-        <span className="info-label">Tab Size:</span>
         <select
-          className="footer-select"
+          className="footer-select footer-select-narrow"
           value={tabSize}
-          onChange={handleTabSizeChange}
-          title="タブサイズ"
+          onChange={handleIndentSizeChange}
+          title="インデントサイズ"
         >
           <option value="2">2</option>
           <option value="4">4</option>
@@ -133,7 +109,7 @@ const Footer: React.FC = () => {
 
         <span className="separator">|</span>
 
-        <span className="info-label">Before:</span>
+        <span className="info-label">改行コード:</span>
         <select
           className="footer-select"
           value={leftEOL}
@@ -144,10 +120,6 @@ const Footer: React.FC = () => {
           <option value="LF">LF</option>
           <option value="CRLF">CRLF</option>
         </select>
-
-        <span className="separator">|</span>
-
-        <span className="info-label">After:</span>
         <select
           className="footer-select"
           value={rightEOL}
@@ -165,7 +137,7 @@ const Footer: React.FC = () => {
           className="footer-select footer-select-lang"
           value={language}
           onChange={(e) => updateBuffersLang(e.target.value)}
-          title="シンタックスハイライトの言語"
+          title="言語モード"
         >
           {supportedLanguages.map((lang) => (
             <option key={lang.value} value={lang.value}>
