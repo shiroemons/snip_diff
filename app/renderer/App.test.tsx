@@ -241,6 +241,68 @@ describe('App', () => {
     });
   });
 
+  describe('Header integration', () => {
+    it('should call handleSwap when Header swap button is clicked', async () => {
+      const { userEvent } = await import('@testing-library/user-event');
+      const user = userEvent.setup();
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      const { updateLeftBuffer, updateRightBuffer, getActiveSession } = useDiffStore.getState();
+
+      await act(async () => {
+        updateLeftBuffer('left content');
+        updateRightBuffer('right content');
+      });
+
+      // Click swap button in Header
+      const swapButton = screen.getByTitle(/左右を入れ替え/);
+      await user.click(swapButton);
+
+      await waitFor(() => {
+        const session = getActiveSession();
+        expect(session?.left.content).toBe('right content');
+        expect(session?.right.content).toBe('left content');
+      });
+    });
+
+    it('should call handleClear when Header clear button is clicked', async () => {
+      const { userEvent } = await import('@testing-library/user-event');
+      const user = userEvent.setup();
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      const { updateLeftBuffer, updateRightBuffer, getActiveSession } = useDiffStore.getState();
+
+      await act(async () => {
+        updateLeftBuffer('left content');
+        updateRightBuffer('right content');
+      });
+
+      // Click clear button in Header
+      const clearButton = screen.getByTitle(/クリア/);
+      await user.click(clearButton);
+
+      await waitFor(() => {
+        const session = getActiveSession();
+        expect(session?.left.content).toBe('');
+        expect(session?.right.content).toBe('');
+      });
+    });
+  });
+
   describe('Keyboard shortcuts', () => {
     it('should switch to unified mode on Cmd+1', async () => {
       await act(async () => {

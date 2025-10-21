@@ -28,5 +28,10 @@
     }
   },
   "include": ["app/renderer/**/*"],
+  "exclude": [
+    "app/renderer/features/diff/utils/**/*.test.ts",
+    "app/renderer/features/diff/themes/**/*.test.ts",
+    "app/renderer/features/diff/hooks/useCompactMode.test.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

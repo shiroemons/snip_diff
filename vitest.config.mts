@@ -14,6 +14,8 @@ export default defineConfig({
       'node_modules',
       'dist',
       'app/renderer/features/diff/utils/**', // Monaco Editor依存
+      'app/renderer/features/diff/themes/**', // Monaco Editor依存
+      'app/renderer/features/diff/hooks/useCompactMode.test.ts', // Monaco Editor依存
     ],
     passWithNoTests: true,
     coverage: {

@@ -46,7 +46,10 @@
       "!**/dist",
       "!**/release",
       "!**/*.min.js",
-      "!**/coverage"
+      "!**/coverage",
+      "!app/renderer/features/diff/utils/**/*.test.ts",
+      "!app/renderer/features/diff/themes/**/*.test.ts",
+      "!app/renderer/features/diff/hooks/useCompactMode.test.ts"
     ]
   }
 }

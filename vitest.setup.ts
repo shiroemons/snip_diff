@@ -17,8 +17,13 @@ vi.mock('monaco-editor', async () => {
   }
 
   return {
-    default: {},
+    default: {
+      editor: {
+        defineTheme: vi.fn(),
+      },
+    },
     editor: {
+      defineTheme: vi.fn(),
       TrackedRangeStickiness: {
         NeverGrowsWhenTypingAtEdges: 0,
       },
