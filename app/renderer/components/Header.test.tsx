@@ -24,6 +24,18 @@ describe('Header', () => {
       expect(screen.getByText('SnipDiff')).toBeTruthy();
     });
 
+    it('should render version with "v" prefix', () => {
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Header />);
+
+      // __APP_VERSION__はvite.config.mtsで定義される
+      const versionElement = screen.getByText(/^v\d{4}\.\d{1,2}\.\d+$/);
+      expect(versionElement).toBeTruthy();
+      expect(versionElement.className).toContain('app-version');
+    });
+
     it('should render all control buttons', () => {
       const { initializeSession } = useDiffStore.getState();
       initializeSession();

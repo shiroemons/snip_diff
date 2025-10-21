@@ -124,6 +124,7 @@ const Header: React.FC<HeaderProps> = ({ onSwap, onClear, actualTheme = 'dark' }
     <header className="app-header">
       <div className="header-section">
         <h1 className="app-title">SnipDiff</h1>
+        <span className="app-version">v{__APP_VERSION__}</span>
         <div className="theme-menu-container">
           <button
             ref={themeButtonRef}
