@@ -5,7 +5,11 @@ import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
 import monacoEditorPluginDefault from 'vite-plugin-monaco-editor';
 
-const monacoEditorPlugin = (monacoEditorPluginDefault as any).default || monacoEditorPluginDefault;
+// ESM/CommonJS互換性のための型安全な処理
+const monacoEditorPlugin =
+  (typeof monacoEditorPluginDefault === 'function'
+    ? monacoEditorPluginDefault
+    : (monacoEditorPluginDefault as { default: typeof monacoEditorPluginDefault }).default);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
