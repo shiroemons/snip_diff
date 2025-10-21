@@ -81,6 +81,20 @@ describe('Footer', () => {
       const session = getActiveSession();
       expect(session?.options.fontSize).toBe(20);
     });
+
+    it('should support maximum font size of 36', async () => {
+      const user = userEvent.setup();
+      const { initializeSession, getActiveSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Footer />);
+
+      const fontSizeSelect = screen.getByTitle('フォントサイズ');
+      await user.selectOptions(fontSizeSelect, '36');
+
+      const session = getActiveSession();
+      expect(session?.options.fontSize).toBe(36);
+    });
   });
 
   describe('Indent selection', () => {
