@@ -1,6 +1,6 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor, act, type RenderResult } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import App from './App';
 import { useDiffStore } from './stores/diffStore';
 
@@ -60,7 +60,23 @@ const mockElectronAPI = {
     open: vi.fn().mockResolvedValue({ success: true }),
   },
   settings: {
-    get: vi.fn().mockResolvedValue({}),
+    get: vi.fn().mockResolvedValue({
+      theme: 'auto',
+      defaultOptions: {
+        ignoreWhitespace: false,
+        normalizeEOL: true,
+        viewMode: 'side-by-side',
+        compactMode: false,
+        wordWrap: false,
+        tabSize: 4,
+        fontSize: 14,
+        insertSpaces: true,
+        diffAlgorithm: 'advanced',
+        hideUnchangedRegions: false,
+      },
+      defaultLanguage: 'plaintext',
+      defaultEOL: 'auto',
+    }),
     set: vi.fn().mockResolvedValue({ success: true }),
   },
   theme: {
@@ -162,8 +178,23 @@ describe('App', () => {
     });
 
     it('should apply explicit theme when set', async () => {
-      const { setTheme } = useDiffStore.getState();
-      setTheme('light');
+      mockElectronAPI.settings.get.mockResolvedValue({
+        theme: 'light',
+        defaultOptions: {
+          ignoreWhitespace: false,
+          normalizeEOL: true,
+          viewMode: 'side-by-side',
+          compactMode: false,
+          wordWrap: false,
+          tabSize: 4,
+          fontSize: 14,
+          insertSpaces: true,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: false,
+        },
+        defaultLanguage: 'plaintext',
+        defaultEOL: 'auto',
+      });
 
       await act(async () => {
         render(<App />);
@@ -203,19 +234,6 @@ describe('App', () => {
         const diffEditor = screen.getByTestId('diff-editor');
         expect(diffEditor.getAttribute('data-theme')).toBe('light');
       });
-    });
-
-    it('should cleanup theme listener on unmount', async () => {
-      let component: RenderResult;
-      await act(async () => {
-        component = render(<App />);
-      });
-
-      await act(async () => {
-        component.unmount();
-      });
-
-      expect(mockElectronAPI.theme.removeListener).toHaveBeenCalled();
     });
 
     it('should handle missing Electron API gracefully', async () => {

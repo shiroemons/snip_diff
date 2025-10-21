@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import type { AppSettings } from '../shared/types';
 
 /**
  * IPC通信チャンネル定義
@@ -71,8 +72,8 @@ const electronAPI = {
 
   // 設定
   settings: {
-    get: (): Promise<unknown> => ipcRenderer.invoke(IPC_CHANNELS.SETTINGS_GET),
-    set: (settings: unknown): Promise<{ success: boolean }> =>
+    get: (): Promise<AppSettings> => ipcRenderer.invoke(IPC_CHANNELS.SETTINGS_GET),
+    set: (settings: Partial<AppSettings>): Promise<{ success: boolean; error?: string }> =>
       ipcRenderer.invoke(IPC_CHANNELS.SETTINGS_SET, settings),
   },
 

@@ -4,7 +4,7 @@ import type { Theme } from '@shared/types';
 import './Footer.css';
 
 const Footer: React.FC = () => {
-  const { getActiveSession, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang, updateOptions, theme, setTheme } = useDiffStore();
+  const { getActiveSession, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang, updateOptions, theme, setTheme, openSettingsModal } = useDiffStore();
   const activeSession = getActiveSession();
 
   if (!activeSession) return null;
@@ -173,6 +173,16 @@ const Footer: React.FC = () => {
             </option>
           ))}
         </select>
+
+        <button
+          type="button"
+          className="settings-icon-button"
+          onClick={openSettingsModal}
+          title="設定"
+          aria-label="設定を開く"
+        >
+          ⚙
+        </button>
       </div>
     </footer>
   );

@@ -75,3 +75,28 @@
 .footer-select-lang {
   min-width: 100px;
 }
+
+.settings-icon-button {
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-size: 16px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-icon-button:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--accent-primary);
+  transform: rotate(45deg);
+}
+
+.settings-icon-button:active {
+  transform: rotate(45deg) scale(0.95);
+}

@@ -59,6 +59,8 @@ export type Theme = 'light' | 'dark' | 'auto';
 export interface AppSettings {
   theme: Theme;
   defaultOptions: DiffOptions;
+  defaultLanguage: string; // シンタックスハイライトのデフォルト言語
+  defaultEOL: 'LF' | 'CRLF' | 'auto'; // デフォルト改行コード
   shortcuts: Record<string, string>;
   clipboardHistorySize: number;
   clipboardHistoryTTL: number; // ミリ秒

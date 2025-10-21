@@ -1,10 +1,16 @@
 import { app, BrowserWindow, ipcMain, clipboard, dialog, nativeTheme } from 'electron';
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { IPC_CHANNELS } from '../shared/types';
+import { IPC_CHANNELS, type AppSettings } from '../shared/types';
 
 let mainWindow: BrowserWindow | null = null;
 const isDev = process.env.NODE_ENV === 'development';
+
+// electron-storeはESモジュールなので動的importで読み込む
+// biome-ignore lint/suspicious/noExplicitAny: 動的importのため型定義不可
+let ElectronStore: any;
+// biome-ignore lint/suspicious/noExplicitAny: 動的importのため型定義不可
+let store: any;
 
 // アプリケーション名を早期に設定（メニューバー表示用）
 app.setName('SnipDiff');
@@ -12,6 +18,40 @@ app.setName('SnipDiff');
 // クリップボード履歴（メモリ内のみ）
 const clipboardHistory: Array<{ id: string; content: string; timestamp: number }> = [];
 const MAX_HISTORY_SIZE = 50;
+
+// 設定ストアの初期化（非同期）
+async function initializeStore() {
+  // TypeScriptのimport()はCommonJSでrequire()に変換されてしまうため、
+  // Function constructorを使って真の動的importを実現
+  const importDynamic = new Function('specifier', 'return import(specifier)');
+  const StoreModule = await importDynamic('electron-store');
+  ElectronStore = StoreModule.default;
+
+  store = new ElectronStore({
+    defaults: {
+      theme: 'auto',
+      defaultOptions: {
+        ignoreWhitespace: false,
+        normalizeEOL: true,
+        viewMode: 'side-by-side',
+        compactMode: false,
+        wordWrap: false,
+        tabSize: 4,
+        fontSize: 14,
+        insertSpaces: true,
+        diffAlgorithm: 'advanced',
+        hideUnchangedRegions: false,
+      },
+      defaultLanguage: 'plaintext',
+      defaultEOL: 'auto',
+      shortcuts: {},
+      clipboardHistorySize: 50,
+      clipboardHistoryTTL: 1000 * 60 * 60 * 24, // 24時間
+      autoUpdate: false,
+      crashReport: false,
+    },
+  });
+}
 
 /**
  * メインウィンドウを作成
@@ -69,7 +109,10 @@ function createWindow(): void {
 /**
  * アプリケーション起動時の処理
  */
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // electron-storeを初期化
+  await initializeStore();
+
   // Aboutパネルの情報をカスタマイズ（macOS）
   if (process.platform === 'darwin') {
     app.setAboutPanelOptions({
@@ -206,27 +249,32 @@ function registerIpcHandlers(): void {
     }
   });
 
-  // 設定の取得（簡易版：今後はelectron-storeなどを使用）
+  // 設定の取得
   ipcMain.handle(IPC_CHANNELS.SETTINGS_GET, async () => {
-    // TODO: 永続化された設定を読み込む
-    return {
-      theme: 'auto',
-      defaultOptions: {
-        ignoreWhitespace: false,
-        normalizeEOL: true,
-        viewMode: 'side-by-side',
-        wordWrap: false,
-        tabSize: 4,
-        fontSize: 14,
-      },
-    };
+    return store.store as AppSettings;
   });
 
   // 設定の保存
-  ipcMain.handle(IPC_CHANNELS.SETTINGS_SET, async (_event, settings) => {
-    // TODO: 設定を永続化
-    console.log('Settings updated:', settings);
-    return { success: true };
+  ipcMain.handle(IPC_CHANNELS.SETTINGS_SET, async (_event, settings: Partial<AppSettings>) => {
+    try {
+      const currentStore = store.store as AppSettings;
+      const updatedStore = { ...currentStore, ...settings };
+
+      // defaultOptionsの部分的な更新をサポート
+      if (settings.defaultOptions) {
+        updatedStore.defaultOptions = {
+          ...currentStore.defaultOptions,
+          ...settings.defaultOptions,
+        };
+      }
+
+      store.store = updatedStore;
+
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      return { success: false, error: String(error) };
+    }
   });
 
   // テーマ取得

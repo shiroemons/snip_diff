@@ -3,62 +3,101 @@ import { useDiffStore } from './stores/diffStore';
 import Header from './components/Header';
 import DiffEditor, { type DiffEditorRef } from './features/diff/DiffEditor';
 import Footer from './components/Footer';
+import SettingsModal from './components/SettingsModal';
+import type { AppSettings } from '@shared/types';
 
 const App: React.FC = () => {
-  const { initializeSession, theme, updateOptions } = useDiffStore();
+  const { initializeSession, theme, updateOptions, loadSettings } = useDiffStore();
   const diffEditorRef = useRef<DiffEditorRef>(null);
   const [actualTheme, setActualTheme] = React.useState<'light' | 'dark'>('dark');
+  const initialized = useRef(false);
+  const settingsLoaded = useRef(false);
 
-  // 初回セッションの作成（一度だけ実行）
+  // 設定の読み込みと初回セッションの作成（一度だけ実行）
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 初回のみ実行するため意図的に空配列
   useEffect(() => {
-    initializeSession();
-  }, [initializeSession]);
+    // React.StrictModeによる2重実行を防ぐ
+    if (initialized.current) return;
+    initialized.current = true;
 
-  // テーマの初期化と監視（themeが変更された時のみ実行）
+    const loadInitialSettings = async () => {
+      try {
+        if (window.electron) {
+          const settings = await window.electron.settings.get() as AppSettings;
+          loadSettings({
+            theme: settings.theme,
+            defaultOptions: settings.defaultOptions,
+            defaultLanguage: settings.defaultLanguage,
+            defaultEOL: settings.defaultEOL,
+          });
+
+          // 設定読み込み後、即座にテーマを適用
+          if (settings.theme === 'auto') {
+            try {
+              const themeInfo = await window.electron.theme.get();
+              const systemTheme = themeInfo.shouldUseDarkColors ? 'dark' : 'light';
+              setActualTheme(systemTheme);
+            } catch (error) {
+              console.error('Failed to get initial system theme:', error);
+            }
+          } else {
+            setActualTheme(settings.theme as 'light' | 'dark');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+      } finally {
+        // 設定読み込み完了（成功/失敗/スキップに関わらず）
+        settingsLoaded.current = true;
+        // 設定読み込みの成否に関わらず、セッションを初期化
+        initializeSession();
+      }
+    };
+
+    loadInitialSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 空の依存配列で初回のみ実行
+
+  // テーマ適用とシステムテーマ監視
   useEffect(() => {
+    // 設定が読み込まれるまで待つ（初回のみ）
+    if (!settingsLoaded.current) return;
+
     // Electron APIが利用可能かチェック
     if (!window.electron) {
       console.warn('Electron API is not available. Running in browser mode.');
+      if (theme !== 'auto') {
+        setActualTheme(theme as 'light' | 'dark');
+      }
       return;
     }
 
-    // テーマの初期化
-    const initTheme = async () => {
-      try {
-        const themeInfo = await window.electron.theme.get();
-        console.log('Initial theme:', themeInfo);
-        // Autoモードの場合はシステムテーマを適用
-        if (theme === 'auto') {
-          setActualTheme(themeInfo.shouldUseDarkColors ? 'dark' : 'light');
-        }
-      } catch (error) {
-        console.error('Failed to get initial theme:', error);
-      }
-    };
-
-    initTheme();
-
-    // テーマ変更のリスナー
-    window.electron.theme.onChanged((themeInfo) => {
-      console.log('Theme changed:', themeInfo);
-      // Autoモードの場合のみシステムテーマを適用
-      if (theme === 'auto') {
-        setActualTheme(themeInfo.shouldUseDarkColors ? 'dark' : 'light');
-      }
-    });
-
-    return () => {
-      window.electron.theme.removeListener();
-    };
-  }, [theme]);
-
-  // テーマの適用
-  useEffect(() => {
+    // autoモードの場合はシステムテーマを取得・監視
     if (theme === 'auto') {
-      // actualThemeを使用（システム設定に従う）
+      const initTheme = async () => {
+        try {
+          const themeInfo = await window.electron.theme.get();
+          const systemTheme = themeInfo.shouldUseDarkColors ? 'dark' : 'light';
+          setActualTheme(systemTheme);
+        } catch (error) {
+          console.error('Failed to get theme:', error);
+        }
+      };
+
+      initTheme();
+
+      // システムテーマ変更のリスナー
+      window.electron.theme.onChanged((themeInfo) => {
+        const systemTheme = themeInfo.shouldUseDarkColors ? 'dark' : 'light';
+        setActualTheme(systemTheme);
+      });
+
+      return () => {
+        window.electron.theme.removeListener();
+      };
     } else {
-      // 明示的に選択されたテーマを使用
-      setActualTheme(theme);
+      // 明示的なテーマ設定（light/dark）の場合
+      setActualTheme(theme as 'light' | 'dark');
     }
   }, [theme]);
 
@@ -132,6 +171,7 @@ const App: React.FC = () => {
         <DiffEditor ref={diffEditorRef} theme={actualTheme} />
       </main>
       <Footer />
+      <SettingsModal />
     </div>
   );
 };

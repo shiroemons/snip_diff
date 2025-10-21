@@ -144,6 +144,11 @@
   border-top: none;
 }
 
+.compare-panel-content {
+  flex: 1;
+  overflow: hidden;
+}
+
 .compare-panel.minimized {
   overflow: hidden;
 }
@@ -165,12 +170,6 @@
   justify-content: center;
 }
 
-.resize-handle:hover .resize-handle-bar,
-.resize-handle.resizing .resize-handle-bar {
-  background-color: #1f6feb;
-  height: 3px;
-}
-
 .resize-handle-bar {
   width: 60px;
   height: 2px;
@@ -178,6 +177,12 @@
   border-radius: 2px;
   transition: all 0.2s;
   pointer-events: none;
+}
+
+.resize-handle:hover .resize-handle-bar,
+.resize-handle.resizing .resize-handle-bar {
+  background-color: #1f6feb;
+  height: 3px;
 }
 
 .compare-panel-header {
@@ -323,11 +328,6 @@
 .close-panel-button:hover {
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
-}
-
-.compare-panel-content {
-  flex: 1;
-  overflow: hidden;
 }
 
 .no-session {

@@ -15,6 +15,14 @@ interface DiffStore {
   // テーマ
   theme: Theme;
 
+  // 設定モーダル
+  isSettingsModalOpen: boolean;
+
+  // デフォルト設定
+  defaultOptions: DiffOptions;
+  defaultLanguage: string;
+  defaultEOL: 'LF' | 'CRLF' | 'auto';
+
   // アクション
   initializeSession: () => void;
   createNewSession: () => string;
@@ -29,6 +37,9 @@ interface DiffStore {
   updateLeftBufferEOL: (eol: 'LF' | 'CRLF' | 'auto') => void;
   updateRightBufferEOL: (eol: 'LF' | 'CRLF' | 'auto') => void;
   updateBuffersLang: (lang: string) => void;
+  openSettingsModal: () => void;
+  closeSettingsModal: () => void;
+  loadSettings: (settings: { theme: Theme; defaultOptions: DiffOptions; defaultLanguage: string; defaultEOL: 'LF' | 'CRLF' | 'auto' }) => void;
 
   // ヘルパー
   getActiveSession: () => DiffSession | undefined;
@@ -47,11 +58,11 @@ const defaultOptions: DiffOptions = {
   hideUnchangedRegions: false,
 };
 
-const createEmptySession = (): DiffSession => ({
+const createEmptySession = (defaults: DiffOptions, defaultLang: string, defaultEOL: 'LF' | 'CRLF' | 'auto'): DiffSession => ({
   id: generateId(),
-  left: createBuffer(''),
-  right: createBuffer(''),
-  options: { ...defaultOptions },
+  left: { ...createBuffer(''), lang: defaultLang, eol: defaultEOL },
+  right: { ...createBuffer(''), lang: defaultLang, eol: defaultEOL },
+  options: { ...defaults },
   createdAt: Date.now(),
   updatedAt: Date.now(),
 });
@@ -60,9 +71,14 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
   sessions: [],
   activeSessionId: null,
   theme: 'auto',
+  isSettingsModalOpen: false,
+  defaultOptions: { ...defaultOptions },
+  defaultLanguage: 'plaintext',
+  defaultEOL: 'auto',
 
   initializeSession: () => {
-    const session = createEmptySession();
+    const { defaultOptions: opts, defaultLanguage, defaultEOL } = get();
+    const session = createEmptySession(opts, defaultLanguage, defaultEOL);
     set({
       sessions: [session],
       activeSessionId: session.id,
@@ -70,7 +86,8 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
   },
 
   createNewSession: () => {
-    const session = createEmptySession();
+    const { defaultOptions: opts, defaultLanguage, defaultEOL } = get();
+    const session = createEmptySession(opts, defaultLanguage, defaultEOL);
     set((state) => ({
       sessions: [...state.sessions, session],
       activeSessionId: session.id,
@@ -241,6 +258,23 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
         s.id === activeSession.id ? updatedSession : s
       ),
     }));
+  },
+
+  openSettingsModal: () => {
+    set({ isSettingsModalOpen: true });
+  },
+
+  closeSettingsModal: () => {
+    set({ isSettingsModalOpen: false });
+  },
+
+  loadSettings: (settings) => {
+    set({
+      theme: settings.theme,
+      defaultOptions: settings.defaultOptions,
+      defaultLanguage: settings.defaultLanguage,
+      defaultEOL: settings.defaultEOL,
+    });
   },
 
   getActiveSession: () => {
