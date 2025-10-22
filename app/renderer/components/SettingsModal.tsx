@@ -133,6 +133,12 @@ const SettingsModal: React.FC = () => {
           </button>
         </div>
 
+        <div className="settings-modal-intro">
+          <p>
+            ここで設定した値が、アプリケーション起動時や新しく比較を開始する際のデフォルト値として使用されます。
+          </p>
+        </div>
+
         <div className="settings-modal-body">
           <div className="settings-section">
             <label className="settings-label">
@@ -146,6 +152,9 @@ const SettingsModal: React.FC = () => {
                 <option value="dark">ダークテーマ</option>
                 <option value="auto">システムテーマ</option>
               </select>
+              <span className="settings-description">
+                エディターの外観を変更します。「システムテーマ」を選択すると、macOSの設定に従います。
+              </span>
             </label>
           </div>
 
@@ -172,6 +181,9 @@ const SettingsModal: React.FC = () => {
                 <option value="34">34</option>
                 <option value="36">36</option>
               </select>
+              <span className="settings-description">
+                エディターで表示されるテキストのサイズを変更します。
+              </span>
             </label>
           </div>
 
@@ -186,6 +198,9 @@ const SettingsModal: React.FC = () => {
                 <option value="side-by-side">Side by Side</option>
                 <option value="unified">Unified</option>
               </select>
+              <span className="settings-description">
+                Side by Side（左右並べて表示）またはUnified（統合表示）を選択できます。
+              </span>
             </label>
           </div>
 
@@ -198,6 +213,9 @@ const SettingsModal: React.FC = () => {
               />
               <span>Compactモード</span>
             </label>
+            <span className="settings-description">
+              行レベルの背景色を削除し、実際に変更された文字だけを精密にハイライト表示します。
+            </span>
           </div>
 
           <div className="settings-section">
@@ -211,6 +229,9 @@ const SettingsModal: React.FC = () => {
                 <option value="スペース">スペース</option>
                 <option value="タブ">タブ</option>
               </select>
+              <span className="settings-description">
+                Tabキーを押したときにスペースまたはタブ文字のどちらを挿入するかを設定します。
+              </span>
             </label>
           </div>
 
@@ -226,6 +247,9 @@ const SettingsModal: React.FC = () => {
                 <option value="4">4</option>
                 <option value="8">8</option>
               </select>
+              <span className="settings-description">
+                インデント1つあたりのスペース数、またはタブ文字の表示幅を設定します。
+              </span>
             </label>
           </div>
 
@@ -241,6 +265,9 @@ const SettingsModal: React.FC = () => {
                 <option value="LF">LF</option>
                 <option value="CRLF">CRLF</option>
               </select>
+              <span className="settings-description">
+                新規入力時の改行コードを設定します（LF: Unix/Mac、CRLF: Windows、Auto: OSに従う）。
+              </span>
             </label>
           </div>
 
@@ -258,6 +285,9 @@ const SettingsModal: React.FC = () => {
                   </option>
                 ))}
               </select>
+              <span className="settings-description">
+                シンタックスハイライトに使用する言語を設定します。コードの構文に応じた色分けが適用されます。
+              </span>
             </label>
           </div>
         </div>

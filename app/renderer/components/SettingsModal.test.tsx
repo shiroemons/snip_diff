@@ -95,6 +95,12 @@ describe('SettingsModal', () => {
       render(<SettingsModal />);
       expect(screen.getByText('デフォルト設定')).toBeTruthy();
     });
+
+    it('should display default settings intro text', () => {
+      useDiffStore.setState({ isSettingsModalOpen: true });
+      render(<SettingsModal />);
+      expect(screen.getByText(/ここで設定した値が、アプリケーション起動時や新しく比較を開始する際のデフォルト値として使用されます/)).toBeTruthy();
+    });
   });
 
   describe('Font size selection', () => {
@@ -261,6 +267,53 @@ describe('SettingsModal', () => {
 
       await user.selectOptions(languageSelect, 'javascript');
       expect(languageSelect.value).toBe('javascript');
+    });
+  });
+
+  describe('Description texts', () => {
+    beforeEach(() => {
+      useDiffStore.setState({ isSettingsModalOpen: true });
+    });
+
+    it('should display theme description', () => {
+      render(<SettingsModal />);
+      expect(screen.getByText(/エディターの外観を変更します/)).toBeTruthy();
+      expect(screen.getByText(/システムテーマ.*を選択すると、macOSの設定に従います/)).toBeTruthy();
+    });
+
+    it('should display font size description', () => {
+      render(<SettingsModal />);
+      expect(screen.getByText('エディターで表示されるテキストのサイズを変更します。')).toBeTruthy();
+    });
+
+    it('should display view mode description', () => {
+      render(<SettingsModal />);
+      expect(screen.getByText(/Side by Side.*左右並べて表示.*またはUnified.*統合表示/)).toBeTruthy();
+    });
+
+    it('should display compact mode description', () => {
+      render(<SettingsModal />);
+      expect(screen.getByText('行レベルの背景色を削除し、実際に変更された文字だけを精密にハイライト表示します。')).toBeTruthy();
+    });
+
+    it('should display indent method description', () => {
+      render(<SettingsModal />);
+      expect(screen.getByText(/Tabキーを押したときにスペースまたはタブ文字のどちらを挿入するか/)).toBeTruthy();
+    });
+
+    it('should display indent size description', () => {
+      render(<SettingsModal />);
+      expect(screen.getByText(/インデント1つあたりのスペース数、またはタブ文字の表示幅/)).toBeTruthy();
+    });
+
+    it('should display EOL description', () => {
+      render(<SettingsModal />);
+      expect(screen.getByText(/新規入力時の改行コード.*LF: Unix\/Mac.*CRLF: Windows.*Auto: OSに従う/)).toBeTruthy();
+    });
+
+    it('should display language mode description', () => {
+      render(<SettingsModal />);
+      expect(screen.getByText(/シンタックスハイライトに使用する言語.*コードの構文に応じた色分け/)).toBeTruthy();
     });
   });
 });

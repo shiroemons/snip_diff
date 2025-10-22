@@ -38,6 +38,19 @@
   color: var(--text-primary);
 }
 
+.settings-modal-intro {
+  padding: 16px 24px;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-modal-intro p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
 .settings-modal-close {
   background: none;
   border: none;
@@ -80,6 +93,14 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
+}
+
+.settings-description {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.5;
 }
 
 .settings-select {
