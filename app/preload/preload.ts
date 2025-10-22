@@ -41,12 +41,9 @@ const electronAPI = {
     read: (): Promise<string> => ipcRenderer.invoke(IPC_CHANNELS.CLIPBOARD_READ),
     write: (text: string): Promise<boolean> =>
       ipcRenderer.invoke(IPC_CHANNELS.CLIPBOARD_WRITE, text),
-    getHistory: (): Promise<
-      Array<{ id: string; content: string; timestamp: number }>
-    > => ipcRenderer.invoke(IPC_CHANNELS.CLIPBOARD_HISTORY_GET),
-    addToHistory: (
-      content: string
-    ): Promise<{ id: string; content: string; timestamp: number }> =>
+    getHistory: (): Promise<Array<{ id: string; content: string; timestamp: number }>> =>
+      ipcRenderer.invoke(IPC_CHANNELS.CLIPBOARD_HISTORY_GET),
+    addToHistory: (content: string): Promise<{ id: string; content: string; timestamp: number }> =>
       ipcRenderer.invoke(IPC_CHANNELS.CLIPBOARD_HISTORY_ADD, content),
   },
 
@@ -94,12 +91,9 @@ const electronAPI = {
   // ウィンドウ操作
   window: {
     close: (): Promise<void> => ipcRenderer.invoke(IPC_CHANNELS.WINDOW_CLOSE),
-    minimize: (): Promise<void> =>
-      ipcRenderer.invoke(IPC_CHANNELS.WINDOW_MINIMIZE),
-    maximize: (): Promise<void> =>
-      ipcRenderer.invoke(IPC_CHANNELS.WINDOW_MAXIMIZE),
-    isMaximized: (): Promise<boolean> =>
-      ipcRenderer.invoke(IPC_CHANNELS.WINDOW_IS_MAXIMIZED),
+    minimize: (): Promise<void> => ipcRenderer.invoke(IPC_CHANNELS.WINDOW_MINIMIZE),
+    maximize: (): Promise<void> => ipcRenderer.invoke(IPC_CHANNELS.WINDOW_MAXIMIZE),
+    isMaximized: (): Promise<boolean> => ipcRenderer.invoke(IPC_CHANNELS.WINDOW_IS_MAXIMIZED),
     onMaximizedChanged: (callback: (state: { isMaximized: boolean }) => void) => {
       ipcRenderer.on(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED, (_event, state) => {
         callback(state);

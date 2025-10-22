@@ -1,20 +1,14 @@
-import type React from 'react';
-import {
-  useEffect,
-  useRef,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
 import { loader } from '@monaco-editor/react';
-import { useDiffStore } from '../../stores/diffStore';
 import type { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
-import { defineCompactThemes, getThemeName } from './themes/compactThemes';
-import { usePanelResize } from './hooks/usePanelResize';
-import { useCompactMode } from './hooks/useCompactMode';
-import { InputEditorPanel } from './components/InputEditorPanel';
+import type React from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useDiffStore } from '../../stores/diffStore';
 import { ComparisonPanel } from './components/ComparisonPanel';
+import { InputEditorPanel } from './components/InputEditorPanel';
+import { useCompactMode } from './hooks/useCompactMode';
+import { usePanelResize } from './hooks/usePanelResize';
+import { defineCompactThemes, getThemeName } from './themes/compactThemes';
 import './DiffEditor.css';
 
 // Monaco Editor のローダー設定 - ローカルから読み込み
@@ -251,10 +245,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
   }
 
   // compactModeに応じたテーマ名を取得
-  const themeName = getThemeName(
-    activeSession.options.compactMode ?? false,
-    theme,
-  );
+  const themeName = getThemeName(activeSession.options.compactMode ?? false, theme);
 
   // 入力エディタセクションの高さを計算
   const inputEditorHeight = showComparePanel

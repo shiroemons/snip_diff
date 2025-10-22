@@ -1,7 +1,7 @@
-import { useRef, useCallback, useEffect } from 'react';
+import { diffChars } from 'diff';
 import type { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
-import { diffChars } from 'diff';
+import { useCallback, useEffect, useRef } from 'react';
 import { getTextFromModel, splitRangeToSingleLine } from '../utils/diffUtils';
 
 export interface UseCompactModeOptions {
@@ -18,7 +18,7 @@ export interface UseCompactModeOptions {
  */
 export const useCompactMode = (
   diffEditorRef: React.MutableRefObject<editor.IStandaloneDiffEditor | null>,
-  options: UseCompactModeOptions,
+  options: UseCompactModeOptions
 ) => {
   const compactDecorationsRef = useRef<{
     original: editor.IEditorDecorationsCollection | null;
@@ -68,14 +68,14 @@ export const useCompactMode = (
             charChange.originalStartLineNumber,
             charChange.originalStartColumn,
             charChange.originalEndLineNumber,
-            charChange.originalEndColumn,
+            charChange.originalEndColumn
           );
           const modifiedText = getTextFromModel(
             modifiedModel,
             charChange.modifiedStartLineNumber,
             charChange.modifiedStartColumn,
             charChange.modifiedEndLineNumber,
-            charChange.modifiedEndColumn,
+            charChange.modifiedEndColumn
           );
 
           const charDiffs = diffChars(originalText, modifiedText);
@@ -169,8 +169,7 @@ export const useCompactMode = (
               range: new monaco.Range(line, 1, line, maxColumn),
               options: {
                 inlineClassName: 'compact-diff-delete',
-                stickiness:
-                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+                stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
               },
             });
           } else {
@@ -195,8 +194,7 @@ export const useCompactMode = (
               range: new monaco.Range(line, 1, line, maxColumn),
               options: {
                 inlineClassName: 'compact-diff-insert',
-                stickiness:
-                  monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+                stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
               },
             });
           } else {
@@ -218,14 +216,14 @@ export const useCompactMode = (
           charChange.originalStartLineNumber,
           charChange.originalStartColumn,
           charChange.originalEndLineNumber,
-          charChange.originalEndColumn,
+          charChange.originalEndColumn
         );
         const modifiedText = getTextFromModel(
           modifiedModel,
           charChange.modifiedStartLineNumber,
           charChange.modifiedStartColumn,
           charChange.modifiedEndLineNumber,
-          charChange.modifiedEndColumn,
+          charChange.modifiedEndColumn
         );
 
         // diffCharsで文字単位の詳細な差分を計算(中間の共通部分も除外)
@@ -241,26 +239,26 @@ export const useCompactMode = (
               originalModel.getOffsetAt(
                 new monaco.Position(
                   charChange.originalStartLineNumber,
-                  charChange.originalStartColumn,
-                ),
-              ) + originalOffset,
+                  charChange.originalStartColumn
+                )
+              ) + originalOffset
             );
             const endPos = originalModel.getPositionAt(
               originalModel.getOffsetAt(
                 new monaco.Position(
                   charChange.originalStartLineNumber,
-                  charChange.originalStartColumn,
-                ),
+                  charChange.originalStartColumn
+                )
               ) +
                 originalOffset +
-                part.value.length,
+                part.value.length
             );
 
             const range = new monaco.Range(
               startPos.lineNumber,
               startPos.column,
               endPos.lineNumber,
-              endPos.column,
+              endPos.column
             );
 
             const ranges = splitRangeToSingleLine(originalModel, range);
@@ -269,8 +267,7 @@ export const useCompactMode = (
                 range: r,
                 options: {
                   inlineClassName: 'compact-diff-delete',
-                  stickiness:
-                    monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+                  stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
                 },
               });
             });
@@ -282,26 +279,26 @@ export const useCompactMode = (
               modifiedModel.getOffsetAt(
                 new monaco.Position(
                   charChange.modifiedStartLineNumber,
-                  charChange.modifiedStartColumn,
-                ),
-              ) + modifiedOffset,
+                  charChange.modifiedStartColumn
+                )
+              ) + modifiedOffset
             );
             const endPos = modifiedModel.getPositionAt(
               modifiedModel.getOffsetAt(
                 new monaco.Position(
                   charChange.modifiedStartLineNumber,
-                  charChange.modifiedStartColumn,
-                ),
+                  charChange.modifiedStartColumn
+                )
               ) +
                 modifiedOffset +
-                part.value.length,
+                part.value.length
             );
 
             const range = new monaco.Range(
               startPos.lineNumber,
               startPos.column,
               endPos.lineNumber,
-              endPos.column,
+              endPos.column
             );
 
             const ranges = splitRangeToSingleLine(modifiedModel, range);
@@ -310,8 +307,7 @@ export const useCompactMode = (
                 range: r,
                 options: {
                   inlineClassName: 'compact-diff-insert',
-                  stickiness:
-                    monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+                  stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
                 },
               });
             });
@@ -337,8 +333,10 @@ export const useCompactMode = (
     }
 
     // 新しいdecorationsを設定
-    compactDecorationsRef.current.original = originalEditor.createDecorationsCollection(originalDecorations);
-    compactDecorationsRef.current.modified = modifiedEditor.createDecorationsCollection(modifiedDecorations);
+    compactDecorationsRef.current.original =
+      originalEditor.createDecorationsCollection(originalDecorations);
+    compactDecorationsRef.current.modified =
+      modifiedEditor.createDecorationsCollection(modifiedDecorations);
 
     // UnifiedモードのDOMを修正
     fixUnifiedModeCharHighlights();

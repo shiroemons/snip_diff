@@ -69,10 +69,7 @@ export const defineCompactThemes = (): void => {
  * @param theme - テーマ設定 ('light' | 'dark')
  * @returns Monaco エディタのテーマ名
  */
-export const getThemeName = (
-  compactMode: boolean,
-  theme: 'light' | 'dark',
-): string => {
+export const getThemeName = (compactMode: boolean, theme: 'light' | 'dark'): string => {
   if (compactMode) {
     return theme === 'light' ? 'compact-light' : 'compact-dark';
   }

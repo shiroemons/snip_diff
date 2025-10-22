@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { usePanelResize } from './usePanelResize';
 
 describe('usePanelResize', () => {
@@ -34,9 +34,7 @@ describe('usePanelResize', () => {
     });
 
     it('should initialize with custom initial height', () => {
-      const { result } = renderHook(() =>
-        usePanelResize({ initialHeight: 500 }),
-      );
+      const { result } = renderHook(() => usePanelResize({ initialHeight: 500 }));
 
       expect(result.current.panelHeight).toBe(500);
     });
@@ -76,9 +74,7 @@ describe('usePanelResize', () => {
     });
 
     it('should restore panel to previous height when unminimizing', () => {
-      const { result } = renderHook(() =>
-        usePanelResize({ initialHeight: 400 }),
-      );
+      const { result } = renderHook(() => usePanelResize({ initialHeight: 400 }));
 
       // Minimize
       act(() => {
@@ -97,9 +93,7 @@ describe('usePanelResize', () => {
     });
 
     it('should remember height even after resizing before minimize', () => {
-      const { result } = renderHook(() =>
-        usePanelResize({ initialHeight: 400 }),
-      );
+      const { result } = renderHook(() => usePanelResize({ initialHeight: 400 }));
 
       // Start resize
       act(() => {
@@ -149,9 +143,7 @@ describe('usePanelResize', () => {
 
   describe('resize behavior', () => {
     it('should update panel height when dragging', () => {
-      const { result } = renderHook(() =>
-        usePanelResize({ initialHeight: 400 }),
-      );
+      const { result } = renderHook(() => usePanelResize({ initialHeight: 400 }));
 
       // Start resize at Y=500
       act(() => {
@@ -168,9 +160,7 @@ describe('usePanelResize', () => {
     });
 
     it('should clamp height to minimum value', () => {
-      const { result } = renderHook(() =>
-        usePanelResize({ initialHeight: 400, minHeight: 200 }),
-      );
+      const { result } = renderHook(() => usePanelResize({ initialHeight: 400, minHeight: 200 }));
 
       // Start resize
       act(() => {
@@ -188,7 +178,7 @@ describe('usePanelResize', () => {
 
     it('should clamp height to maximum value (80% of window height by default)', () => {
       const { result } = renderHook(() =>
-        usePanelResize({ initialHeight: 400, windowHeightOffset: 100 }),
+        usePanelResize({ initialHeight: 400, windowHeightOffset: 100 })
       );
 
       // window.innerHeight = 1000, offset = 100, so container = 900
@@ -231,9 +221,7 @@ describe('usePanelResize', () => {
 
   describe('custom options', () => {
     it('should respect custom minHeight', () => {
-      const { result } = renderHook(() =>
-        usePanelResize({ minHeight: 300 }),
-      );
+      const { result } = renderHook(() => usePanelResize({ minHeight: 300 }));
 
       act(() => {
         result.current.startResize(500);
@@ -252,7 +240,7 @@ describe('usePanelResize', () => {
         usePanelResize({
           maxHeightRatio: 0.5,
           windowHeightOffset: 0,
-        }),
+        })
       );
 
       // window.innerHeight = 1000, offset = 0, ratio = 0.5
@@ -275,7 +263,7 @@ describe('usePanelResize', () => {
         usePanelResize({
           maxHeightRatio: 0.8,
           windowHeightOffset: 200,
-        }),
+        })
       );
 
       // window.innerHeight = 1000, offset = 200, so container = 800

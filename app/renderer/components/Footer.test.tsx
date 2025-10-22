@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import Footer from './Footer';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useDiffStore } from '../stores/diffStore';
+import Footer from './Footer';
 
 describe('Footer', () => {
   beforeEach(() => {
@@ -272,7 +272,7 @@ describe('Footer', () => {
       render(<Footer />);
 
       const langSelect = screen.getByTitle('言語モード') as HTMLSelectElement;
-      const options = Array.from(langSelect.options).map(opt => opt.value);
+      const options = Array.from(langSelect.options).map((opt) => opt.value);
 
       // Check for some key languages
       expect(options).toContain('plaintext');

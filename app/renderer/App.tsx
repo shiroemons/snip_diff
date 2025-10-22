@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from 'react';
-import { useDiffStore } from './stores/diffStore';
-import Header from './components/Header';
-import DiffEditor, { type DiffEditorRef } from './features/diff/DiffEditor';
-import Footer from './components/Footer';
-import SettingsModal from './components/SettingsModal';
 import type { AppSettings } from '@shared/types';
+import React, { useEffect, useRef } from 'react';
+import Footer from './components/Footer';
+import Header from './components/Header';
+import SettingsModal from './components/SettingsModal';
+import DiffEditor, { type DiffEditorRef } from './features/diff/DiffEditor';
+import { useDiffStore } from './stores/diffStore';
 
 const App: React.FC = () => {
   const { initializeSession, theme, updateOptions, loadSettings } = useDiffStore();
@@ -23,7 +23,7 @@ const App: React.FC = () => {
     const loadInitialSettings = async () => {
       try {
         if (window.electron) {
-          const settings = await window.electron.settings.get() as AppSettings;
+          const settings = (await window.electron.settings.get()) as AppSettings;
           loadSettings({
             theme: settings.theme,
             defaultOptions: settings.defaultOptions,
@@ -150,7 +150,8 @@ const App: React.FC = () => {
       // ⌘3: Compact モードのトグル
       if (e.key === '3') {
         e.preventDefault();
-        const currentCompactMode = useDiffStore.getState().getActiveSession()?.options.compactMode ?? false;
+        const currentCompactMode =
+          useDiffStore.getState().getActiveSession()?.options.compactMode ?? false;
         updateOptions({ compactMode: !currentCompactMode });
         return;
       }

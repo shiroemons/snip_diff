@@ -1,7 +1,7 @@
-import type React from 'react';
 import { Editor as MonacoEditor } from '@monaco-editor/react';
-import type { editor } from 'monaco-editor';
 import { Clipboard, Trash2 } from 'lucide-react';
+import type { editor } from 'monaco-editor';
+import type React from 'react';
 
 export interface InputEditorPanelProps {
   /** 左エディタのデフォルト値 */
@@ -53,10 +53,7 @@ export const InputEditorPanel: React.FC<InputEditorPanelProps> = ({
   const themeName = theme === 'light' ? 'vs' : 'vs-dark';
 
   return (
-    <div
-      className={`input-editor-section ${isResizing ? 'resizing' : ''}`}
-      style={{ height }}
-    >
+    <div className={`input-editor-section ${isResizing ? 'resizing' : ''}`} style={{ height }}>
       <div className="editor-labels">
         <div className="editor-label editor-label-left">
           <span className="editor-label-text">Before</span>

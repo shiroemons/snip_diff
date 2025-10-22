@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain, clipboard, dialog, nativeTheme } from 'electron';
-import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { IPC_CHANNELS, type AppSettings } from '../shared/types';
+import * as path from 'node:path';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme } from 'electron';
+import { type AppSettings, IPC_CHANNELS } from '../shared/types';
 
 let mainWindow: BrowserWindow | null = null;
 const isDev = process.env.NODE_ENV === 'development';
@@ -176,54 +176,48 @@ function registerIpcHandlers(): void {
   });
 
   // クリップボード履歴追加
-  ipcMain.handle(
-    IPC_CHANNELS.CLIPBOARD_HISTORY_ADD,
-    async (_event, content: string) => {
-      const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      const item = {
-        id,
-        content,
-        timestamp: Date.now(),
-      };
+  ipcMain.handle(IPC_CHANNELS.CLIPBOARD_HISTORY_ADD, async (_event, content: string) => {
+    const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const item = {
+      id,
+      content,
+      timestamp: Date.now(),
+    };
 
-      clipboardHistory.unshift(item);
+    clipboardHistory.unshift(item);
 
-      // 上限を超えたら古いものを削除
-      if (clipboardHistory.length > MAX_HISTORY_SIZE) {
-        clipboardHistory.pop();
-      }
-
-      return item;
+    // 上限を超えたら古いものを削除
+    if (clipboardHistory.length > MAX_HISTORY_SIZE) {
+      clipboardHistory.pop();
     }
-  );
+
+    return item;
+  });
 
   // ファイル保存
-  ipcMain.handle(
-    IPC_CHANNELS.FILE_SAVE,
-    async (_event, content: string, defaultName?: string) => {
-      try {
-        const result = await dialog.showSaveDialog({
-          title: 'Save Diff',
-          defaultPath: defaultName || 'diff.patch',
-          filters: [
-            { name: 'Patch Files', extensions: ['patch', 'diff'] },
-            { name: 'Text Files', extensions: ['txt'] },
-            { name: 'All Files', extensions: ['*'] },
-          ],
-        });
+  ipcMain.handle(IPC_CHANNELS.FILE_SAVE, async (_event, content: string, defaultName?: string) => {
+    try {
+      const result = await dialog.showSaveDialog({
+        title: 'Save Diff',
+        defaultPath: defaultName || 'diff.patch',
+        filters: [
+          { name: 'Patch Files', extensions: ['patch', 'diff'] },
+          { name: 'Text Files', extensions: ['txt'] },
+          { name: 'All Files', extensions: ['*'] },
+        ],
+      });
 
-        if (result.canceled || !result.filePath) {
-          return { success: false, canceled: true };
-        }
-
-        await fs.writeFile(result.filePath, content, 'utf-8');
-        return { success: true, filePath: result.filePath };
-      } catch (error) {
-        console.error('Failed to save file:', error);
-        return { success: false, error: String(error) };
+      if (result.canceled || !result.filePath) {
+        return { success: false, canceled: true };
       }
+
+      await fs.writeFile(result.filePath, content, 'utf-8');
+      return { success: true, filePath: result.filePath };
+    } catch (error) {
+      console.error('Failed to save file:', error);
+      return { success: false, error: String(error) };
     }
-  );
+  });
 
   // ファイルを開く
   ipcMain.handle(IPC_CHANNELS.FILE_OPEN, async () => {

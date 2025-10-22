@@ -1,7 +1,7 @@
-import type React from 'react';
 import { DiffEditor as MonacoDiffEditor } from '@monaco-editor/react';
+import { ChevronDown, ChevronUp, Maximize2, Minimize2 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
-import { ChevronUp, ChevronDown, Maximize2, Minimize2 } from 'lucide-react';
+import type React from 'react';
 import { useDiffStore } from '../../../stores/diffStore';
 
 export interface ComparisonPanelProps {
@@ -122,7 +122,9 @@ export const ComparisonPanel: React.FC<ComparisonPanelProps> = ({
             <input
               type="checkbox"
               checked={compactMode}
-              onChange={(e) => useDiffStore.getState().updateOptions({ compactMode: e.target.checked })}
+              onChange={(e) =>
+                useDiffStore.getState().updateOptions({ compactMode: e.target.checked })
+              }
               title="Compact Mode (⌘3)"
             />
             <span>Compact</span>
@@ -155,31 +157,33 @@ export const ComparisonPanel: React.FC<ComparisonPanelProps> = ({
             language={language}
             theme={themeName}
             onMount={onDiffEditorMount}
-            options={{
-              readOnly: true,
-              renderSideBySide: viewMode === 'side-by-side',
-              ignoreTrimWhitespace: ignoreWhitespace,
-              originalEditable: false,
-              automaticLayout: true,
-              fontSize,
-              tabSize,
-              insertSpaces,
-              diffAlgorithm: 'advanced',
-              renderIndicators: !compactMode,
-              renderWhitespace: 'none',
-              renderOverviewRuler: !compactMode,
-              scrollBeyondLastLine: false,
-              scrollBeyondLastColumn: 0,
-              hideUnchangedRegions:
-                compactMode || hideUnchangedRegions
-                  ? {
-                      enabled: true,
-                      revealLineCount: 3,
-                      minimumLineCount: 3,
-                      contextLineCount: 3,
-                    }
-                  : undefined,
-            } as editor.IDiffEditorConstructionOptions}
+            options={
+              {
+                readOnly: true,
+                renderSideBySide: viewMode === 'side-by-side',
+                ignoreTrimWhitespace: ignoreWhitespace,
+                originalEditable: false,
+                automaticLayout: true,
+                fontSize,
+                tabSize,
+                insertSpaces,
+                diffAlgorithm: 'advanced',
+                renderIndicators: !compactMode,
+                renderWhitespace: 'none',
+                renderOverviewRuler: !compactMode,
+                scrollBeyondLastLine: false,
+                scrollBeyondLastColumn: 0,
+                hideUnchangedRegions:
+                  compactMode || hideUnchangedRegions
+                    ? {
+                        enabled: true,
+                        revealLineCount: 3,
+                        minimumLineCount: 3,
+                        contextLineCount: 3,
+                      }
+                    : undefined,
+              } as editor.IDiffEditorConstructionOptions
+            }
           />
         </div>
       )}

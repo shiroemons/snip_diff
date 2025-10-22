@@ -1,8 +1,8 @@
-import type React from 'react';
-import { useState, useRef, useEffect } from 'react';
-import { Sun, Moon } from 'lucide-react';
-import { useDiffStore } from '../stores/diffStore';
 import type { Theme } from '@shared/types';
+import { Moon, Sun } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useDiffStore } from '../stores/diffStore';
 import './Header.css';
 
 interface HeaderProps {

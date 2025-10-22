@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface UsePanelResizeReturn {
   /** 現在のパネルの高さ（ピクセル） */
@@ -33,9 +33,7 @@ export interface UsePanelResizeOptions {
  * @param options - 設定オプション
  * @returns パネルの状態と制御関数
  */
-export const usePanelResize = (
-  options: UsePanelResizeOptions = {},
-): UsePanelResizeReturn => {
+export const usePanelResize = (options: UsePanelResizeOptions = {}): UsePanelResizeReturn => {
   const {
     initialHeight = 350,
     minHeight = 200,
@@ -77,7 +75,7 @@ export const usePanelResize = (
       setIsResizing(true);
       document.body.classList.add('resizing-panel');
     },
-    [panelHeight],
+    [panelHeight]
   );
 
   // リサイズ中のマウス移動とマウスアップを処理

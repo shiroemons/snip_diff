@@ -1,15 +1,15 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  detectEOL,
-  normalizeText,
-  generatePreview,
-  countLines,
   calculateSimpleStats,
-  sanitizeFilename,
-  formatTimestamp,
+  countLines,
   createBuffer,
-  generateId,
   debounce,
+  detectEOL,
+  formatTimestamp,
+  generateId,
+  generatePreview,
+  normalizeText,
+  sanitizeFilename,
 } from './index';
 
 describe('detectEOL', () => {
@@ -178,7 +178,9 @@ describe('sanitizeFilename', () => {
   });
 
   it('should replace multiple special characters', () => {
-    expect(sanitizeFilename('file/name\\with:many*chars?.txt')).toBe('file_name_with_many_chars_.txt');
+    expect(sanitizeFilename('file/name\\with:many*chars?.txt')).toBe(
+      'file_name_with_many_chars_.txt'
+    );
   });
 });
 

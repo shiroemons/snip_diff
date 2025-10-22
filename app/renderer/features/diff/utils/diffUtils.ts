@@ -15,15 +15,13 @@ export const getTextFromModel = (
   startLine: number,
   startColumn: number,
   endLine: number,
-  endColumn: number,
+  endColumn: number
 ): string => {
   if (!model) return '';
   if (startLine <= 0 || startColumn <= 0 || endLine <= 0 || endColumn <= 0) {
     return '';
   }
-  return model.getValueInRange(
-    new monaco.Range(startLine, startColumn, endLine, endColumn),
-  );
+  return model.getValueInRange(new monaco.Range(startLine, startColumn, endLine, endColumn));
 };
 
 /**
@@ -34,7 +32,7 @@ export const getTextFromModel = (
  */
 export const splitRangeToSingleLine = (
   model: editor.ITextModel,
-  range: monaco.Range,
+  range: monaco.Range
 ): monaco.Range[] => {
   if (range.startLineNumber === range.endLineNumber) {
     if (range.startColumn === range.endColumn) {
@@ -46,10 +44,7 @@ export const splitRangeToSingleLine = (
   const ranges: monaco.Range[] = [];
   for (let line = range.startLineNumber; line <= range.endLineNumber; line += 1) {
     const startColumn = line === range.startLineNumber ? range.startColumn : 1;
-    const endColumn =
-      line === range.endLineNumber
-        ? range.endColumn
-        : model.getLineMaxColumn(line);
+    const endColumn = line === range.endLineNumber ? range.endColumn : model.getLineMaxColumn(line);
     if (startColumn === endColumn) continue;
     ranges.push(new monaco.Range(line, startColumn, line, endColumn));
   }

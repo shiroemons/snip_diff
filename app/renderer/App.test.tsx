@@ -1,6 +1,5 @@
-
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { useDiffStore } from './stores/diffStore';
 
@@ -35,10 +34,14 @@ vi.mock('./features/diff/DiffEditor', async () => {
         },
       }));
 
-      return React.createElement('div', {
-        'data-testid': 'diff-editor',
-        'data-theme': theme,
-      }, 'Diff Editor Mock');
+      return React.createElement(
+        'div',
+        {
+          'data-testid': 'diff-editor',
+          'data-theme': theme,
+        },
+        'Diff Editor Mock'
+      );
     }
   );
 
@@ -207,7 +210,8 @@ describe('App', () => {
     });
 
     it('should handle theme changes', async () => {
-      let themeChangeCallback: ((themeInfo: { shouldUseDarkColors: boolean }) => void) | null = null;
+      let themeChangeCallback: ((themeInfo: { shouldUseDarkColors: boolean }) => void) | null =
+        null;
       mockElectronAPI.theme.onChanged.mockImplementation((callback) => {
         themeChangeCallback = callback;
       });

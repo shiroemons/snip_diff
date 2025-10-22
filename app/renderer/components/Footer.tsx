@@ -3,7 +3,14 @@ import { useDiffStore } from '../stores/diffStore';
 import './Footer.css';
 
 const Footer: React.FC = () => {
-  const { getActiveSession, updateLeftBufferEOL, updateRightBufferEOL, updateBuffersLang, updateOptions, openSettingsModal } = useDiffStore();
+  const {
+    getActiveSession,
+    updateLeftBufferEOL,
+    updateRightBufferEOL,
+    updateBuffersLang,
+    updateOptions,
+    openSettingsModal,
+  } = useDiffStore();
   const activeSession = getActiveSession();
 
   if (!activeSession) return null;

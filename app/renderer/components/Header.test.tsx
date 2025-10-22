@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import Header from './Header';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDiffStore } from '../stores/diffStore';
+import Header from './Header';
 
 describe('Header', () => {
   beforeEach(() => {
@@ -47,7 +47,6 @@ describe('Header', () => {
       expect(screen.getByTitle(/左右を入れ替え/)).toBeTruthy();
       expect(screen.getByTitle(/クリア/)).toBeTruthy();
     });
-
   });
 
   describe('Option toggles', () => {

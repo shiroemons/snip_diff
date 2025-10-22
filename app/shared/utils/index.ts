@@ -57,9 +57,7 @@ export function createBuffer(content: string, lang: string = 'plaintext'): Buffe
  */
 export function generatePreview(text: string, maxLength: number = 100): string {
   const normalized = text.replace(/\s+/g, ' ').trim();
-  return normalized.length > maxLength
-    ? `${normalized.substring(0, maxLength)}...`
-    : normalized;
+  return normalized.length > maxLength ? `${normalized.substring(0, maxLength)}...` : normalized;
 }
 
 /**
@@ -73,10 +71,7 @@ export function countLines(text: string): number {
 /**
  * 差分統計を計算（簡易版）
  */
-export function calculateSimpleStats(
-  leftText: string,
-  rightText: string
-): DiffStats {
+export function calculateSimpleStats(leftText: string, rightText: string): DiffStats {
   const leftLines = countLines(leftText);
   const rightLines = countLines(rightText);
 

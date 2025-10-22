@@ -8,12 +8,15 @@ vi.mock('monaco-editor', async () => {
       public startLineNumber: number,
       public startColumn: number,
       public endLineNumber: number,
-      public endColumn: number,
+      public endColumn: number
     ) {}
   }
 
   class MockPosition {
-    constructor(public lineNumber: number, public column: number) {}
+    constructor(
+      public lineNumber: number,
+      public column: number
+    ) {}
   }
 
   return {

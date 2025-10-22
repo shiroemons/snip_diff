@@ -396,21 +396,42 @@
 
 /* Side-by-Sideモード専用の設定 */
 /* 左右どちらのエディタでもデフォルト装飾を抑制 */
-.compare-panel-content.compact-mode .monaco-diff-editor .original-in-monaco-diff-editor .view-overlays .cdr.char-delete,
-.compare-panel-content.compact-mode .monaco-diff-editor .modified-in-monaco-diff-editor .view-overlays .cdr.char-insert {
+.compare-panel-content.compact-mode .monaco-diff-editor
+  .original-in-monaco-diff-editor
+  .view-overlays
+  .cdr.char-delete,
+.compare-panel-content.compact-mode
+  .monaco-diff-editor
+  .modified-in-monaco-diff-editor
+  .view-overlays
+  .cdr.char-insert {
   background-color: transparent !important;
   background: none !important;
 }
 
 /* Side-by-Sideモードの行レベル背景も無効化 */
-.compare-panel-content.compact-mode .monaco-diff-editor .original-in-monaco-diff-editor .view-overlays .cdr.line-delete,
-.compare-panel-content.compact-mode .monaco-diff-editor .modified-in-monaco-diff-editor .view-overlays .cdr.line-insert {
+.compare-panel-content.compact-mode .monaco-diff-editor
+  .original-in-monaco-diff-editor
+  .view-overlays
+  .cdr.line-delete,
+.compare-panel-content.compact-mode
+  .monaco-diff-editor
+  .modified-in-monaco-diff-editor
+  .view-overlays
+  .cdr.line-insert {
   background-color: transparent !important;
   background: none !important;
 }
 
 /* Side-by-SideモードのGutter背景も無効化 */
-.compare-panel-content.compact-mode .monaco-diff-editor .original-in-monaco-diff-editor .margin-view-overlays .cmdr.gutter-delete,
-.compare-panel-content.compact-mode .monaco-diff-editor .modified-in-monaco-diff-editor .margin-view-overlays .cmdr.gutter-insert {
+.compare-panel-content.compact-mode .monaco-diff-editor
+  .original-in-monaco-diff-editor
+  .margin-view-overlays
+  .cmdr.gutter-delete,
+.compare-panel-content.compact-mode
+  .monaco-diff-editor
+  .modified-in-monaco-diff-editor
+  .margin-view-overlays
+  .cmdr.gutter-insert {
   background-color: transparent !important;
 }
