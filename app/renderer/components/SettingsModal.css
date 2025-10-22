@@ -147,10 +147,15 @@
 .settings-modal-footer {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
+  justify-content: space-between;
   padding: 16px 24px;
   border-top: 1px solid var(--border-color);
+}
+
+.settings-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .settings-button {
@@ -188,6 +193,22 @@
 .settings-button-save:active {
   background-color: #004578;
   border-color: #004578;
+}
+
+.settings-button-reset {
+  background-color: #f59e0b;
+  color: #ffffff;
+  border: 1px solid #f59e0b;
+}
+
+.settings-button-reset:hover {
+  background-color: #d97706;
+  border-color: #d97706;
+}
+
+.settings-button-reset:active {
+  background-color: #b45309;
+  border-color: #b45309;
 }
 
 .settings-button:active {

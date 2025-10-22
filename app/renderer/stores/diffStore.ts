@@ -1,11 +1,6 @@
+import type { DiffOptions, DiffSession, DiffStats, Theme } from '@shared/types';
+import { createBuffer, generateId } from '@shared/utils';
 import { create } from 'zustand';
-import type {
-  DiffSession,
-  DiffOptions,
-  Theme,
-  DiffStats,
-} from '@shared/types';
-import { generateId, createBuffer } from '@shared/utils';
 
 interface DiffStore {
   // セッション管理
@@ -39,13 +34,20 @@ interface DiffStore {
   updateBuffersLang: (lang: string) => void;
   openSettingsModal: () => void;
   closeSettingsModal: () => void;
-  loadSettings: (settings: { theme: Theme; defaultOptions: DiffOptions; defaultLanguage: string; defaultEOL: 'LF' | 'CRLF' | 'auto' }) => void;
+  loadSettings: (settings: {
+    theme: Theme;
+    defaultOptions: DiffOptions;
+    defaultLanguage: string;
+    defaultEOL: 'LF' | 'CRLF' | 'auto';
+  }) => void;
+  resetSettings: () => void;
 
   // ヘルパー
   getActiveSession: () => DiffSession | undefined;
 }
 
-const defaultOptions: DiffOptions = {
+// デフォルト設定値（リセット時に使用）
+export const INITIAL_DEFAULT_OPTIONS: DiffOptions = {
   ignoreWhitespace: false,
   normalizeEOL: true,
   viewMode: 'side-by-side',
@@ -58,7 +60,15 @@ const defaultOptions: DiffOptions = {
   hideUnchangedRegions: false,
 };
 
-const createEmptySession = (defaults: DiffOptions, defaultLang: string, defaultEOL: 'LF' | 'CRLF' | 'auto'): DiffSession => ({
+export const INITIAL_DEFAULT_THEME: Theme = 'auto';
+export const INITIAL_DEFAULT_LANGUAGE = 'plaintext';
+export const INITIAL_DEFAULT_EOL: 'LF' | 'CRLF' | 'auto' = 'auto';
+
+const createEmptySession = (
+  defaults: DiffOptions,
+  defaultLang: string,
+  defaultEOL: 'LF' | 'CRLF' | 'auto'
+): DiffSession => ({
   id: generateId(),
   left: { ...createBuffer(''), lang: defaultLang, eol: defaultEOL },
   right: { ...createBuffer(''), lang: defaultLang, eol: defaultEOL },
@@ -70,11 +80,11 @@ const createEmptySession = (defaults: DiffOptions, defaultLang: string, defaultE
 export const useDiffStore = create<DiffStore>((set, get) => ({
   sessions: [],
   activeSessionId: null,
-  theme: 'auto',
+  theme: INITIAL_DEFAULT_THEME,
   isSettingsModalOpen: false,
-  defaultOptions: { ...defaultOptions },
-  defaultLanguage: 'plaintext',
-  defaultEOL: 'auto',
+  defaultOptions: { ...INITIAL_DEFAULT_OPTIONS },
+  defaultLanguage: INITIAL_DEFAULT_LANGUAGE,
+  defaultEOL: INITIAL_DEFAULT_EOL,
 
   initializeSession: () => {
     const { defaultOptions: opts, defaultLanguage, defaultEOL } = get();
@@ -110,9 +120,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     };
 
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === activeSession.id ? updatedSession : s
-      ),
+      sessions: state.sessions.map((s) => (s.id === activeSession.id ? updatedSession : s)),
     }));
   },
 
@@ -127,9 +135,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     };
 
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === activeSession.id ? updatedSession : s
-      ),
+      sessions: state.sessions.map((s) => (s.id === activeSession.id ? updatedSession : s)),
     }));
   },
 
@@ -144,9 +150,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     };
 
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === activeSession.id ? updatedSession : s
-      ),
+      sessions: state.sessions.map((s) => (s.id === activeSession.id ? updatedSession : s)),
     }));
   },
 
@@ -161,9 +165,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     };
 
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === activeSession.id ? updatedSession : s
-      ),
+      sessions: state.sessions.map((s) => (s.id === activeSession.id ? updatedSession : s)),
     }));
   },
 
@@ -179,9 +181,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     };
 
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === activeSession.id ? updatedSession : s
-      ),
+      sessions: state.sessions.map((s) => (s.id === activeSession.id ? updatedSession : s)),
     }));
   },
 
@@ -198,9 +198,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     };
 
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === activeSession.id ? updatedSession : s
-      ),
+      sessions: state.sessions.map((s) => (s.id === activeSession.id ? updatedSession : s)),
     }));
   },
 
@@ -219,9 +217,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     };
 
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === activeSession.id ? updatedSession : s
-      ),
+      sessions: state.sessions.map((s) => (s.id === activeSession.id ? updatedSession : s)),
     }));
   },
 
@@ -236,9 +232,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     };
 
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === activeSession.id ? updatedSession : s
-      ),
+      sessions: state.sessions.map((s) => (s.id === activeSession.id ? updatedSession : s)),
     }));
   },
 
@@ -254,9 +248,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     };
 
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === activeSession.id ? updatedSession : s
-      ),
+      sessions: state.sessions.map((s) => (s.id === activeSession.id ? updatedSession : s)),
     }));
   },
 
@@ -274,6 +266,15 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
       defaultOptions: settings.defaultOptions,
       defaultLanguage: settings.defaultLanguage,
       defaultEOL: settings.defaultEOL,
+    });
+  },
+
+  resetSettings: () => {
+    set({
+      theme: INITIAL_DEFAULT_THEME,
+      defaultOptions: { ...INITIAL_DEFAULT_OPTIONS },
+      defaultLanguage: INITIAL_DEFAULT_LANGUAGE,
+      defaultEOL: INITIAL_DEFAULT_EOL,
     });
   },
 

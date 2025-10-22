@@ -1,7 +1,13 @@
+import type { DiffOptions, Theme } from '@shared/types';
 import type React from 'react';
-import { useState, useEffect, useId } from 'react';
-import { useDiffStore } from '../stores/diffStore';
-import type { Theme, DiffOptions } from '@shared/types';
+import { useEffect, useId, useState } from 'react';
+import {
+  INITIAL_DEFAULT_EOL,
+  INITIAL_DEFAULT_LANGUAGE,
+  INITIAL_DEFAULT_OPTIONS,
+  INITIAL_DEFAULT_THEME,
+  useDiffStore,
+} from '../stores/diffStore';
 import './SettingsModal.css';
 
 const SettingsModal: React.FC = () => {
@@ -73,6 +79,23 @@ const SettingsModal: React.FC = () => {
 
   const handleCancel = () => {
     closeSettingsModal();
+  };
+
+  const handleReset = () => {
+    // 確認ダイアログ表示
+    const confirmed = window.confirm(
+      '設定をデフォルト値にリセットしますか？\n\nこの操作により、すべての設定が初期値に戻ります。\n（「保存」ボタンを押すまで永続化されません）'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    // ローカル状態をデフォルト値に更新（プレビュー表示）
+    setLocalTheme(INITIAL_DEFAULT_THEME);
+    setLocalOptions({ ...INITIAL_DEFAULT_OPTIONS });
+    setLocalLanguage(INITIAL_DEFAULT_LANGUAGE);
+    setLocalEOL(INITIAL_DEFAULT_EOL);
   };
 
   if (!isSettingsModalOpen) return null;
@@ -164,7 +187,9 @@ const SettingsModal: React.FC = () => {
               <select
                 className="settings-select"
                 value={localOptions.fontSize}
-                onChange={(e) => setLocalOptions({ ...localOptions, fontSize: Number(e.target.value) })}
+                onChange={(e) =>
+                  setLocalOptions({ ...localOptions, fontSize: Number(e.target.value) })
+                }
               >
                 <option value="10">10</option>
                 <option value="12">12</option>
@@ -193,7 +218,12 @@ const SettingsModal: React.FC = () => {
               <select
                 className="settings-select"
                 value={localOptions.viewMode}
-                onChange={(e) => setLocalOptions({ ...localOptions, viewMode: e.target.value as 'unified' | 'side-by-side' })}
+                onChange={(e) =>
+                  setLocalOptions({
+                    ...localOptions,
+                    viewMode: e.target.value as 'unified' | 'side-by-side',
+                  })
+                }
               >
                 <option value="side-by-side">Side by Side</option>
                 <option value="unified">Unified</option>
@@ -209,7 +239,9 @@ const SettingsModal: React.FC = () => {
               <input
                 type="checkbox"
                 checked={localOptions.compactMode || false}
-                onChange={(e) => setLocalOptions({ ...localOptions, compactMode: e.target.checked })}
+                onChange={(e) =>
+                  setLocalOptions({ ...localOptions, compactMode: e.target.checked })
+                }
               />
               <span>Compactモード</span>
             </label>
@@ -224,7 +256,9 @@ const SettingsModal: React.FC = () => {
               <select
                 className="settings-select"
                 value={localOptions.insertSpaces ? 'スペース' : 'タブ'}
-                onChange={(e) => setLocalOptions({ ...localOptions, insertSpaces: e.target.value === 'スペース' })}
+                onChange={(e) =>
+                  setLocalOptions({ ...localOptions, insertSpaces: e.target.value === 'スペース' })
+                }
               >
                 <option value="スペース">スペース</option>
                 <option value="タブ">タブ</option>
@@ -241,7 +275,9 @@ const SettingsModal: React.FC = () => {
               <select
                 className="settings-select"
                 value={localOptions.tabSize}
-                onChange={(e) => setLocalOptions({ ...localOptions, tabSize: Number(e.target.value) })}
+                onChange={(e) =>
+                  setLocalOptions({ ...localOptions, tabSize: Number(e.target.value) })
+                }
               >
                 <option value="2">2</option>
                 <option value="4">4</option>
@@ -295,18 +331,28 @@ const SettingsModal: React.FC = () => {
         <div className="settings-modal-footer">
           <button
             type="button"
-            className="settings-button settings-button-cancel"
-            onClick={handleCancel}
+            className="settings-button settings-button-reset"
+            onClick={handleReset}
+            title="すべての設定をデフォルト値にリセットします"
           >
-            キャンセル
+            デフォルトにリセット
           </button>
-          <button
-            type="button"
-            className="settings-button settings-button-save"
-            onClick={handleSave}
-          >
-            保存
-          </button>
+          <div className="settings-footer-right">
+            <button
+              type="button"
+              className="settings-button settings-button-cancel"
+              onClick={handleCancel}
+            >
+              キャンセル
+            </button>
+            <button
+              type="button"
+              className="settings-button settings-button-save"
+              onClick={handleSave}
+            >
+              保存
+            </button>
+          </div>
         </div>
       </div>
     </div>

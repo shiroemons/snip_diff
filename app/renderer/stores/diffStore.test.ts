@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useDiffStore } from './diffStore';
 
 describe('diffStore', () => {
@@ -151,7 +151,13 @@ describe('diffStore', () => {
 
   describe('swapBuffers', () => {
     it('should swap left and right buffers', () => {
-      const { initializeSession, updateLeftBuffer, updateRightBuffer, swapBuffers, getActiveSession } = useDiffStore.getState();
+      const {
+        initializeSession,
+        updateLeftBuffer,
+        updateRightBuffer,
+        swapBuffers,
+        getActiveSession,
+      } = useDiffStore.getState();
 
       initializeSession();
       updateLeftBuffer('left content');
@@ -165,7 +171,13 @@ describe('diffStore', () => {
     });
 
     it('should swap buffer EOL settings', () => {
-      const { initializeSession, updateLeftBuffer, updateRightBuffer, swapBuffers, getActiveSession } = useDiffStore.getState();
+      const {
+        initializeSession,
+        updateLeftBuffer,
+        updateRightBuffer,
+        swapBuffers,
+        getActiveSession,
+      } = useDiffStore.getState();
 
       initializeSession();
       updateLeftBuffer('line1\nline2');
@@ -193,7 +205,13 @@ describe('diffStore', () => {
 
   describe('clearBuffers', () => {
     it('should clear both buffers', () => {
-      const { initializeSession, updateLeftBuffer, updateRightBuffer, clearBuffers, getActiveSession } = useDiffStore.getState();
+      const {
+        initializeSession,
+        updateLeftBuffer,
+        updateRightBuffer,
+        clearBuffers,
+        getActiveSession,
+      } = useDiffStore.getState();
 
       initializeSession();
       updateLeftBuffer('left content');
@@ -207,7 +225,8 @@ describe('diffStore', () => {
     });
 
     it('should clear stats', () => {
-      const { initializeSession, updateStats, clearBuffers, getActiveSession } = useDiffStore.getState();
+      const { initializeSession, updateStats, clearBuffers, getActiveSession } =
+        useDiffStore.getState();
 
       initializeSession();
       updateStats({ adds: 10, dels: 5, hunks: 2, leftLines: 100, rightLines: 105 });
@@ -371,6 +390,141 @@ describe('diffStore', () => {
       setActiveSession(firstId!);
 
       expect(useDiffStore.getState().activeSessionId).toBe(firstId);
+    });
+  });
+
+  describe('loadSettings', () => {
+    it('should load all settings', () => {
+      const { loadSettings } = useDiffStore.getState();
+
+      loadSettings({
+        theme: 'dark',
+        defaultOptions: {
+          ignoreWhitespace: true,
+          normalizeEOL: false,
+          viewMode: 'unified',
+          compactMode: true,
+          wordWrap: true,
+          tabSize: 2,
+          fontSize: 18,
+          insertSpaces: false,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: true,
+        },
+        defaultLanguage: 'typescript',
+        defaultEOL: 'LF',
+      });
+
+      const state = useDiffStore.getState();
+      expect(state.theme).toBe('dark');
+      expect(state.defaultOptions.fontSize).toBe(18);
+      expect(state.defaultOptions.tabSize).toBe(2);
+      expect(state.defaultOptions.viewMode).toBe('unified');
+      expect(state.defaultLanguage).toBe('typescript');
+      expect(state.defaultEOL).toBe('LF');
+    });
+  });
+
+  describe('resetSettings', () => {
+    it('should reset all settings to initial defaults', () => {
+      const { loadSettings, resetSettings } = useDiffStore.getState();
+
+      // まず設定を変更
+      loadSettings({
+        theme: 'dark',
+        defaultOptions: {
+          ignoreWhitespace: true,
+          normalizeEOL: false,
+          viewMode: 'unified',
+          compactMode: true,
+          wordWrap: true,
+          tabSize: 2,
+          fontSize: 24,
+          insertSpaces: false,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: true,
+        },
+        defaultLanguage: 'javascript',
+        defaultEOL: 'CRLF',
+      });
+
+      // リセット実行
+      resetSettings();
+
+      // デフォルト値に戻っていることを確認
+      const state = useDiffStore.getState();
+      expect(state.theme).toBe('auto');
+      expect(state.defaultOptions.ignoreWhitespace).toBe(false);
+      expect(state.defaultOptions.normalizeEOL).toBe(true);
+      expect(state.defaultOptions.viewMode).toBe('side-by-side');
+      expect(state.defaultOptions.compactMode).toBe(false);
+      expect(state.defaultOptions.wordWrap).toBe(false);
+      expect(state.defaultOptions.tabSize).toBe(4);
+      expect(state.defaultOptions.fontSize).toBe(14);
+      expect(state.defaultOptions.insertSpaces).toBe(true);
+      expect(state.defaultLanguage).toBe('plaintext');
+      expect(state.defaultEOL).toBe('auto');
+    });
+
+    it('should reset theme to auto', () => {
+      const { setTheme, resetSettings } = useDiffStore.getState();
+
+      setTheme('dark');
+      resetSettings();
+
+      expect(useDiffStore.getState().theme).toBe('auto');
+    });
+
+    it('should reset language to plaintext', () => {
+      const { loadSettings, resetSettings } = useDiffStore.getState();
+
+      loadSettings({
+        theme: 'auto',
+        defaultOptions: {
+          ignoreWhitespace: false,
+          normalizeEOL: true,
+          viewMode: 'side-by-side',
+          compactMode: false,
+          wordWrap: false,
+          tabSize: 4,
+          fontSize: 14,
+          insertSpaces: true,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: false,
+        },
+        defaultLanguage: 'typescript',
+        defaultEOL: 'auto',
+      });
+
+      resetSettings();
+
+      expect(useDiffStore.getState().defaultLanguage).toBe('plaintext');
+    });
+
+    it('should reset EOL to auto', () => {
+      const { loadSettings, resetSettings } = useDiffStore.getState();
+
+      loadSettings({
+        theme: 'auto',
+        defaultOptions: {
+          ignoreWhitespace: false,
+          normalizeEOL: true,
+          viewMode: 'side-by-side',
+          compactMode: false,
+          wordWrap: false,
+          tabSize: 4,
+          fontSize: 14,
+          insertSpaces: true,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: false,
+        },
+        defaultLanguage: 'plaintext',
+        defaultEOL: 'CRLF',
+      });
+
+      resetSettings();
+
+      expect(useDiffStore.getState().defaultEOL).toBe('auto');
     });
   });
 });
