@@ -18,6 +18,9 @@ interface DiffStore {
   defaultLanguage: string;
   defaultEOL: 'LF' | 'CRLF' | 'auto';
 
+  // 開発者モード
+  devMode: boolean;
+
   // アクション
   initializeSession: () => void;
   createNewSession: () => string;
@@ -39,6 +42,7 @@ interface DiffStore {
     defaultOptions: DiffOptions;
     defaultLanguage: string;
     defaultEOL: 'LF' | 'CRLF' | 'auto';
+    devMode?: boolean;
   }) => void;
   resetSettings: () => void;
 
@@ -85,6 +89,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
   defaultOptions: { ...INITIAL_DEFAULT_OPTIONS },
   defaultLanguage: INITIAL_DEFAULT_LANGUAGE,
   defaultEOL: INITIAL_DEFAULT_EOL,
+  devMode: false,
 
   initializeSession: () => {
     const { defaultOptions: opts, defaultLanguage, defaultEOL } = get();
@@ -266,6 +271,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
       defaultOptions: settings.defaultOptions,
       defaultLanguage: settings.defaultLanguage,
       defaultEOL: settings.defaultEOL,
+      devMode: settings.devMode ?? false,
     });
   },
 

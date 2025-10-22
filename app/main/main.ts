@@ -55,6 +55,7 @@ async function initializeStore() {
       clipboardHistoryTTL: 1000 * 60 * 60 * 24, // 24時間
       autoUpdate: false,
       crashReport: false,
+      devMode: false, // 開発者モード（設定ファイルで有効化可能）
     },
   });
 }

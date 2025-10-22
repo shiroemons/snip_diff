@@ -19,6 +19,7 @@ const SettingsModal: React.FC = () => {
     defaultOptions,
     defaultLanguage,
     defaultEOL,
+    devMode,
     setTheme,
     updateOptions,
     updateBuffersLang,
@@ -164,26 +165,30 @@ const SettingsModal: React.FC = () => {
         </div>
 
         <div className="settings-modal-body">
-          <div className="settings-section-group">
-            <h3 className="settings-section-title">アプリケーション</h3>
-            <p className="settings-section-description">
-              アプリケーション全体に関する設定です。
-            </p>
-          </div>
+          {devMode && (
+            <>
+              <div className="settings-section-group">
+                <h3 className="settings-section-title">アプリケーション</h3>
+                <p className="settings-section-description">
+                  アプリケーション全体に関する設定です。
+                </p>
+              </div>
 
-          <div className="settings-section">
-            <label className="settings-checkbox-label">
-              <input
-                type="checkbox"
-                checked={localAutoUpdate}
-                onChange={(e) => setLocalAutoUpdate(e.target.checked)}
-              />
-              <span>自動更新チェック</span>
-            </label>
-            <span className="settings-description">
-              アプリ起動時に自動的に更新をチェックします。新しいバージョンが見つかった場合は通知が表示されます。
-            </span>
-          </div>
+              <div className="settings-section">
+                <label className="settings-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localAutoUpdate}
+                    onChange={(e) => setLocalAutoUpdate(e.target.checked)}
+                  />
+                  <span>自動更新チェック</span>
+                </label>
+                <span className="settings-description">
+                  アプリ起動時に自動的に更新をチェックします。新しいバージョンが見つかった場合は通知が表示されます。
+                </span>
+              </div>
+            </>
+          )}
 
           <div className="settings-section-group">
             <h3 className="settings-section-title">デフォルト値の設定</h3>

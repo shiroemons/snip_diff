@@ -30,6 +30,7 @@ const App: React.FC = () => {
             defaultOptions: settings.defaultOptions,
             defaultLanguage: settings.defaultLanguage,
             defaultEOL: settings.defaultEOL,
+            devMode: settings.devMode,
           });
 
           // 設定読み込み後、即座にテーマを適用

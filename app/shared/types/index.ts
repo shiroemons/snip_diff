@@ -66,6 +66,7 @@ export interface AppSettings {
   clipboardHistoryTTL: number; // ミリ秒
   autoUpdate: boolean;
   crashReport: boolean;
+  devMode?: boolean; // 開発者モード（設定ファイルで有効化）
 }
 
 /**

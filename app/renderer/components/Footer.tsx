@@ -10,6 +10,7 @@ const Footer: React.FC = () => {
     updateBuffersLang,
     updateOptions,
     openSettingsModal,
+    devMode,
   } = useDiffStore();
   const activeSession = getActiveSession();
 
@@ -168,6 +169,12 @@ const Footer: React.FC = () => {
         >
           ⚙
         </button>
+
+        {devMode && (
+          <span className="dev-mode-indicator" title="開発者モード有効">
+            DEV
+          </span>
+        )}
       </div>
     </footer>
   );

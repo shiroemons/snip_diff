@@ -104,3 +104,25 @@
 .settings-icon-button:active {
   transform: rotate(45deg) scale(0.95);
 }
+
+.dev-mode-indicator {
+  margin-left: 12px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(238, 90, 111, 0.3);
+  animation: pulse-dev 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dev {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
