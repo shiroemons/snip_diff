@@ -79,6 +79,26 @@ export interface ClipboardHistoryItem {
 }
 
 /**
+ * 更新情報
+ */
+export interface UpdateInfo {
+  version: string;
+  releaseDate: string;
+  releaseNotes?: string;
+  downloadedPath?: string;
+}
+
+/**
+ * ダウンロード進捗情報
+ */
+export interface DownloadProgress {
+  percent: number;
+  bytesPerSecond: number;
+  transferred: number;
+  total: number;
+}
+
+/**
  * IPC通信チャンネル定義
  */
 export const IPC_CHANNELS = {
@@ -106,6 +126,16 @@ export const IPC_CHANNELS = {
   // テーマ
   THEME_CHANGED: 'theme:changed',
   THEME_GET: 'theme:get',
+
+  // 自動更新
+  UPDATE_CHECK: 'update:check',
+  UPDATE_DOWNLOAD: 'update:download',
+  UPDATE_AVAILABLE: 'update:available',
+  UPDATE_NOT_AVAILABLE: 'update:not-available',
+  UPDATE_DOWNLOAD_PROGRESS: 'update:download-progress',
+  UPDATE_DOWNLOADED: 'update:downloaded',
+  UPDATE_INSTALL: 'update:install',
+  UPDATE_ERROR: 'update:error',
 } as const;
 
 /**

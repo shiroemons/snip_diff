@@ -1,7 +1,13 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme } from 'electron';
-import { type AppSettings, IPC_CHANNELS } from '../shared/types';
+import { autoUpdater } from 'electron-updater';
+import {
+  type AppSettings,
+  type DownloadProgress,
+  IPC_CHANNELS,
+  type UpdateInfo,
+} from '../shared/types';
 
 let mainWindow: BrowserWindow | null = null;
 const isDev = process.env.NODE_ENV === 'development';
@@ -134,6 +140,18 @@ app.whenReady().then(async () => {
 
   // IPCハンドラの登録
   registerIpcHandlers();
+
+  // 自動更新の設定
+  setupAutoUpdater();
+
+  // 設定で自動更新が有効な場合、起動時に更新チェック
+  const settings = store.store as AppSettings;
+  if (settings.autoUpdate && !isDev) {
+    // ウィンドウが表示されてから少し待ってチェック
+    setTimeout(() => {
+      checkForUpdates();
+    }, 3000);
+  }
 });
 
 /**
@@ -144,6 +162,90 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+/**
+ * 自動更新の設定とイベントリスナーの登録
+ */
+function setupAutoUpdater(): void {
+  // 開発環境では自動更新を無効化
+  if (isDev) {
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = false;
+    return;
+  }
+
+  // 自動更新の設定
+  autoUpdater.autoDownload = false; // 手動でダウンロードを制御
+  autoUpdater.autoInstallOnAppQuit = true; // アプリ終了時に自動インストール
+
+  // 更新が利用可能になったとき
+  autoUpdater.on('update-available', (info) => {
+    console.log('Update available:', info.version);
+    const updateInfo: UpdateInfo = {
+      version: info.version,
+      releaseDate: info.releaseDate,
+      releaseNotes: typeof info.releaseNotes === 'string' ? info.releaseNotes : undefined,
+    };
+    mainWindow?.webContents.send(IPC_CHANNELS.UPDATE_AVAILABLE, updateInfo);
+  });
+
+  // 更新が利用不可の場合
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('Update not available:', info.version);
+    mainWindow?.webContents.send(IPC_CHANNELS.UPDATE_NOT_AVAILABLE, {
+      version: info.version,
+    });
+  });
+
+  // ダウンロード進捗
+  autoUpdater.on('download-progress', (progressObj) => {
+    console.log(
+      `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`
+    );
+    const progress: DownloadProgress = {
+      percent: progressObj.percent,
+      bytesPerSecond: progressObj.bytesPerSecond,
+      transferred: progressObj.transferred,
+      total: progressObj.total,
+    };
+    mainWindow?.webContents.send(IPC_CHANNELS.UPDATE_DOWNLOAD_PROGRESS, progress);
+  });
+
+  // ダウンロード完了
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('Update downloaded:', info.version);
+    const updateInfo: UpdateInfo = {
+      version: info.version,
+      releaseDate: info.releaseDate,
+      releaseNotes: typeof info.releaseNotes === 'string' ? info.releaseNotes : undefined,
+    };
+    mainWindow?.webContents.send(IPC_CHANNELS.UPDATE_DOWNLOADED, updateInfo);
+  });
+
+  // エラー発生時
+  autoUpdater.on('error', (error) => {
+    console.error('Update error:', error);
+    mainWindow?.webContents.send(IPC_CHANNELS.UPDATE_ERROR, {
+      message: error.message,
+    });
+  });
+}
+
+/**
+ * 更新チェックを実行
+ */
+async function checkForUpdates(): Promise<void> {
+  if (isDev) {
+    console.log('Auto-update is disabled in development mode');
+    return;
+  }
+
+  try {
+    await autoUpdater.checkForUpdates();
+  } catch (error) {
+    console.error('Failed to check for updates:', error);
+  }
+}
 
 /**
  * IPCハンドラを登録
@@ -177,7 +279,7 @@ function registerIpcHandlers(): void {
 
   // クリップボード履歴追加
   ipcMain.handle(IPC_CHANNELS.CLIPBOARD_HISTORY_ADD, async (_event, content: string) => {
-    const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const id = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
     const item = {
       id,
       content,
@@ -298,6 +400,29 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC_CHANNELS.WINDOW_IS_MAXIMIZED, async () => {
     return mainWindow?.isMaximized() ?? false;
+  });
+
+  // 自動更新関連
+  ipcMain.handle(IPC_CHANNELS.UPDATE_CHECK, async () => {
+    await checkForUpdates();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.UPDATE_DOWNLOAD, async () => {
+    if (!isDev) {
+      try {
+        await autoUpdater.downloadUpdate();
+      } catch (error) {
+        console.error('Failed to download update:', error);
+        throw error;
+      }
+    }
+  });
+
+  ipcMain.handle(IPC_CHANNELS.UPDATE_INSTALL, async () => {
+    if (!isDev) {
+      // ダウンロード済みの更新をインストールして再起動
+      autoUpdater.quitAndInstall(false, true);
+    }
   });
 }
 

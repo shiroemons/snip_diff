@@ -30,6 +30,7 @@ const SettingsModal: React.FC = () => {
   const [localOptions, setLocalOptions] = useState<DiffOptions>(defaultOptions);
   const [localLanguage, setLocalLanguage] = useState(defaultLanguage);
   const [localEOL, setLocalEOL] = useState<'LF' | 'CRLF' | 'auto'>(defaultEOL);
+  const [localAutoUpdate, setLocalAutoUpdate] = useState(false);
 
   // モーダルが開かれたら現在の設定を読み込む
   useEffect(() => {
@@ -38,6 +39,11 @@ const SettingsModal: React.FC = () => {
       setLocalOptions(defaultOptions);
       setLocalLanguage(defaultLanguage);
       setLocalEOL(defaultEOL);
+
+      // 自動更新設定を読み込む
+      window.electron?.settings.get().then((settings) => {
+        setLocalAutoUpdate(settings.autoUpdate ?? false);
+      });
     }
   }, [isSettingsModalOpen, theme, defaultOptions, defaultLanguage, defaultEOL]);
 
@@ -52,6 +58,7 @@ const SettingsModal: React.FC = () => {
         defaultOptions: localOptions,
         defaultLanguage: safeLocalLanguage,
         defaultEOL: safeLocalEOL,
+        autoUpdate: localAutoUpdate,
       };
 
       const result = await window.electron.settings.set(settings);
@@ -145,7 +152,7 @@ const SettingsModal: React.FC = () => {
         aria-labelledby={titleId}
       >
         <div className="settings-modal-header">
-          <h2 id={titleId}>デフォルト設定</h2>
+          <h2 id={titleId}>設定</h2>
           <button
             type="button"
             className="settings-modal-close"
@@ -156,13 +163,35 @@ const SettingsModal: React.FC = () => {
           </button>
         </div>
 
-        <div className="settings-modal-intro">
-          <p>
-            ここで設定した値が、アプリケーション起動時や新しく比較を開始する際のデフォルト値として使用されます。
-          </p>
-        </div>
-
         <div className="settings-modal-body">
+          <div className="settings-section-group">
+            <h3 className="settings-section-title">アプリケーション</h3>
+            <p className="settings-section-description">
+              アプリケーション全体に関する設定です。
+            </p>
+          </div>
+
+          <div className="settings-section">
+            <label className="settings-checkbox-label">
+              <input
+                type="checkbox"
+                checked={localAutoUpdate}
+                onChange={(e) => setLocalAutoUpdate(e.target.checked)}
+              />
+              <span>自動更新チェック</span>
+            </label>
+            <span className="settings-description">
+              アプリ起動時に自動的に更新をチェックします。新しいバージョンが見つかった場合は通知が表示されます。
+            </span>
+          </div>
+
+          <div className="settings-section-group">
+            <h3 className="settings-section-title">デフォルト値の設定</h3>
+            <p className="settings-section-description">
+              アプリケーション起動時や新しく比較を開始する際のデフォルト値を設定します。
+            </p>
+          </div>
+
           <div className="settings-section">
             <label className="settings-label">
               テーマ

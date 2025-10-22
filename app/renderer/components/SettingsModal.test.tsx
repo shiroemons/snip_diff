@@ -33,6 +33,7 @@ const mockElectronAPI = {
       },
       defaultLanguage: 'plaintext',
       defaultEOL: 'auto',
+      autoUpdate: false,
     }),
     set: vi.fn().mockResolvedValue({ success: true }),
   },
@@ -48,6 +49,17 @@ const mockElectronAPI = {
     isMaximized: vi.fn().mockResolvedValue(false),
     onMaximizedChanged: vi.fn(),
     removeMaximizedListener: vi.fn(),
+  },
+  updater: {
+    checkForUpdates: vi.fn().mockResolvedValue(undefined),
+    downloadUpdate: vi.fn().mockResolvedValue(undefined),
+    installUpdate: vi.fn().mockResolvedValue(undefined),
+    onUpdateAvailable: vi.fn(),
+    onUpdateNotAvailable: vi.fn(),
+    onDownloadProgress: vi.fn(),
+    onUpdateDownloaded: vi.fn(),
+    onError: vi.fn(),
+    removeAllListeners: vi.fn(),
   },
   platform: 'darwin' as NodeJS.Platform,
 };
@@ -93,16 +105,15 @@ describe('SettingsModal', () => {
     it('should render when modal is open', () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
-      expect(screen.getByText('デフォルト設定')).toBeTruthy();
+      expect(screen.getByText('設定')).toBeTruthy();
     });
 
-    it('should display default settings intro text', () => {
+    it('should display default settings section title', () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
+      expect(screen.getByText('デフォルト値の設定')).toBeTruthy();
       expect(
-        screen.getByText(
-          /ここで設定した値が、アプリケーション起動時や新しく比較を開始する際のデフォルト値として使用されます/
-        )
+        screen.getByText(/アプリケーション起動時や新しく比較を開始する際のデフォルト値を設定します/)
       ).toBeTruthy();
     });
   });

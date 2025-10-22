@@ -95,6 +95,17 @@ const mockElectronAPI = {
     onMaximizedChanged: vi.fn(),
     removeMaximizedListener: vi.fn(),
   },
+  updater: {
+    checkForUpdates: vi.fn().mockResolvedValue(undefined),
+    downloadUpdate: vi.fn().mockResolvedValue(undefined),
+    installUpdate: vi.fn().mockResolvedValue(undefined),
+    onUpdateAvailable: vi.fn(),
+    onUpdateNotAvailable: vi.fn(),
+    onDownloadProgress: vi.fn(),
+    onUpdateDownloaded: vi.fn(),
+    onError: vi.fn(),
+    removeAllListeners: vi.fn(),
+  },
   platform: 'darwin' as NodeJS.Platform,
 };
 

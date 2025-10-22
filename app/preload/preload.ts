@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { AppSettings } from '../shared/types';
+import type { AppSettings, DownloadProgress, UpdateInfo } from '../shared/types';
 
 /**
  * IPC通信チャンネル定義
@@ -29,6 +29,16 @@ const IPC_CHANNELS = {
   // テーマ
   THEME_CHANGED: 'theme:changed',
   THEME_GET: 'theme:get',
+
+  // 自動更新
+  UPDATE_CHECK: 'update:check',
+  UPDATE_DOWNLOAD: 'update:download',
+  UPDATE_AVAILABLE: 'update:available',
+  UPDATE_NOT_AVAILABLE: 'update:not-available',
+  UPDATE_DOWNLOAD_PROGRESS: 'update:download-progress',
+  UPDATE_DOWNLOADED: 'update:downloaded',
+  UPDATE_INSTALL: 'update:install',
+  UPDATE_ERROR: 'update:error',
 } as const;
 
 /**
@@ -101,6 +111,45 @@ const electronAPI = {
     },
     removeMaximizedListener: () => {
       ipcRenderer.removeAllListeners(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED);
+    },
+  },
+
+  // 自動更新
+  updater: {
+    checkForUpdates: (): Promise<void> => ipcRenderer.invoke(IPC_CHANNELS.UPDATE_CHECK),
+    downloadUpdate: (): Promise<void> => ipcRenderer.invoke(IPC_CHANNELS.UPDATE_DOWNLOAD),
+    installUpdate: (): Promise<void> => ipcRenderer.invoke(IPC_CHANNELS.UPDATE_INSTALL),
+    onUpdateAvailable: (callback: (info: UpdateInfo) => void) => {
+      ipcRenderer.on(IPC_CHANNELS.UPDATE_AVAILABLE, (_event, info) => {
+        callback(info);
+      });
+    },
+    onUpdateNotAvailable: (callback: (info: { version: string }) => void) => {
+      ipcRenderer.on(IPC_CHANNELS.UPDATE_NOT_AVAILABLE, (_event, info) => {
+        callback(info);
+      });
+    },
+    onDownloadProgress: (callback: (progress: DownloadProgress) => void) => {
+      ipcRenderer.on(IPC_CHANNELS.UPDATE_DOWNLOAD_PROGRESS, (_event, progress) => {
+        callback(progress);
+      });
+    },
+    onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => {
+      ipcRenderer.on(IPC_CHANNELS.UPDATE_DOWNLOADED, (_event, info) => {
+        callback(info);
+      });
+    },
+    onError: (callback: (error: { message: string }) => void) => {
+      ipcRenderer.on(IPC_CHANNELS.UPDATE_ERROR, (_event, error) => {
+        callback(error);
+      });
+    },
+    removeAllListeners: () => {
+      ipcRenderer.removeAllListeners(IPC_CHANNELS.UPDATE_AVAILABLE);
+      ipcRenderer.removeAllListeners(IPC_CHANNELS.UPDATE_NOT_AVAILABLE);
+      ipcRenderer.removeAllListeners(IPC_CHANNELS.UPDATE_DOWNLOAD_PROGRESS);
+      ipcRenderer.removeAllListeners(IPC_CHANNELS.UPDATE_DOWNLOADED);
+      ipcRenderer.removeAllListeners(IPC_CHANNELS.UPDATE_ERROR);
     },
   },
 

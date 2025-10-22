@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import SettingsModal from './components/SettingsModal';
+import UpdateNotification from './components/UpdateNotification';
 import DiffEditor, { type DiffEditorRef } from './features/diff/DiffEditor';
 import { useDiffStore } from './stores/diffStore';
 
@@ -174,6 +175,7 @@ const App: React.FC = () => {
       </main>
       <Footer />
       <SettingsModal />
+      <UpdateNotification theme={actualTheme} />
     </div>
   );
 };

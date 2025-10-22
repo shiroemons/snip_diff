@@ -1,0 +1,134 @@
+.update-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+}
+
+.update-notification.light {
+  background-color: #ffffff;
+  border: 1px solid #e1e4e8;
+  color: #24292e;
+}
+
+.update-notification.dark {
+  background-color: #2d2d2d;
+  border: 1px solid #444;
+  color: #e1e4e8;
+}
+
+.update-notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.update-notification-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.update-notification-text strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.update-notification-text p {
+  font-size: 13px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.update-notification-text.error {
+  color: #f85149;
+}
+
+.update-notification-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.update-notification button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.update-notification .btn-primary {
+  background-color: #2da44e;
+  color: white;
+}
+
+.update-notification .btn-primary:hover {
+  background-color: #2c974b;
+}
+
+.update-notification .btn-secondary {
+  background-color: transparent;
+  border: 1px solid #d0d7de;
+  padding: 6px 8px;
+}
+
+.update-notification.light .btn-secondary {
+  color: #24292e;
+  border-color: #d0d7de;
+}
+
+.update-notification.light .btn-secondary:hover {
+  background-color: #f6f8fa;
+}
+
+.update-notification.dark .btn-secondary {
+  color: #e1e4e8;
+  border-color: #444;
+}
+
+.update-notification.dark .btn-secondary:hover {
+  background-color: #3a3a3a;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(128, 128, 128, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #2da44e;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
