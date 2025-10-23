@@ -98,6 +98,22 @@ function createWindow(): void {
     mainWindow.loadFile(rendererPath);
   }
 
+  // セキュリティ: ナビゲーションをブロック（ドラッグ・アンド・ドロップによるファイルオープンを防止）
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    // 開発モードでのlocalhostへのナビゲーションは許可
+    if (isDev && url.startsWith('http://localhost:5173')) {
+      return;
+    }
+    // それ以外のナビゲーションはすべてブロック
+    event.preventDefault();
+    console.warn('Navigation blocked:', url);
+  });
+
+  mainWindow.webContents.setWindowOpenHandler(() => {
+    // 新しいウィンドウを開くことを拒否
+    return { action: 'deny' };
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });

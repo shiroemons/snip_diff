@@ -189,6 +189,23 @@ const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [updateOptions]);
 
+  // セキュリティ: ドラッグ・アンド・ドロップによるファイルオープンを防止
+  useEffect(() => {
+    const preventDragDrop = (e: Event) => {
+      e.preventDefault();
+    };
+
+    // ドラッグオーバー時のデフォルト動作を防止
+    document.addEventListener('dragover', preventDragDrop);
+    // ドロップ時のデフォルト動作を防止
+    document.addEventListener('drop', preventDragDrop);
+
+    return () => {
+      document.removeEventListener('dragover', preventDragDrop);
+      document.removeEventListener('drop', preventDragDrop);
+    };
+  }, []);
+
   return (
     <div className={`app ${actualTheme}`}>
       <Header

@@ -645,4 +645,84 @@ describe('App', () => {
       expect(session?.options.viewMode).toBe(initialViewMode);
     });
   });
+
+  describe('Security: Drag and Drop prevention', () => {
+    it('should prevent dragover default behavior', async () => {
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initialization
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      // Create a dragover event
+      const dragoverEvent = new Event('dragover', {
+        bubbles: true,
+        cancelable: true,
+      });
+
+      const preventDefaultSpy = vi.spyOn(dragoverEvent, 'preventDefault');
+
+      // Dispatch the dragover event
+      await act(async () => {
+        document.dispatchEvent(dragoverEvent);
+      });
+
+      // Verify preventDefault was called
+      expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    it('should prevent drop default behavior', async () => {
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initialization
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      // Create a drop event
+      const dropEvent = new Event('drop', {
+        bubbles: true,
+        cancelable: true,
+      });
+
+      const preventDefaultSpy = vi.spyOn(dropEvent, 'preventDefault');
+
+      // Dispatch the drop event
+      await act(async () => {
+        document.dispatchEvent(dropEvent);
+      });
+
+      // Verify preventDefault was called
+      expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    it('should clean up event listeners on unmount', async () => {
+      const { unmount } = await act(async () => {
+        return render(<App />);
+      });
+
+      // Wait for initialization
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
+
+      // Unmount the component
+      await act(async () => {
+        unmount();
+      });
+
+      // Verify event listeners were removed
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('dragover', expect.any(Function));
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('drop', expect.any(Function));
+
+      removeEventListenerSpy.mockRestore();
+    });
+  });
 });
