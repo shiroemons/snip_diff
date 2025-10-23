@@ -311,4 +311,15 @@ describe('Footer', () => {
       expect(screen.getByText('0 hunks')).toBeTruthy();
     });
   });
+
+  describe('Development mode indicator', () => {
+    it('should not display DEV indicator in test environment', () => {
+      render(<Footer />);
+
+      // In test environment, import.meta.env.DEV is false
+      // So DEV indicator should not be present
+      const devIndicator = screen.queryByText('DEV');
+      expect(devIndicator).toBeNull();
+    });
+  });
 });

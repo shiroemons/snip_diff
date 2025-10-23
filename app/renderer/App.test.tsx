@@ -344,6 +344,99 @@ describe('App', () => {
   });
 
   describe('Menu events', () => {
+    it('should handle settings.onOpen event', async () => {
+      let settingsOpenCallback: (() => void) | null = null;
+      mockElectronAPI.settings.onOpen.mockImplementation((callback) => {
+        settingsOpenCallback = callback;
+      });
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      // Initially modal should be closed
+      const { isSettingsModalOpen: initialState } = useDiffStore.getState();
+      expect(initialState).toBe(false);
+
+      // Trigger settings open event
+      await act(async () => {
+        if (settingsOpenCallback) {
+          settingsOpenCallback();
+        }
+      });
+
+      // Modal should now be open
+      const { isSettingsModalOpen } = useDiffStore.getState();
+      expect(isSettingsModalOpen).toBe(true);
+    });
+
+    it('should handle view.onModeChange event for unified mode', async () => {
+      let modeChangeCallback: ((mode: 'unified' | 'side-by-side') => void) | null = null;
+      mockElectronAPI.view.onModeChange.mockImplementation((callback) => {
+        modeChangeCallback = callback;
+      });
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      // Trigger mode change to unified
+      await act(async () => {
+        if (modeChangeCallback) {
+          modeChangeCallback('unified');
+        }
+      });
+
+      await waitFor(() => {
+        const { getActiveSession } = useDiffStore.getState();
+        const session = getActiveSession();
+        expect(session?.options.viewMode).toBe('unified');
+      });
+    });
+
+    it('should handle view.onModeChange event for side-by-side mode', async () => {
+      let modeChangeCallback: ((mode: 'unified' | 'side-by-side') => void) | null = null;
+      mockElectronAPI.view.onModeChange.mockImplementation((callback) => {
+        modeChangeCallback = callback;
+      });
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      // First change to unified
+      await act(async () => {
+        if (modeChangeCallback) {
+          modeChangeCallback('unified');
+        }
+      });
+
+      // Then change back to side-by-side
+      await act(async () => {
+        if (modeChangeCallback) {
+          modeChangeCallback('side-by-side');
+        }
+      });
+
+      await waitFor(() => {
+        const { getActiveSession } = useDiffStore.getState();
+        const session = getActiveSession();
+        expect(session?.options.viewMode).toBe('side-by-side');
+      });
+    });
+
     it('should handle view.onToggleCompact event', async () => {
       let toggleCompactCallback: (() => void) | null = null;
       mockElectronAPI.view.onToggleCompact.mockImplementation((callback) => {

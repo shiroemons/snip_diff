@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDiffStore } from '../stores/diffStore';
@@ -694,6 +694,91 @@ describe('SettingsModal', () => {
       // ストアの設定は変更されていない
       expect(state.theme).toBe('dark');
       expect(state.defaultOptions.fontSize).toBe(24);
+    });
+  });
+
+  describe('Update check functionality', () => {
+    beforeEach(() => {
+      // Clear localStorage before each test
+      localStorage.clear();
+    });
+
+    it('should display checking message when checking for updates', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      // Mock checkForUpdates to be a long-running operation
+      mockElectronAPI.updater.checkForUpdates.mockImplementation(
+        () => new Promise((resolve) => setTimeout(resolve, 100))
+      );
+
+      render(<SettingsModal />);
+
+      const checkButton = screen.getByText('今すぐ更新を確認');
+      await user.click(checkButton);
+
+      // Should display checking message
+      await waitFor(() => {
+        expect(screen.getByText('更新を確認中...')).toBeTruthy();
+      });
+
+      // Button should be disabled while checking
+      const button = checkButton as HTMLButtonElement;
+      expect(button.disabled).toBe(true);
+    });
+
+    it('should display last update check time from localStorage', () => {
+      const lastCheckTime = '2025/10/23 22:00';
+      localStorage.setItem('lastUpdateCheck', lastCheckTime);
+
+      useDiffStore.setState({ isSettingsModalOpen: true });
+      render(<SettingsModal />);
+
+      expect(screen.getByText(`最終確認: ${lastCheckTime}`)).toBeTruthy();
+    });
+
+    it('should update last check time after checking for updates', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const checkButton = screen.getByText('今すぐ更新を確認');
+      await user.click(checkButton);
+
+      // Wait for success message
+      await waitFor(() => {
+        expect(screen.getByText('最新バージョンです')).toBeTruthy();
+      }, { timeout: 3000 });
+
+      // Check that localStorage was updated with a timestamp
+      const savedTime = localStorage.getItem('lastUpdateCheck');
+      expect(savedTime).toBeTruthy();
+      expect(savedTime).toMatch(/\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}/);
+    });
+
+    it('should display error message when update check fails', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      // Mock checkForUpdates to throw an error
+      mockElectronAPI.updater.checkForUpdates.mockRejectedValueOnce(
+        new Error('Network error')
+      );
+
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      render(<SettingsModal />);
+
+      const checkButton = screen.getByText('今すぐ更新を確認');
+      await user.click(checkButton);
+
+      // Should display error message
+      await waitFor(() => {
+        expect(screen.getByText('更新チェックに失敗しました')).toBeTruthy();
+      });
+
+      consoleErrorSpy.mockRestore();
     });
   });
 });
