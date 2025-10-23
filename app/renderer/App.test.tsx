@@ -343,6 +343,38 @@ describe('App', () => {
     });
   });
 
+  describe('Menu events', () => {
+    it('should handle view.onToggleCompact event', async () => {
+      let toggleCompactCallback: (() => void) | null = null;
+      mockElectronAPI.view.onToggleCompact.mockImplementation((callback) => {
+        toggleCompactCallback = callback;
+      });
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      const { getActiveSession } = useDiffStore.getState();
+      const initialCompactMode = getActiveSession()?.options.compactMode ?? false;
+
+      // Trigger toggle compact event
+      await act(async () => {
+        if (toggleCompactCallback) {
+          toggleCompactCallback();
+        }
+      });
+
+      await waitFor(() => {
+        const session = getActiveSession();
+        expect(session?.options.compactMode).toBe(!initialCompactMode);
+      });
+    });
+  });
+
   describe('Keyboard shortcuts', () => {
     it('should switch to unified mode on Cmd+1', async () => {
       await act(async () => {

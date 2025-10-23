@@ -368,6 +368,126 @@ describe('SettingsModal', () => {
     });
   });
 
+  describe('Compact mode toggle', () => {
+    it('should toggle compact mode checkbox', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const compactCheckbox = screen.getByRole('checkbox', { name: /Compactモード/ }) as HTMLInputElement;
+      expect(compactCheckbox.checked).toBe(false);
+
+      await user.click(compactCheckbox);
+      expect(compactCheckbox.checked).toBe(true);
+
+      await user.click(compactCheckbox);
+      expect(compactCheckbox.checked).toBe(false);
+    });
+
+    it('should save compact mode setting', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const compactCheckbox = screen.getByRole('checkbox', { name: /Compactモード/ });
+      await user.click(compactCheckbox);
+
+      const saveButton = screen.getByText('保存');
+      await user.click(saveButton);
+
+      expect(mockElectronAPI.settings.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          defaultOptions: expect.objectContaining({
+            compactMode: true,
+          }),
+        })
+      );
+    });
+  });
+
+  describe('Indent settings', () => {
+    it('should change indent method from space to tab', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const indentMethodLabel = screen.getByText('インデント方式');
+      const indentMethodSelect = indentMethodLabel.querySelector('select') as HTMLSelectElement;
+
+      expect(indentMethodSelect.value).toBe('スペース');
+
+      await user.selectOptions(indentMethodSelect, 'タブ');
+      expect(indentMethodSelect.value).toBe('タブ');
+    });
+
+    it('should save indent method setting', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const indentMethodLabel = screen.getByText('インデント方式');
+      const indentMethodSelect = indentMethodLabel.querySelector('select') as HTMLSelectElement;
+
+      await user.selectOptions(indentMethodSelect, 'タブ');
+
+      const saveButton = screen.getByText('保存');
+      await user.click(saveButton);
+
+      expect(mockElectronAPI.settings.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          defaultOptions: expect.objectContaining({
+            insertSpaces: false,
+          }),
+        })
+      );
+    });
+
+    it('should change tab size', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const tabSizeLabel = screen.getByText('インデントサイズ');
+      const tabSizeSelect = tabSizeLabel.querySelector('select') as HTMLSelectElement;
+
+      expect(tabSizeSelect.value).toBe('4');
+
+      await user.selectOptions(tabSizeSelect, '2');
+      expect(tabSizeSelect.value).toBe('2');
+
+      await user.selectOptions(tabSizeSelect, '8');
+      expect(tabSizeSelect.value).toBe('8');
+    });
+
+    it('should save tab size setting', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const tabSizeLabel = screen.getByText('インデントサイズ');
+      const tabSizeSelect = tabSizeLabel.querySelector('select') as HTMLSelectElement;
+
+      await user.selectOptions(tabSizeSelect, '2');
+
+      const saveButton = screen.getByText('保存');
+      await user.click(saveButton);
+
+      expect(mockElectronAPI.settings.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          defaultOptions: expect.objectContaining({
+            tabSize: 2,
+          }),
+        })
+      );
+    });
+  });
+
   describe('Reset button', () => {
     beforeEach(() => {
       // Mock window.confirm
