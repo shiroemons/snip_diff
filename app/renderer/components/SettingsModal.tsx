@@ -19,6 +19,7 @@ const SettingsModal: React.FC = () => {
     defaultOptions,
     defaultLanguage,
     defaultEOL,
+    devMode,
     setTheme,
     updateOptions,
     updateBuffersLang,
@@ -46,16 +47,11 @@ const SettingsModal: React.FC = () => {
       setLocalOptions(defaultOptions);
       setLocalLanguage(defaultLanguage);
       setLocalEOL(defaultEOL);
+      setLocalDevMode(devMode);
 
-      // 自動更新設定と開発者モードを読み込む
+      // 自動更新設定を読み込む
       window.electron?.settings.get().then((settings) => {
         setLocalAutoUpdate(settings.autoUpdate ?? false);
-        // 開発環境の場合のみdevModeを読み込む
-        if (isDev) {
-          setLocalDevMode(settings.devMode ?? false);
-        } else {
-          setLocalDevMode(false);
-        }
       });
 
       // 最終確認日を読み込む
@@ -64,7 +60,7 @@ const SettingsModal: React.FC = () => {
         setLastUpdateCheck(savedLastCheck);
       }
     }
-  }, [isSettingsModalOpen, theme, defaultOptions, defaultLanguage, defaultEOL]);
+  }, [isSettingsModalOpen, theme, defaultOptions, defaultLanguage, defaultEOL, devMode]);
 
   const handleSave = async () => {
     try {
@@ -229,6 +225,31 @@ const SettingsModal: React.FC = () => {
         </div>
 
         <div className="settings-modal-body">
+          {isDev && (
+            <>
+              <div className="settings-section-group">
+                <h3 className="settings-section-title">開発者向け設定</h3>
+                <p className="settings-section-description">
+                  開発環境でのみ利用可能な設定です。
+                </p>
+              </div>
+
+              <div className="settings-section">
+                <label className="settings-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localDevMode}
+                    onChange={(e) => setLocalDevMode(e.target.checked)}
+                  />
+                  <span>開発者モード</span>
+                </label>
+                <span className="settings-description">
+                  有効にすると、メニューに「更新を確認...」が表示され、アプリケーション設定セクションが利用可能になります。
+                </span>
+              </div>
+            </>
+          )}
+
           {localDevMode && (
             <>
               <div className="settings-section-group">
@@ -446,31 +467,6 @@ const SettingsModal: React.FC = () => {
               </span>
             </label>
           </div>
-
-          {isDev && (
-            <>
-              <div className="settings-section-group">
-                <h3 className="settings-section-title">開発者向け設定</h3>
-                <p className="settings-section-description">
-                  開発環境でのみ利用可能な設定です。
-                </p>
-              </div>
-
-              <div className="settings-section">
-                <label className="settings-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={localDevMode}
-                    onChange={(e) => setLocalDevMode(e.target.checked)}
-                  />
-                  <span>開発者モード</span>
-                </label>
-                <span className="settings-description">
-                  有効にすると、メニューに「更新を確認...」が表示され、アプリケーション設定セクションが利用可能になります。
-                </span>
-              </div>
-            </>
-          )}
         </div>
 
         <div className="settings-modal-footer">

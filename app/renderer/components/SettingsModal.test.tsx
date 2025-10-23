@@ -702,6 +702,8 @@ describe('SettingsModal', () => {
     beforeEach(() => {
       // Clear localStorage before each test
       localStorage.clear();
+      // Enable devMode to show application settings section
+      useDiffStore.setState({ devMode: true });
     });
 
     it('should display checking message when checking for updates', async () => {
