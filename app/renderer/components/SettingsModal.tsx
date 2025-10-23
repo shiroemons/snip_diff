@@ -131,10 +131,10 @@ const SettingsModal: React.FC = () => {
       localStorage.setItem('lastUpdateCheck', formattedDate);
 
       // 結果はUpdateNotificationコンポーネントで表示される
-      // 3秒後に状態をリセット
+      // 更新がない場合はメッセージを表示
       setTimeout(() => {
         setUpdateCheckState('success');
-        setUpdateCheckMessage('更新チェックが完了しました');
+        setUpdateCheckMessage('最新バージョンです');
 
         setTimeout(() => {
           setUpdateCheckState('idle');
