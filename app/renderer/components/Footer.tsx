@@ -1,4 +1,5 @@
 import type React from 'react';
+import { Settings } from 'lucide-react';
 import { useDiffStore } from '../stores/diffStore';
 import './Footer.css';
 
@@ -160,6 +161,12 @@ const Footer: React.FC = () => {
           ))}
         </select>
 
+        {devMode && (
+          <span className="dev-mode-indicator" title="開発者モード有効">
+            DEV
+          </span>
+        )}
+
         <button
           type="button"
           className="settings-icon-button"
@@ -167,14 +174,8 @@ const Footer: React.FC = () => {
           title="設定"
           aria-label="設定を開く"
         >
-          ⚙
+          <Settings className="settings-icon" size={18} />
         </button>
-
-        {devMode && (
-          <span className="dev-mode-indicator" title="開発者モード有効">
-            DEV
-          </span>
-        )}
       </div>
     </footer>
   );

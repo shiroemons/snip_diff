@@ -727,14 +727,16 @@ describe('SettingsModal', () => {
       expect(button.disabled).toBe(true);
     });
 
-    it('should display last update check time from localStorage', () => {
+    it('should display last update check time from localStorage', async () => {
       const lastCheckTime = '2025/10/23 22:00';
       localStorage.setItem('lastUpdateCheck', lastCheckTime);
 
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
 
-      expect(screen.getByText(`最終確認: ${lastCheckTime}`)).toBeTruthy();
+      await waitFor(() => {
+        expect(screen.getByText(`最終確認: ${lastCheckTime}`)).toBeTruthy();
+      });
     });
 
     it('should update last check time after checking for updates', async () => {

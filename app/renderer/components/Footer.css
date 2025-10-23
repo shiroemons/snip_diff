@@ -81,7 +81,7 @@
 }
 
 .settings-icon-button {
-  margin-left: 8px;
+  margin-left: auto;
   padding: 4px 8px;
   font-size: 16px;
   background: none;
@@ -97,11 +97,20 @@
 
 .settings-icon-button:hover {
   background-color: var(--bg-tertiary);
+}
+
+.settings-icon {
+  display: inline-block;
+  transition: transform 0.15s ease;
+  color: inherit;
+}
+
+.settings-icon-button:hover .settings-icon {
   color: var(--accent-primary);
   transform: rotate(45deg);
 }
 
-.settings-icon-button:active {
+.settings-icon-button:active .settings-icon {
   transform: rotate(45deg) scale(0.95);
 }
 
