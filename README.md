@@ -381,14 +381,19 @@ IPC ハンドラを追加する場合:
    # 例: git commit -m "chore: bump version to 2025.10.2"
    ```
 
-4. **タグを作成してプッシュ**
+4. **変更をプッシュ**
+   ```bash
+   git push origin main
+   ```
+
+5. **タグを作成してプッシュ**
    ```bash
    git tag v{VERSION}
    git push origin main --tags
    # 例: git tag v2025.10.2
    ```
 
-4. **GitHub Actionsによる自動リリース**
+6. **GitHub Actionsによる自動リリース**
    - タグがプッシュされると自動的にビルド・リリースが実行されます
    - `.dmg` ファイルの作成とGitHubリリースへのアップロード
    - Homebrewへの自動配信
