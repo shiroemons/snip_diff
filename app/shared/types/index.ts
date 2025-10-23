@@ -116,6 +116,7 @@ export const IPC_CHANNELS = {
   // 設定
   SETTINGS_GET: 'settings:get',
   SETTINGS_SET: 'settings:set',
+  SETTINGS_OPEN: 'settings:open',
 
   // ウィンドウ
   WINDOW_CLOSE: 'window:close',
@@ -123,6 +124,10 @@ export const IPC_CHANNELS = {
   WINDOW_MAXIMIZE: 'window:maximize',
   WINDOW_MAXIMIZED_CHANGED: 'window:maximized:changed',
   WINDOW_IS_MAXIMIZED: 'window:is-maximized',
+
+  // 表示モード
+  VIEW_MODE_CHANGE: 'view:mode',
+  VIEW_TOGGLE_COMPACT: 'view:toggle-compact',
 
   // テーマ
   THEME_CHANGED: 'theme:changed',

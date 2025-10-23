@@ -19,7 +19,6 @@ const SettingsModal: React.FC = () => {
     defaultOptions,
     defaultLanguage,
     defaultEOL,
-    devMode,
     setTheme,
     updateOptions,
     updateBuffersLang,
@@ -32,6 +31,9 @@ const SettingsModal: React.FC = () => {
   const [localLanguage, setLocalLanguage] = useState(defaultLanguage);
   const [localEOL, setLocalEOL] = useState<'LF' | 'CRLF' | 'auto'>(defaultEOL);
   const [localAutoUpdate, setLocalAutoUpdate] = useState(false);
+  const [updateCheckState, setUpdateCheckState] = useState<'idle' | 'checking' | 'success' | 'error'>('idle');
+  const [updateCheckMessage, setUpdateCheckMessage] = useState('');
+  const [lastUpdateCheck, setLastUpdateCheck] = useState<string>('');
 
   // モーダルが開かれたら現在の設定を読み込む
   useEffect(() => {
@@ -45,6 +47,12 @@ const SettingsModal: React.FC = () => {
       window.electron?.settings.get().then((settings) => {
         setLocalAutoUpdate(settings.autoUpdate ?? false);
       });
+
+      // 最終確認日を読み込む
+      const savedLastCheck = localStorage.getItem('lastUpdateCheck');
+      if (savedLastCheck) {
+        setLastUpdateCheck(savedLastCheck);
+      }
     }
   }, [isSettingsModalOpen, theme, defaultOptions, defaultLanguage, defaultEOL]);
 
@@ -106,6 +114,45 @@ const SettingsModal: React.FC = () => {
     setLocalEOL(INITIAL_DEFAULT_EOL);
   };
 
+  const handleCheckForUpdates = async () => {
+    if (!window.electron?.updater) return;
+
+    setUpdateCheckState('checking');
+    setUpdateCheckMessage('更新を確認中...');
+
+    try {
+      // 更新チェックを実行
+      await window.electron.updater.checkForUpdates();
+
+      // 最終確認日時を更新
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      setLastUpdateCheck(formattedDate);
+      localStorage.setItem('lastUpdateCheck', formattedDate);
+
+      // 結果はUpdateNotificationコンポーネントで表示される
+      // 3秒後に状態をリセット
+      setTimeout(() => {
+        setUpdateCheckState('success');
+        setUpdateCheckMessage('更新チェックが完了しました');
+
+        setTimeout(() => {
+          setUpdateCheckState('idle');
+          setUpdateCheckMessage('');
+        }, 3000);
+      }, 1000);
+    } catch (error) {
+      console.error('Failed to check for updates:', error);
+      setUpdateCheckState('error');
+      setUpdateCheckMessage('更新チェックに失敗しました');
+
+      setTimeout(() => {
+        setUpdateCheckState('idle');
+        setUpdateCheckMessage('');
+      }, 3000);
+    }
+  };
+
   if (!isSettingsModalOpen) return null;
 
   // サポートする言語リスト
@@ -165,30 +212,48 @@ const SettingsModal: React.FC = () => {
         </div>
 
         <div className="settings-modal-body">
-          {devMode && (
-            <>
-              <div className="settings-section-group">
-                <h3 className="settings-section-title">アプリケーション</h3>
-                <p className="settings-section-description">
-                  アプリケーション全体に関する設定です。
-                </p>
-              </div>
+          <div className="settings-section-group">
+            <h3 className="settings-section-title">アプリケーション</h3>
+            <p className="settings-section-description">
+              アプリケーション全体に関する設定です。
+            </p>
+          </div>
 
-              <div className="settings-section">
-                <label className="settings-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={localAutoUpdate}
-                    onChange={(e) => setLocalAutoUpdate(e.target.checked)}
-                  />
-                  <span>自動更新チェック</span>
-                </label>
-                <span className="settings-description">
-                  アプリ起動時に自動的に更新をチェックします。新しいバージョンが見つかった場合は通知が表示されます。
-                </span>
+          <div className="settings-section">
+            <label className="settings-checkbox-label">
+              <input
+                type="checkbox"
+                checked={localAutoUpdate}
+                onChange={(e) => setLocalAutoUpdate(e.target.checked)}
+              />
+              <span>自動更新チェック</span>
+            </label>
+            <span className="settings-description">
+              アプリ起動時に自動的に更新をチェックします。新しいバージョンが見つかった場合は通知が表示されます。
+            </span>
+
+            <div className="update-check-container">
+              <button
+                type="button"
+                className="update-check-button"
+                onClick={handleCheckForUpdates}
+                disabled={updateCheckState === 'checking'}
+              >
+                {updateCheckState === 'checking' ? '確認中...' : '今すぐ更新を確認'}
+              </button>
+              <div className="update-check-info">
+                {updateCheckMessage ? (
+                  <span className={`update-check-message ${updateCheckState}`}>
+                    {updateCheckMessage}
+                  </span>
+                ) : lastUpdateCheck ? (
+                  <span className="last-update-check">
+                    最終確認: {lastUpdateCheck}
+                  </span>
+                ) : null}
               </div>
-            </>
-          )}
+            </div>
+          </div>
 
           <div className="settings-section-group">
             <h3 className="settings-section-title">デフォルト値の設定</h3>

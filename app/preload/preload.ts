@@ -18,6 +18,7 @@ const IPC_CHANNELS = {
   // 設定
   SETTINGS_GET: 'settings:get',
   SETTINGS_SET: 'settings:set',
+  SETTINGS_OPEN: 'settings:open',
 
   // ウィンドウ
   WINDOW_CLOSE: 'window:close',
@@ -25,6 +26,10 @@ const IPC_CHANNELS = {
   WINDOW_MAXIMIZE: 'window:maximize',
   WINDOW_MAXIMIZED_CHANGED: 'window:maximized:changed',
   WINDOW_IS_MAXIMIZED: 'window:is-maximized',
+
+  // 表示モード
+  VIEW_MODE_CHANGE: 'view:mode',
+  VIEW_TOGGLE_COMPACT: 'view:toggle-compact',
 
   // テーマ
   THEME_CHANGED: 'theme:changed',
@@ -82,6 +87,14 @@ const electronAPI = {
     get: (): Promise<AppSettings> => ipcRenderer.invoke(IPC_CHANNELS.SETTINGS_GET),
     set: (settings: Partial<AppSettings>): Promise<{ success: boolean; error?: string }> =>
       ipcRenderer.invoke(IPC_CHANNELS.SETTINGS_SET, settings),
+    onOpen: (callback: () => void) => {
+      ipcRenderer.on(IPC_CHANNELS.SETTINGS_OPEN, () => {
+        callback();
+      });
+    },
+    removeListener: () => {
+      ipcRenderer.removeAllListeners(IPC_CHANNELS.SETTINGS_OPEN);
+    },
   },
 
   // テーマ
@@ -111,6 +124,24 @@ const electronAPI = {
     },
     removeMaximizedListener: () => {
       ipcRenderer.removeAllListeners(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED);
+    },
+  },
+
+  // 表示モード
+  view: {
+    onModeChange: (callback: (mode: 'unified' | 'side-by-side') => void) => {
+      ipcRenderer.on(IPC_CHANNELS.VIEW_MODE_CHANGE, (_event, mode) => {
+        callback(mode);
+      });
+    },
+    onToggleCompact: (callback: () => void) => {
+      ipcRenderer.on(IPC_CHANNELS.VIEW_TOGGLE_COMPACT, () => {
+        callback();
+      });
+    },
+    removeAllListeners: () => {
+      ipcRenderer.removeAllListeners(IPC_CHANNELS.VIEW_MODE_CHANGE);
+      ipcRenderer.removeAllListeners(IPC_CHANNELS.VIEW_TOGGLE_COMPACT);
     },
   },
 

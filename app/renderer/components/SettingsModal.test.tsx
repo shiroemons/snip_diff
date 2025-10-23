@@ -36,6 +36,8 @@ const mockElectronAPI = {
       autoUpdate: false,
     }),
     set: vi.fn().mockResolvedValue({ success: true }),
+    onOpen: vi.fn(),
+    removeListener: vi.fn(),
   },
   theme: {
     get: vi.fn(),
@@ -49,6 +51,11 @@ const mockElectronAPI = {
     isMaximized: vi.fn().mockResolvedValue(false),
     onMaximizedChanged: vi.fn(),
     removeMaximizedListener: vi.fn(),
+  },
+  view: {
+    onModeChange: vi.fn(),
+    onToggleCompact: vi.fn(),
+    removeAllListeners: vi.fn(),
   },
   updater: {
     checkForUpdates: vi.fn().mockResolvedValue(undefined),

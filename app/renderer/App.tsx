@@ -103,6 +103,32 @@ const App: React.FC = () => {
     }
   }, [theme]);
 
+  // メニューからのイベントを監視
+  useEffect(() => {
+    if (!window.electron) return;
+
+    // 設定モーダルを開く
+    window.electron.settings.onOpen(() => {
+      useDiffStore.getState().openSettingsModal();
+    });
+
+    // 表示モードの変更
+    window.electron.view.onModeChange((mode) => {
+      updateOptions({ viewMode: mode });
+    });
+
+    // Compactモードのトグル
+    window.electron.view.onToggleCompact(() => {
+      const currentCompactMode = useDiffStore.getState().getActiveSession()?.options.compactMode ?? false;
+      updateOptions({ compactMode: !currentCompactMode });
+    });
+
+    return () => {
+      window.electron.settings.removeListener();
+      window.electron.view.removeAllListeners();
+    };
+  }, [updateOptions]);
+
   const handleCompare = () => {
     diffEditorRef.current?.compare();
   };

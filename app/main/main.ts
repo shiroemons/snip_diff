@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, nativeTheme } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import {
   type AppSettings,
@@ -17,6 +17,9 @@ const isDev = process.env.NODE_ENV === 'development';
 let ElectronStore: any;
 // biome-ignore lint/suspicious/noExplicitAny: 動的importのため型定義不可
 let store: any;
+
+// メニューから更新チェックを実行した場合のダイアログ表示フラグ
+let shouldShowUpdateDialog = false;
 
 // アプリケーション名を早期に設定（メニューバー表示用）
 app.setName('SnipDiff');
@@ -66,8 +69,8 @@ async function initializeStore() {
 function createWindow(): void {
   // preloadスクリプトのパスを設定
   const preloadPath = isDev
-    ? path.join(__dirname, '../../../preload/app/preload/preload.js')
-    : path.join(app.getAppPath(), 'dist/preload/app/preload/preload.js');
+    ? path.join(__dirname, '../../preload/preload/preload.js')
+    : path.join(app.getAppPath(), 'dist/preload/preload/preload.js');
 
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -145,6 +148,9 @@ app.whenReady().then(async () => {
   // 自動更新の設定
   setupAutoUpdater();
 
+  // アプリケーションメニューの設定
+  createApplicationMenu();
+
   // 設定で自動更新が有効な場合、起動時に更新チェック
   const settings = store.store as AppSettings;
   if (settings.autoUpdate && !isDev) {
@@ -188,6 +194,9 @@ function setupAutoUpdater(): void {
       releaseNotes: typeof info.releaseNotes === 'string' ? info.releaseNotes : undefined,
     };
     mainWindow?.webContents.send(IPC_CHANNELS.UPDATE_AVAILABLE, updateInfo);
+
+    // メニューから実行された場合もダイアログフラグをリセット
+    shouldShowUpdateDialog = false;
   });
 
   // 更新が利用不可の場合
@@ -196,6 +205,18 @@ function setupAutoUpdater(): void {
     mainWindow?.webContents.send(IPC_CHANNELS.UPDATE_NOT_AVAILABLE, {
       version: info.version,
     });
+
+    // メニューから実行された場合はダイアログを表示
+    if (shouldShowUpdateDialog && mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: '更新確認',
+        message: '現在入手可能な更新はありません。',
+        detail: `現在のバージョン: ${app.getVersion()}\n最新バージョンです。`,
+        buttons: ['OK'],
+      });
+      shouldShowUpdateDialog = false;
+    }
   });
 
   // ダウンロード進捗
@@ -229,22 +250,174 @@ function setupAutoUpdater(): void {
     mainWindow?.webContents.send(IPC_CHANNELS.UPDATE_ERROR, {
       message: error.message,
     });
+
+    // メニューから実行された場合はエラーダイアログを表示
+    if (shouldShowUpdateDialog && mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'error',
+        title: '更新確認エラー',
+        message: '更新の確認中にエラーが発生しました。',
+        detail: error.message,
+        buttons: ['OK'],
+      });
+      shouldShowUpdateDialog = false;
+    }
   });
 }
 
 /**
- * 更新チェックを実行
+ * アプリケーションメニューを作成・設定
  */
-async function checkForUpdates(): Promise<void> {
+function createApplicationMenu(): void {
+  const isMac = process.platform === 'darwin';
+
+  const template: Electron.MenuItemConstructorOptions[] = [
+    // macOSのアプリケーションメニュー
+    ...(isMac
+      ? [
+          {
+            label: app.name,
+            submenu: [
+              {
+                label: `${app.name}について`,
+                role: 'about' as const,
+              },
+              {
+                label: '更新を確認...',
+                click: async () => {
+                  await checkForUpdates(true);
+                },
+              },
+              { type: 'separator' as const },
+              {
+                label: '環境設定...',
+                accelerator: 'CmdOrCtrl+,',
+                click: () => {
+                  mainWindow?.webContents.send(IPC_CHANNELS.SETTINGS_OPEN);
+                },
+              },
+              { type: 'separator' as const },
+              { role: 'services' as const },
+              { type: 'separator' as const },
+              { role: 'hide' as const },
+              { role: 'hideOthers' as const },
+              { role: 'unhide' as const },
+              { type: 'separator' as const },
+              { role: 'quit' as const },
+            ],
+          },
+        ]
+      : []),
+    // 編集メニュー
+    {
+      label: '編集',
+      submenu: [
+        { role: 'undo' as const },
+        { role: 'redo' as const },
+        { type: 'separator' as const },
+        { role: 'cut' as const },
+        { role: 'copy' as const },
+        { role: 'paste' as const },
+        { role: 'selectAll' as const },
+      ],
+    },
+    // 表示メニュー
+    {
+      label: '表示',
+      submenu: [
+        {
+          label: 'Unified表示に切り替え',
+          accelerator: 'CmdOrCtrl+1',
+          click: () => {
+            mainWindow?.webContents.send(IPC_CHANNELS.VIEW_MODE_CHANGE, 'unified');
+          },
+        },
+        {
+          label: 'Side-by-Side表示に切り替え',
+          accelerator: 'CmdOrCtrl+2',
+          click: () => {
+            mainWindow?.webContents.send(IPC_CHANNELS.VIEW_MODE_CHANGE, 'side-by-side');
+          },
+        },
+        {
+          label: 'Compactモードを切り替え',
+          accelerator: 'CmdOrCtrl+3',
+          click: () => {
+            mainWindow?.webContents.send(IPC_CHANNELS.VIEW_TOGGLE_COMPACT);
+          },
+        },
+        { type: 'separator' as const },
+        { role: 'resetZoom' as const },
+        { role: 'zoomIn' as const },
+        { role: 'zoomOut' as const },
+        { type: 'separator' as const },
+        { role: 'togglefullscreen' as const },
+      ],
+    },
+    // ウィンドウメニュー
+    {
+      label: 'ウィンドウ',
+      submenu: [
+        { role: 'minimize' as const },
+        { role: 'zoom' as const },
+        ...(isMac
+          ? [
+              { type: 'separator' as const },
+              { role: 'front' as const },
+              { type: 'separator' as const },
+              { role: 'window' as const },
+            ]
+          : [{ role: 'close' as const }]),
+      ],
+    },
+    // ヘルプメニュー
+    {
+      label: 'ヘルプ',
+      role: 'help',
+      submenu: [],
+    },
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+}
+
+/**
+ * 更新チェックを実行
+ * @param showDialog メニューから実行された場合にダイアログを表示するかどうか
+ */
+async function checkForUpdates(showDialog = false): Promise<void> {
   if (isDev) {
     console.log('Auto-update is disabled in development mode');
+    if (showDialog && mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: '更新確認',
+        message: '開発モードでは更新確認は無効です。',
+        buttons: ['OK'],
+      });
+    }
     return;
   }
+
+  // ダイアログ表示フラグを設定
+  shouldShowUpdateDialog = showDialog;
 
   try {
     await autoUpdater.checkForUpdates();
   } catch (error) {
     console.error('Failed to check for updates:', error);
+    // エラー時もダイアログを表示する場合
+    if (showDialog && mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'error',
+        title: '更新確認エラー',
+        message: '更新の確認中にエラーが発生しました。',
+        detail: String(error),
+        buttons: ['OK'],
+      });
+      shouldShowUpdateDialog = false;
+    }
   }
 }
 
