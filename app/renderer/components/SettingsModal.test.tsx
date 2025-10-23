@@ -780,5 +780,54 @@ describe('SettingsModal', () => {
 
       consoleErrorSpy.mockRestore();
     });
+
+    it('should clear success message after 3 seconds', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const checkButton = screen.getByText('今すぐ更新を確認');
+      await user.click(checkButton);
+
+      // Wait for success message (after 1 second)
+      await waitFor(() => {
+        expect(screen.getByText('最新バージョンです')).toBeTruthy();
+      }, { timeout: 2000 });
+
+      // Wait for message to be cleared (after 3 more seconds)
+      await waitFor(() => {
+        expect(screen.queryByText('最新バージョンです')).toBeNull();
+      }, { timeout: 4000 });
+    }, 10000);
+
+    it('should clear error message after 3 seconds', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      // Mock checkForUpdates to throw an error
+      mockElectronAPI.updater.checkForUpdates.mockRejectedValueOnce(
+        new Error('Network error')
+      );
+
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      render(<SettingsModal />);
+
+      const checkButton = screen.getByText('今すぐ更新を確認');
+      await user.click(checkButton);
+
+      // Wait for error message
+      await waitFor(() => {
+        expect(screen.getByText('更新チェックに失敗しました')).toBeTruthy();
+      }, { timeout: 2000 });
+
+      // Wait for message to be cleared (after 3 seconds)
+      await waitFor(() => {
+        expect(screen.queryByText('更新チェックに失敗しました')).toBeNull();
+      }, { timeout: 4000 });
+
+      consoleErrorSpy.mockRestore();
+    }, 10000);
   });
 });
