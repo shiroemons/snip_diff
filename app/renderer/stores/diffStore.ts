@@ -21,6 +21,9 @@ interface DiffStore {
   // 開発者モード
   devMode: boolean;
 
+  // 更新通知
+  isUpdateAvailable: boolean;
+
   // アクション
   initializeSession: () => void;
   createNewSession: () => string;
@@ -37,6 +40,7 @@ interface DiffStore {
   updateBuffersLang: (lang: string) => void;
   openSettingsModal: () => void;
   closeSettingsModal: () => void;
+  setIsUpdateAvailable: (isAvailable: boolean) => void;
   loadSettings: (settings: {
     theme: Theme;
     defaultOptions: DiffOptions;
@@ -90,6 +94,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
   defaultLanguage: INITIAL_DEFAULT_LANGUAGE,
   defaultEOL: INITIAL_DEFAULT_EOL,
   devMode: false,
+  isUpdateAvailable: false,
 
   initializeSession: () => {
     const { defaultOptions: opts, defaultLanguage, defaultEOL } = get();
@@ -263,6 +268,10 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
 
   closeSettingsModal: () => {
     set({ isSettingsModalOpen: false });
+  },
+
+  setIsUpdateAvailable: (isAvailable: boolean) => {
+    set({ isUpdateAvailable: isAvailable });
   },
 
   loadSettings: (settings) => {

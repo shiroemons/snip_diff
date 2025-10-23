@@ -20,6 +20,7 @@ const SettingsModal: React.FC = () => {
     defaultLanguage,
     defaultEOL,
     devMode,
+    isUpdateAvailable,
     setTheme,
     updateOptions,
     updateBuffersLang,
@@ -61,6 +62,35 @@ const SettingsModal: React.FC = () => {
       }
     }
   }, [isSettingsModalOpen, theme, defaultOptions, defaultLanguage, defaultEOL, devMode]);
+
+  // 更新チェック結果のイベントリスナー
+  useEffect(() => {
+    if (!window.electron?.updater) return;
+
+    // 更新が利用可能な場合
+    const handleUpdateAvailable = () => {
+      // UpdateNotificationコンポーネントで表示されるため、
+      // SettingsModalではメッセージを非表示にする
+      setUpdateCheckState('idle');
+      setUpdateCheckMessage('');
+    };
+
+    // 更新が利用不可の場合
+    const handleUpdateNotAvailable = () => {
+      setUpdateCheckState('success');
+      setUpdateCheckMessage('最新バージョンです');
+
+      setTimeout(() => {
+        setUpdateCheckState('idle');
+        setUpdateCheckMessage('');
+      }, 3000);
+    };
+
+    window.electron.updater.onUpdateAvailable(handleUpdateAvailable);
+    window.electron.updater.onUpdateNotAvailable(handleUpdateNotAvailable);
+
+    // クリーンアップは不要（removeAllListenersが全て削除するため）
+  }, []);
 
   const handleSave = async () => {
     try {
@@ -143,17 +173,7 @@ const SettingsModal: React.FC = () => {
       setLastUpdateCheck(formattedDate);
       localStorage.setItem('lastUpdateCheck', formattedDate);
 
-      // 結果はUpdateNotificationコンポーネントで表示される
-      // 更新がない場合はメッセージを表示
-      setTimeout(() => {
-        setUpdateCheckState('success');
-        setUpdateCheckMessage('最新バージョンです');
-
-        setTimeout(() => {
-          setUpdateCheckState('idle');
-          setUpdateCheckMessage('');
-        }, 3000);
-      }, 1000);
+      // 結果はイベントリスナーで処理される
     } catch (error) {
       console.error('Failed to check for updates:', error);
       setUpdateCheckState('error');
@@ -277,9 +297,13 @@ const SettingsModal: React.FC = () => {
                     type="button"
                     className="update-check-button"
                     onClick={handleCheckForUpdates}
-                    disabled={updateCheckState === 'checking'}
+                    disabled={updateCheckState === 'checking' || isUpdateAvailable}
                   >
-                    {updateCheckState === 'checking' ? '確認中...' : '今すぐ更新を確認'}
+                    {updateCheckState === 'checking'
+                      ? '確認中...'
+                      : isUpdateAvailable
+                        ? '新しいバージョンが利用可能です'
+                        : '今すぐ更新を確認'}
                   </button>
                   <div className="update-check-info">
                     {updateCheckMessage ? (

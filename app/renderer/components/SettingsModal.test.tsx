@@ -747,6 +747,12 @@ describe('SettingsModal', () => {
       const user = userEvent.setup();
       useDiffStore.setState({ isSettingsModalOpen: true });
 
+      // Mock onUpdateNotAvailable to trigger the callback
+      mockElectronAPI.updater.onUpdateNotAvailable.mockImplementation((callback) => {
+        // Simulate update not available event (version is arbitrary for this test)
+        setTimeout(() => callback({ version: '1.0.0' }), 100);
+      });
+
       render(<SettingsModal />);
 
       const checkButton = await screen.findByText('今すぐ更新を確認');
@@ -792,13 +798,19 @@ describe('SettingsModal', () => {
       const user = userEvent.setup();
       useDiffStore.setState({ isSettingsModalOpen: true });
 
+      // Mock onUpdateNotAvailable to trigger the callback
+      mockElectronAPI.updater.onUpdateNotAvailable.mockImplementation((callback) => {
+        // Simulate update not available event (version is arbitrary for this test)
+        setTimeout(() => callback({ version: '1.0.0' }), 100);
+      });
+
       render(<SettingsModal />);
 
       // Wait for the button to appear (after devMode is loaded)
       const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
-      // Wait for success message (after 1 second)
+      // Wait for success message
       await waitFor(() => {
         expect(screen.getByText('最新バージョンです')).toBeTruthy();
       }, { timeout: 2000 });

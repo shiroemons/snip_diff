@@ -2,6 +2,7 @@ import type { DownloadProgress, UpdateInfo } from '@shared/types';
 import { Download, X } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import { useDiffStore } from '../stores/diffStore';
 import './UpdateNotification.css';
 
 interface UpdateNotificationProps {
@@ -17,6 +18,7 @@ type NotificationState =
 
 const UpdateNotification: React.FC<UpdateNotificationProps> = ({ theme }) => {
   const [state, setState] = useState<NotificationState>({ type: 'hidden' });
+  const { setIsUpdateAvailable } = useDiffStore();
 
   useEffect(() => {
     if (!window.electron?.updater) return;
@@ -24,6 +26,7 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ theme }) => {
     // 更新が利用可能
     window.electron.updater.onUpdateAvailable((info) => {
       setState({ type: 'available', info });
+      setIsUpdateAvailable(true);
     });
 
     // ダウンロード進捗
@@ -57,7 +60,7 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ theme }) => {
     return () => {
       window.electron?.updater.removeAllListeners();
     };
-  }, []);
+  }, [setIsUpdateAvailable]);
 
   const handleDownload = async () => {
     if (state.type === 'available') {
@@ -81,6 +84,7 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ theme }) => {
 
   const handleDismiss = () => {
     setState({ type: 'hidden' });
+    setIsUpdateAvailable(false);
   };
 
   if (state.type === 'hidden') {
