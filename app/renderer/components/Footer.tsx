@@ -1,5 +1,5 @@
-import type React from 'react';
 import { Settings } from 'lucide-react';
+import type React from 'react';
 import { useDiffStore } from '../stores/diffStore';
 import './Footer.css';
 

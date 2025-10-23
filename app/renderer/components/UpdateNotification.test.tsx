@@ -131,10 +131,7 @@ describe('UpdateNotification', () => {
       const downloadButton = screen.getByRole('button', { name: /ダウンロード/ });
       await user.click(downloadButton);
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to start download:',
-        expect.any(Error)
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to start download:', expect.any(Error));
 
       consoleErrorSpy.mockRestore();
     });
@@ -158,7 +155,6 @@ describe('UpdateNotification', () => {
 
       expect(container.firstChild).toBeNull();
     });
-
   });
 
   describe('ダウンロード中の状態 (downloading)', () => {
@@ -187,7 +183,6 @@ describe('UpdateNotification', () => {
 
       expect(screen.getByText(/50% \(50MB \/ 100MB\)/)).toBeTruthy();
     });
-
 
     it('downloading状態からさらにダウンロード進捗が更新される', async () => {
       render(<UpdateNotification theme="light" />);
@@ -301,10 +296,7 @@ describe('UpdateNotification', () => {
       const installButton = screen.getByRole('button', { name: '再起動してインストール' });
       await user.click(installButton);
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to install update:',
-        expect.any(Error)
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to install update:', expect.any(Error));
 
       consoleErrorSpy.mockRestore();
     });
@@ -344,7 +336,5 @@ describe('UpdateNotification', () => {
 
       expect(screen.getByText('Network error occurred')).toBeTruthy();
     });
-
-
   });
 });

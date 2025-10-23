@@ -37,7 +37,9 @@ const SettingsModal: React.FC = () => {
   const [localEOL, setLocalEOL] = useState<'LF' | 'CRLF' | 'auto'>(defaultEOL);
   const [localAutoUpdate, setLocalAutoUpdate] = useState(false);
   const [localDevMode, setLocalDevMode] = useState(false);
-  const [updateCheckState, setUpdateCheckState] = useState<'idle' | 'checking' | 'success' | 'error'>('idle');
+  const [updateCheckState, setUpdateCheckState] = useState<
+    'idle' | 'checking' | 'success' | 'error'
+  >('idle');
   const [updateCheckMessage, setUpdateCheckMessage] = useState('');
   const [lastUpdateCheck, setLastUpdateCheck] = useState<string>('');
 
@@ -249,9 +251,7 @@ const SettingsModal: React.FC = () => {
             <>
               <div className="settings-section-group">
                 <h3 className="settings-section-title">開発者向け設定</h3>
-                <p className="settings-section-description">
-                  開発環境でのみ利用可能な設定です。
-                </p>
+                <p className="settings-section-description">開発環境でのみ利用可能な設定です。</p>
               </div>
 
               <div className="settings-section">
@@ -263,14 +263,12 @@ const SettingsModal: React.FC = () => {
                   />
                   <span>開発者モード</span>
                 </label>
-                <span className="settings-description">
-                  有効にすると、メニューに「更新を確認...」が表示され、アプリケーション設定セクションが利用可能になります。
-                </span>
+                <span className="settings-description">開発者モードが有効になります。</span>
               </div>
             </>
           )}
 
-          {localDevMode && (
+          {
             <>
               <div className="settings-section-group">
                 <h3 className="settings-section-title">アプリケーション</h3>
@@ -311,15 +309,13 @@ const SettingsModal: React.FC = () => {
                         {updateCheckMessage}
                       </span>
                     ) : lastUpdateCheck ? (
-                      <span className="last-update-check">
-                        最終確認: {lastUpdateCheck}
-                      </span>
+                      <span className="last-update-check">最終確認: {lastUpdateCheck}</span>
                     ) : null}
                   </div>
                 </div>
               </div>
             </>
-          )}
+          }
 
           <div className="settings-section-group">
             <h3 className="settings-section-title">デフォルト値の設定</h3>

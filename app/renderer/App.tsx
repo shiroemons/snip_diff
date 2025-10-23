@@ -119,7 +119,8 @@ const App: React.FC = () => {
 
     // Compactモードのトグル
     window.electron.view.onToggleCompact(() => {
-      const currentCompactMode = useDiffStore.getState().getActiveSession()?.options.compactMode ?? false;
+      const currentCompactMode =
+        useDiffStore.getState().getActiveSession()?.options.compactMode ?? false;
       updateOptions({ compactMode: !currentCompactMode });
     });
 

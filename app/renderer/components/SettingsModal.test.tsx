@@ -376,7 +376,9 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      const compactCheckbox = screen.getByRole('checkbox', { name: /Compactモード/ }) as HTMLInputElement;
+      const compactCheckbox = screen.getByRole('checkbox', {
+        name: /Compactモード/,
+      }) as HTMLInputElement;
       expect(compactCheckbox.checked).toBe(false);
 
       await user.click(compactCheckbox);
@@ -702,8 +704,6 @@ describe('SettingsModal', () => {
     beforeEach(() => {
       // Clear localStorage before each test
       localStorage.clear();
-      // Enable devMode to show application settings section
-      useDiffStore.setState({ devMode: true });
     });
 
     it('should display checking message when checking for updates', async () => {
@@ -717,7 +717,7 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      // Wait for the button to appear (after devMode is loaded)
+      // Wait for the button to appear
       const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
@@ -759,9 +759,12 @@ describe('SettingsModal', () => {
       await user.click(checkButton);
 
       // Wait for success message
-      await waitFor(() => {
-        expect(screen.getByText('最新バージョンです')).toBeTruthy();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('最新バージョンです')).toBeTruthy();
+        },
+        { timeout: 3000 }
+      );
 
       // Check that localStorage was updated with a timestamp
       const savedTime = localStorage.getItem('lastUpdateCheck');
@@ -774,15 +777,13 @@ describe('SettingsModal', () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
 
       // Mock checkForUpdates to throw an error
-      mockElectronAPI.updater.checkForUpdates.mockRejectedValueOnce(
-        new Error('Network error')
-      );
+      mockElectronAPI.updater.checkForUpdates.mockRejectedValueOnce(new Error('Network error'));
 
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       render(<SettingsModal />);
 
-      // Wait for the button to appear (after devMode is loaded)
+      // Wait for the button to appear
       const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
@@ -806,19 +807,25 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      // Wait for the button to appear (after devMode is loaded)
+      // Wait for the button to appear
       const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
       // Wait for success message
-      await waitFor(() => {
-        expect(screen.getByText('最新バージョンです')).toBeTruthy();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('最新バージョンです')).toBeTruthy();
+        },
+        { timeout: 2000 }
+      );
 
       // Wait for message to be cleared (after 3 more seconds)
-      await waitFor(() => {
-        expect(screen.queryByText('最新バージョンです')).toBeNull();
-      }, { timeout: 4000 });
+      await waitFor(
+        () => {
+          expect(screen.queryByText('最新バージョンです')).toBeNull();
+        },
+        { timeout: 4000 }
+      );
     }, 10000);
 
     it('should clear error message after 3 seconds', async () => {
@@ -826,27 +833,31 @@ describe('SettingsModal', () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
 
       // Mock checkForUpdates to throw an error
-      mockElectronAPI.updater.checkForUpdates.mockRejectedValueOnce(
-        new Error('Network error')
-      );
+      mockElectronAPI.updater.checkForUpdates.mockRejectedValueOnce(new Error('Network error'));
 
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       render(<SettingsModal />);
 
-      // Wait for the button to appear (after devMode is loaded)
+      // Wait for the button to appear
       const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
       // Wait for error message
-      await waitFor(() => {
-        expect(screen.getByText('更新チェックに失敗しました')).toBeTruthy();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('更新チェックに失敗しました')).toBeTruthy();
+        },
+        { timeout: 2000 }
+      );
 
       // Wait for message to be cleared (after 3 seconds)
-      await waitFor(() => {
-        expect(screen.queryByText('更新チェックに失敗しました')).toBeNull();
-      }, { timeout: 4000 });
+      await waitFor(
+        () => {
+          expect(screen.queryByText('更新チェックに失敗しました')).toBeNull();
+        },
+        { timeout: 4000 }
+      );
 
       consoleErrorSpy.mockRestore();
     }, 10000);

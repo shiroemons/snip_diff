@@ -286,8 +286,6 @@ function setupAutoUpdater(): void {
  */
 function createApplicationMenu(): void {
   const isMac = process.platform === 'darwin';
-  const settings = store.store as AppSettings;
-  const isDevMode = settings.devMode ?? false;
 
   const template: Electron.MenuItemConstructorOptions[] = [
     // macOSのアプリケーションメニュー
@@ -300,17 +298,12 @@ function createApplicationMenu(): void {
                 label: `${app.name}について`,
                 role: 'about' as const,
               },
-              // 開発モードの場合のみ表示
-              ...(isDevMode
-                ? [
-                    {
-                      label: '更新を確認...',
-                      click: async () => {
-                        await checkForUpdates(true);
-                      },
-                    },
-                  ]
-                : []),
+              {
+                label: '更新を確認...',
+                click: async () => {
+                  await checkForUpdates(true);
+                },
+              },
               { type: 'separator' as const },
               {
                 label: '環境設定...',
@@ -562,11 +555,6 @@ function registerIpcHandlers(): void {
       }
 
       store.store = updatedStore;
-
-      // devModeが変更された場合はメニューを再構築
-      if (settings.devMode !== undefined && settings.devMode !== currentStore.devMode) {
-        createApplicationMenu();
-      }
 
       return { success: true };
     } catch (error) {
