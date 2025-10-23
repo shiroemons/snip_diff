@@ -403,8 +403,21 @@ function createApplicationMenu(): void {
  * @param showDialog メニューから実行された場合にダイアログを表示するかどうか
  */
 async function checkForUpdates(showDialog = false): Promise<void> {
+  // UXのため最低800ms待機（確認中の状態を見せる）
+  const minDelay = new Promise((resolve) => setTimeout(resolve, 800));
+
   if (isDev) {
     console.log('Auto-update is disabled in development mode');
+
+    // 開発環境でも適切なイベントを発火
+    await minDelay;
+
+    if (mainWindow) {
+      mainWindow.webContents.send(IPC_CHANNELS.UPDATE_NOT_AVAILABLE, {
+        version: app.getVersion(),
+      });
+    }
+
     if (showDialog && mainWindow) {
       dialog.showMessageBox(mainWindow, {
         type: 'info',
@@ -420,7 +433,8 @@ async function checkForUpdates(showDialog = false): Promise<void> {
   shouldShowUpdateDialog = showDialog;
 
   try {
-    await autoUpdater.checkForUpdates();
+    // 更新チェックと最低遅延を並行実行
+    await Promise.all([autoUpdater.checkForUpdates(), minDelay]);
   } catch (error) {
     console.error('Failed to check for updates:', error);
     // エラー時もダイアログを表示する場合
