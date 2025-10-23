@@ -34,6 +34,7 @@ const mockElectronAPI = {
       defaultLanguage: 'plaintext',
       defaultEOL: 'auto',
       autoUpdate: false,
+      devMode: true, // 開発者モードを有効にしてテストを実行
     }),
     set: vi.fn().mockResolvedValue({ success: true }),
     onOpen: vi.fn(),
@@ -714,7 +715,8 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      const checkButton = screen.getByText('今すぐ更新を確認');
+      // Wait for the button to appear (after devMode is loaded)
+      const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
       // Should display checking message
@@ -745,7 +747,7 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      const checkButton = screen.getByText('今すぐ更新を確認');
+      const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
       // Wait for success message
@@ -772,7 +774,8 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      const checkButton = screen.getByText('今すぐ更新を確認');
+      // Wait for the button to appear (after devMode is loaded)
+      const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
       // Should display error message
@@ -789,7 +792,8 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      const checkButton = screen.getByText('今すぐ更新を確認');
+      // Wait for the button to appear (after devMode is loaded)
+      const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
       // Wait for success message (after 1 second)
@@ -816,7 +820,8 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      const checkButton = screen.getByText('今すぐ更新を確認');
+      // Wait for the button to appear (after devMode is loaded)
+      const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
 
       // Wait for error message

@@ -26,11 +26,15 @@ const SettingsModal: React.FC = () => {
     updateRightBufferEOL,
   } = useDiffStore();
 
+  // 開発環境かどうかを判定
+  const isDev = import.meta.env.DEV;
+
   const [localTheme, setLocalTheme] = useState<Theme>(theme);
   const [localOptions, setLocalOptions] = useState<DiffOptions>(defaultOptions);
   const [localLanguage, setLocalLanguage] = useState(defaultLanguage);
   const [localEOL, setLocalEOL] = useState<'LF' | 'CRLF' | 'auto'>(defaultEOL);
   const [localAutoUpdate, setLocalAutoUpdate] = useState(false);
+  const [localDevMode, setLocalDevMode] = useState(false);
   const [updateCheckState, setUpdateCheckState] = useState<'idle' | 'checking' | 'success' | 'error'>('idle');
   const [updateCheckMessage, setUpdateCheckMessage] = useState('');
   const [lastUpdateCheck, setLastUpdateCheck] = useState<string>('');
@@ -43,9 +47,15 @@ const SettingsModal: React.FC = () => {
       setLocalLanguage(defaultLanguage);
       setLocalEOL(defaultEOL);
 
-      // 自動更新設定を読み込む
+      // 自動更新設定と開発者モードを読み込む
       window.electron?.settings.get().then((settings) => {
         setLocalAutoUpdate(settings.autoUpdate ?? false);
+        // 開発環境の場合のみdevModeを読み込む
+        if (isDev) {
+          setLocalDevMode(settings.devMode ?? false);
+        } else {
+          setLocalDevMode(false);
+        }
       });
 
       // 最終確認日を読み込む
@@ -68,6 +78,8 @@ const SettingsModal: React.FC = () => {
         defaultLanguage: safeLocalLanguage,
         defaultEOL: safeLocalEOL,
         autoUpdate: localAutoUpdate,
+        // 開発環境の場合のみdevModeを保存
+        ...(isDev ? { devMode: localDevMode } : {}),
       };
 
       const result = await window.electron.settings.set(settings);
@@ -112,6 +124,11 @@ const SettingsModal: React.FC = () => {
     setLocalOptions({ ...INITIAL_DEFAULT_OPTIONS });
     setLocalLanguage(INITIAL_DEFAULT_LANGUAGE);
     setLocalEOL(INITIAL_DEFAULT_EOL);
+    setLocalAutoUpdate(false);
+    // 開発環境の場合のみdevModeをリセット
+    if (isDev) {
+      setLocalDevMode(false);
+    }
   };
 
   const handleCheckForUpdates = async () => {
@@ -212,48 +229,52 @@ const SettingsModal: React.FC = () => {
         </div>
 
         <div className="settings-modal-body">
-          <div className="settings-section-group">
-            <h3 className="settings-section-title">アプリケーション</h3>
-            <p className="settings-section-description">
-              アプリケーション全体に関する設定です。
-            </p>
-          </div>
-
-          <div className="settings-section">
-            <label className="settings-checkbox-label">
-              <input
-                type="checkbox"
-                checked={localAutoUpdate}
-                onChange={(e) => setLocalAutoUpdate(e.target.checked)}
-              />
-              <span>自動更新チェック</span>
-            </label>
-            <span className="settings-description">
-              アプリ起動時に自動的に更新をチェックします。新しいバージョンが見つかった場合は通知が表示されます。
-            </span>
-
-            <div className="update-check-container">
-              <button
-                type="button"
-                className="update-check-button"
-                onClick={handleCheckForUpdates}
-                disabled={updateCheckState === 'checking'}
-              >
-                {updateCheckState === 'checking' ? '確認中...' : '今すぐ更新を確認'}
-              </button>
-              <div className="update-check-info">
-                {updateCheckMessage ? (
-                  <span className={`update-check-message ${updateCheckState}`}>
-                    {updateCheckMessage}
-                  </span>
-                ) : lastUpdateCheck ? (
-                  <span className="last-update-check">
-                    最終確認: {lastUpdateCheck}
-                  </span>
-                ) : null}
+          {localDevMode && (
+            <>
+              <div className="settings-section-group">
+                <h3 className="settings-section-title">アプリケーション</h3>
+                <p className="settings-section-description">
+                  アプリケーション全体に関する設定です。
+                </p>
               </div>
-            </div>
-          </div>
+
+              <div className="settings-section">
+                <label className="settings-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localAutoUpdate}
+                    onChange={(e) => setLocalAutoUpdate(e.target.checked)}
+                  />
+                  <span>自動更新チェック</span>
+                </label>
+                <span className="settings-description">
+                  アプリ起動時に自動的に更新をチェックします。新しいバージョンが見つかった場合は通知が表示されます。
+                </span>
+
+                <div className="update-check-container">
+                  <button
+                    type="button"
+                    className="update-check-button"
+                    onClick={handleCheckForUpdates}
+                    disabled={updateCheckState === 'checking'}
+                  >
+                    {updateCheckState === 'checking' ? '確認中...' : '今すぐ更新を確認'}
+                  </button>
+                  <div className="update-check-info">
+                    {updateCheckMessage ? (
+                      <span className={`update-check-message ${updateCheckState}`}>
+                        {updateCheckMessage}
+                      </span>
+                    ) : lastUpdateCheck ? (
+                      <span className="last-update-check">
+                        最終確認: {lastUpdateCheck}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="settings-section-group">
             <h3 className="settings-section-title">デフォルト値の設定</h3>
@@ -425,6 +446,31 @@ const SettingsModal: React.FC = () => {
               </span>
             </label>
           </div>
+
+          {isDev && (
+            <>
+              <div className="settings-section-group">
+                <h3 className="settings-section-title">開発者向け設定</h3>
+                <p className="settings-section-description">
+                  開発環境でのみ利用可能な設定です。
+                </p>
+              </div>
+
+              <div className="settings-section">
+                <label className="settings-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localDevMode}
+                    onChange={(e) => setLocalDevMode(e.target.checked)}
+                  />
+                  <span>開発者モード</span>
+                </label>
+                <span className="settings-description">
+                  有効にすると、メニューに「更新を確認...」が表示され、アプリケーション設定セクションが利用可能になります。
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="settings-modal-footer">
