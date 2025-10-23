@@ -109,19 +109,17 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ theme }) => {
         )}
 
         {state.type === 'downloading' && (
-          <>
-            <div className="update-notification-text">
-              <strong>更新をダウンロード中...</strong>
-              <div className="progress-bar">
-                <div className="progress-fill" style={{ width: `${state.progress.percent}%` }} />
-              </div>
-              <p className="progress-text">
-                {Math.round(state.progress.percent)}% (
-                {Math.round(state.progress.transferred / 1024 / 1024)}MB /{' '}
-                {Math.round(state.progress.total / 1024 / 1024)}MB)
-              </p>
+          <div className="update-notification-text">
+            <strong>更新をダウンロード中...</strong>
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `${state.progress.percent}%` }} />
             </div>
-          </>
+            <p className="progress-text">
+              {Math.round(state.progress.percent)}% (
+              {Math.round(state.progress.transferred / 1024 / 1024)}MB /{' '}
+              {Math.round(state.progress.total / 1024 / 1024)}MB)
+            </p>
+          </div>
         )}
 
         {state.type === 'ready' && (
