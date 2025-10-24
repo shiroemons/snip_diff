@@ -9,7 +9,7 @@ export const test = base.extend<{
   electronApp: ElectronApplication;
   page: Page;
 }>({
-  electronApp: async (_fixtures, use) => {
+  electronApp: async (_, use) => {
     // Get project root directory (where package.json is located)
     const projectRoot = path.join(__dirname, '../../..');
 
