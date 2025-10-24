@@ -60,10 +60,3 @@ jobs:
             exit 1
           fi
           echo "Build artifacts verified successfully"
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: release/*.dmg
-          retention-days: 1
