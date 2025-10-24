@@ -3,6 +3,20 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { useDiffStore } from './stores/diffStore';
 
+// Mock monaco-editor and @monaco-editor/react
+vi.mock('monaco-editor', () => ({
+  default: {},
+  editor: {},
+  languages: {},
+  Uri: {},
+}));
+
+vi.mock('@monaco-editor/react', () => ({
+  loader: {
+    config: vi.fn(),
+  },
+}));
+
 // Mock the DiffEditor module before importing
 vi.mock('./features/diff/DiffEditor', async () => {
   const React = await import('react');

@@ -23,91 +23,111 @@
 
 ---
 
-## Phase 1: 小規模な依存関係 🟢
+## Phase 1: 小規模な依存関係 🟡
 
 **リスクレベル**: 低
+**ステータス**: 部分的に完了
+**ブランチ**: mainブランチで直接更新
 
 ### アップデート対象
 
-| パッケージ | 現在 | 最新 |
-|-----------|------|------|
-| @biomejs/biome | 2.2.6 | 2.3.0 |
-| lucide-react | 0.546.0 | 0.547.0 |
-| vite-plugin-electron | 0.28.8 | 0.29.0 |
+| パッケージ | 現在 | 最新 | 実際 |
+|-----------|------|------|------|
+| @biomejs/biome | 2.2.6 | 2.3.0 | ✅ 2.3.0 |
+| lucide-react | 0.546.0 | 0.547.0 | ⏸️ 0.546.0 |
+| vite-plugin-electron | 0.28.8 | 0.29.0 | ✅ 0.29.0 |
 
-### 作業手順
+### 実施した作業
 
 ```bash
-# 1. アップデート実行
-npm update @biomejs/biome lucide-react vite-plugin-electron
+# 1. アップデート実行（部分的）
+npm update @biomejs/biome vite-plugin-electron
 
 # 2. 型チェック
-npm run type-check
+npm run type-check  # ✅ 成功
 
 # 3. テスト実行
-npm run test
+npm run test  # ✅ 223テスト通過
 
 # 4. 開発モードで動作確認
-npm run dev
+npm run dev  # ✅ 正常動作
 ```
 
 ### 確認項目
 
-- [ ] 型エラーなし
-- [ ] テスト全通過
-- [ ] 開発モードで起動
-- [ ] 差分表示機能正常動作
-- [ ] コミット完了
+- [x] 型エラーなし
+- [x] テスト全通過（223テスト）
+- [x] 開発モードで起動
+- [x] 差分表示機能正常動作
+- [ ] lucide-react 0.547.0へのアップデート（保留中）
+- [x] Biome 2.3.0とvite-plugin-electron 0.29.0のコミット完了
 
 ### 注意点
 
-- マイナーバージョンアップのため、破壊的変更はほぼなし
-- Biomeの新機能があれば設定で有効化を検討
+- マイナーバージョンアップのため、破壊的変更はほぼなし ✅
+- Biomeの新機能があれば設定で有効化を検討 → 特に破壊的変更なし
+- lucide-reactは現在0.546.0のまま（0.547.0へのアップデートは次回検討）
 
 ---
 
-## Phase 2: テスト環境 🟡
+## Phase 2: テスト環境 ✅
 
 **リスクレベル**: 中
+**ステータス**: 完了（2025-10-25）
+**ブランチ**: `feature/phase2-vitest-update`
 
 ### アップデート対象
 
-| パッケージ | 現在 | 最新 |
-|-----------|------|------|
-| vitest | 3.2.4 | 4.0.2 |
-| @vitest/coverage-v8 | 3.2.4 | 4.0.2 |
+| パッケージ | 現在 | 最新 | 実際 |
+|-----------|------|------|------|
+| vitest | 3.2.4 | 4.0.2 | ✅ 4.0.3 |
+| @vitest/coverage-v8 | 3.2.4 | 4.0.2 | ✅ 4.0.3 |
 
-### 作業手順
+### 実施した作業
 
 ```bash
 # 1. Vitest 4の破壊的変更を確認
-# https://github.com/vitest-dev/vitest/releases
+# https://vitest.dev/guide/migration.html
 
 # 2. アップデート実行
-npm install -D vitest@4.0.2 @vitest/coverage-v8@4.0.2
+npm install -D vitest@4.0.3 @vitest/coverage-v8@4.0.3
 
-# 3. 設定ファイル確認・修正（必要に応じて）
-# vitest.config.ts の変更が必要か確認
+# 3. 設定ファイル確認・修正
+# - vitest.config.mtsのmonaco-editorエイリアスを修正
+# - App.test.tsxにmonaco-editorとreactのモックを追加
 
 # 4. テスト実行
-npm run test
+npm run test -- --run  # 223テスト全通過
 
 # 5. カバレッジ確認
-npm run test:coverage
+npm run test:coverage  # 91.37%
 ```
 
 ### 確認項目
 
-- [ ] Vitest 4の破壊的変更を確認
-- [ ] 設定ファイル更新（必要な場合）
-- [ ] テスト全通過
-- [ ] カバレッジレポート生成成功
-- [ ] コミット完了
+- [x] Vitest 4の破壊的変更を確認
+- [x] 設定ファイル更新（monaco-editorエイリアスを正しいエントリーポイントに修正）
+- [x] テスト全通過（223テスト）
+- [x] カバレッジレポート生成成功（91.37%）
+- [x] コミット完了（2コミット）
+
+### 実施した変更
+
+1. **vitest.config.mts**
+   - monaco-editorのエイリアスをディレクトリから正しいエントリーポイント（esm/vs/editor/editor.main.js）に変更
+
+2. **app/renderer/App.test.tsx**
+   - monaco-editorのモックを追加
+   - @monaco-editor/reactのモックを追加
+
+3. **app/renderer/features/diff/DiffEditor.css**
+   - CSS specificityの警告を修正（セレクタの順序を最適化）
 
 ### 注意点
 
-- Vitest 4では設定形式やAPIに変更がある可能性
-- テストが通らない場合は、テストコードの修正が必要
+- Vitest 4では設定形式やAPIに変更がある可能性 → **影響なし**（非推奨APIは未使用）
+- テストが通らない場合は、テストコードの修正が必要 → **モック追加で対応完了**
+- Vitest 4のV8カバレッジは、より正確なマッピングロジックを使用
 
 ---
 
@@ -538,8 +558,8 @@ npm run lint:fix
 
 ### フェーズ完了チェックリスト
 
-- [ ] Phase 1: 小規模な依存関係
-- [ ] Phase 2: テスト環境
+- [x] Phase 1: 小規模な依存関係（🟡 部分的に完了、lucide-reactは保留中）
+- [x] Phase 2: テスト環境（✅ 2025-10-25完了）
 - [ ] Phase 3: React生態系
 - [ ] Phase 4: Zustand & Monaco Editor
 - [ ] Phase 5: Electron
@@ -604,3 +624,11 @@ npm run lint:fix
 ## 更新履歴
 
 - 2025-10-24: 初版作成
+- 2025-10-25: Phase 1（小規模な依存関係）部分的に完了
+  - @biomejs/biome 2.2.6 → 2.3.0
+  - vite-plugin-electron 0.28.8 → 0.29.0
+  - lucide-react 0.547.0へのアップデートは保留
+- 2025-10-25: Phase 2（テスト環境）完了
+  - vitest 3.2.4 → 4.0.3
+  - @vitest/coverage-v8 3.2.4 → 4.0.3
+  - 全223テスト通過、カバレッジ91.37%
