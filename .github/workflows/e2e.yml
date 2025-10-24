@@ -1,0 +1,163 @@
+name: E2E Tests
+
+on:
+  # 手動実行を許可
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Run tests in debug mode'
+        required: false
+        type: boolean
+        default: false
+
+  # PRに`e2e`ラベルが付いた場合
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+
+  # コミットメッセージに[e2e]が含まれる場合（push時）
+  push:
+    branches:
+      - main
+      - develop
+
+  # タグpush時
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  # PRラベルまたはコミットメッセージをチェックして、E2Eテストを実行するか判定
+  check-trigger:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Check trigger conditions
+        id: check
+        run: |
+          # デフォルトはfalse
+          SHOULD_RUN="false"
+
+          # 手動実行の場合は常に実行
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SHOULD_RUN="true"
+            echo "Triggered by manual workflow_dispatch"
+          fi
+
+          # タグpushの場合は常に実行
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            SHOULD_RUN="true"
+            echo "Triggered by version tag push"
+          fi
+
+          # PRに`e2e`ラベルがある場合は実行
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            if [[ "${{ contains(github.event.pull_request.labels.*.name, 'e2e') }}" == "true" ]]; then
+              SHOULD_RUN="true"
+              echo "Triggered by PR with 'e2e' label"
+            fi
+          fi
+
+          # コミットメッセージに[e2e]が含まれる場合は実行
+          if [[ "${{ github.event.head_commit.message }}" == *"[e2e]"* ]]; then
+            SHOULD_RUN="true"
+            echo "Triggered by commit message containing [e2e]"
+          fi
+
+          echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
+          echo "E2E tests will run: $SHOULD_RUN"
+
+  e2e-test:
+    needs: check-trigger
+    if: needs.check-trigger.outputs.should_run == 'true'
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npm run type-check
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 7
+
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test-results/**/*.png
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos
+          path: test-results/**/*.webm
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            let comment = '## E2E Test Results\n\n';
+
+            if ('${{ job.status }}' === 'success') {
+              comment += '✅ All E2E tests passed!\n';
+            } else {
+              comment += '❌ Some E2E tests failed.\n\n';
+              comment += 'Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.\n';
+            }
+
+            // レポートへのリンクを追加
+            comment += '\n📊 [View detailed test report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

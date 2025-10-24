@@ -47,6 +47,8 @@
       "!**/release",
       "!**/*.min.js",
       "!**/coverage",
+      "!**/playwright-report",
+      "!**/test-results",
       "!app/renderer/features/diff/utils/**/*.test.ts",
       "!app/renderer/features/diff/themes/**/*.test.ts",
       "!app/renderer/features/diff/hooks/useCompactMode.test.ts"
