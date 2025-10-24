@@ -14,14 +14,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, labeled]
 
-  # コミットメッセージに[e2e]が含まれる場合（push時）
+  # コミットメッセージに[e2e]が含まれる場合（push時）またはタグpush時
   push:
     branches:
       - main
       - develop
-
-  # タグpush時
-  push:
     tags:
       - 'v*'
 
