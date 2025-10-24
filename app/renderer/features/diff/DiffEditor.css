@@ -144,6 +144,16 @@
   border-top: none;
 }
 
+.compare-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  flex-shrink: 0;
+}
+
 /* 最大化時にmacOSのウィンドウ制御ボタンとの重なりを防ぐ */
 .compare-panel.fullscreen .compare-panel-header {
   padding-left: 80px;
@@ -188,16 +198,6 @@
 .resize-handle.resizing .resize-handle-bar {
   background-color: #1f6feb;
   height: 3px;
-}
-
-.compare-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-primary);
-  flex-shrink: 0;
 }
 
 .compare-panel-title {
