@@ -54,7 +54,7 @@ const SettingsModal: React.FC = () => {
 
       // 自動更新設定を読み込む
       window.electron?.settings.get().then((settings) => {
-        setLocalAutoUpdate(settings.autoUpdate ?? false);
+        setLocalAutoUpdate(settings.autoUpdate ?? true);
       });
 
       // 最終確認日を読み込む

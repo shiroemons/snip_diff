@@ -33,7 +33,7 @@ const mockElectronAPI = {
       },
       defaultLanguage: 'plaintext',
       defaultEOL: 'auto',
-      autoUpdate: false,
+      autoUpdate: true,
       devMode: true, // 開発者モードを有効にしてテストを実行
     }),
     set: vi.fn().mockResolvedValue({ success: true }),
