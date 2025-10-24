@@ -144,6 +144,11 @@
   border-top: none;
 }
 
+/* 最大化時にmacOSのウィンドウ制御ボタンとの重なりを防ぐ */
+.compare-panel.fullscreen .compare-panel-header {
+  padding-left: 80px;
+}
+
 .compare-panel-content {
   flex: 1;
   overflow: hidden;
