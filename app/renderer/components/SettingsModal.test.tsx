@@ -110,24 +110,28 @@ describe('SettingsModal', () => {
       expect(container.firstChild).toBeNull();
     });
 
-    it('should render when modal is open', () => {
+    it('should render when modal is open', async () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
-      expect(screen.getByText('設定')).toBeTruthy();
+      await waitFor(() => {
+        expect(screen.getByText('設定')).toBeTruthy();
+      });
     });
 
-    it('should display default settings section title', () => {
+    it('should display default settings section title', async () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
-      expect(screen.getByText('デフォルト値の設定')).toBeTruthy();
-      expect(
-        screen.getByText(/アプリケーション起動時や新しく比較を開始する際のデフォルト値を設定します/)
-      ).toBeTruthy();
+      await waitFor(() => {
+        expect(screen.getByText('デフォルト値の設定')).toBeTruthy();
+        expect(
+          screen.getByText(/アプリケーション起動時や新しく比較を開始する際のデフォルト値を設定します/)
+        ).toBeTruthy();
+      });
     });
   });
 
   describe('Font size selection', () => {
-    it('should display current font size', () => {
+    it('should display current font size', async () => {
       useDiffStore.setState({
         isSettingsModalOpen: true,
         defaultOptions: {
@@ -146,8 +150,10 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      const fontSizeSelects = screen.getAllByDisplayValue('18');
-      expect(fontSizeSelects.length).toBeGreaterThan(0);
+      await waitFor(() => {
+        const fontSizeSelects = screen.getAllByDisplayValue('18');
+        expect(fontSizeSelects.length).toBeGreaterThan(0);
+      });
     });
 
     it('should support maximum font size of 36', async () => {
@@ -179,39 +185,41 @@ describe('SettingsModal', () => {
       );
     });
 
-    it('should have all font size options from 10 to 36', () => {
+    it('should have all font size options from 10 to 36', async () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
 
-      const fontSizeLabel = screen.getByText('フォントサイズ');
-      const fontSizeSelect = fontSizeLabel.querySelector('select') as HTMLSelectElement;
+      await waitFor(() => {
+        const fontSizeLabel = screen.getByText('フォントサイズ');
+        const fontSizeSelect = fontSizeLabel.querySelector('select') as HTMLSelectElement;
 
-      const expectedSizes = [
-        '10',
-        '12',
-        '14',
-        '16',
-        '18',
-        '20',
-        '22',
-        '24',
-        '26',
-        '28',
-        '30',
-        '32',
-        '34',
-        '36',
-      ];
-      const options = Array.from(fontSizeSelect.options).map((opt) => opt.value);
+        const expectedSizes = [
+          '10',
+          '12',
+          '14',
+          '16',
+          '18',
+          '20',
+          '22',
+          '24',
+          '26',
+          '28',
+          '30',
+          '32',
+          '34',
+          '36',
+        ];
+        const options = Array.from(fontSizeSelect.options).map((opt) => opt.value);
 
-      expectedSizes.forEach((size) => {
-        expect(options).toContain(size);
+        expectedSizes.forEach((size) => {
+          expect(options).toContain(size);
+        });
       });
     });
   });
 
   describe('Theme selection', () => {
-    it('should display current theme', () => {
+    it('should display current theme', async () => {
       useDiffStore.setState({
         isSettingsModalOpen: true,
         theme: 'dark',
@@ -219,9 +227,11 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      const themeLabel = screen.getByText('テーマ');
-      const themeSelect = themeLabel.querySelector('select') as HTMLSelectElement;
-      expect(themeSelect.value).toBe('dark');
+      await waitFor(() => {
+        const themeLabel = screen.getByText('テーマ');
+        const themeSelect = themeLabel.querySelector('select') as HTMLSelectElement;
+        expect(themeSelect.value).toBe('dark');
+      });
     });
 
     it('should change theme when selected', async () => {
@@ -313,59 +323,75 @@ describe('SettingsModal', () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
     });
 
-    it('should display theme description', () => {
+    it('should display theme description', async () => {
       render(<SettingsModal />);
-      expect(screen.getByText(/エディターの外観を変更します/)).toBeTruthy();
-      expect(screen.getByText(/システムテーマ.*を選択すると、macOSの設定に従います/)).toBeTruthy();
+      await waitFor(() => {
+        expect(screen.getByText(/エディターの外観を変更します/)).toBeTruthy();
+        expect(screen.getByText(/システムテーマ.*を選択すると、macOSの設定に従います/)).toBeTruthy();
+      });
     });
 
-    it('should display font size description', () => {
+    it('should display font size description', async () => {
       render(<SettingsModal />);
-      expect(screen.getByText('エディターで表示されるテキストのサイズを変更します。')).toBeTruthy();
+      await waitFor(() => {
+        expect(screen.getByText('エディターで表示されるテキストのサイズを変更します。')).toBeTruthy();
+      });
     });
 
-    it('should display view mode description', () => {
+    it('should display view mode description', async () => {
       render(<SettingsModal />);
-      expect(
-        screen.getByText(/Side by Side.*左右並べて表示.*またはUnified.*統合表示/)
-      ).toBeTruthy();
+      await waitFor(() => {
+        expect(
+          screen.getByText(/Side by Side.*左右並べて表示.*またはUnified.*統合表示/)
+        ).toBeTruthy();
+      });
     });
 
-    it('should display compact mode description', () => {
+    it('should display compact mode description', async () => {
       render(<SettingsModal />);
-      expect(
-        screen.getByText(
-          '行レベルの背景色を削除し、実際に変更された文字だけを精密にハイライト表示します。'
-        )
-      ).toBeTruthy();
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            '行レベルの背景色を削除し、実際に変更された文字だけを精密にハイライト表示します。'
+          )
+        ).toBeTruthy();
+      });
     });
 
-    it('should display indent method description', () => {
+    it('should display indent method description', async () => {
       render(<SettingsModal />);
-      expect(
-        screen.getByText(/Tabキーを押したときにスペースまたはタブ文字のどちらを挿入するか/)
-      ).toBeTruthy();
+      await waitFor(() => {
+        expect(
+          screen.getByText(/Tabキーを押したときにスペースまたはタブ文字のどちらを挿入するか/)
+        ).toBeTruthy();
+      });
     });
 
-    it('should display indent size description', () => {
+    it('should display indent size description', async () => {
       render(<SettingsModal />);
-      expect(
-        screen.getByText(/インデント1つあたりのスペース数、またはタブ文字の表示幅/)
-      ).toBeTruthy();
+      await waitFor(() => {
+        expect(
+          screen.getByText(/インデント1つあたりのスペース数、またはタブ文字の表示幅/)
+        ).toBeTruthy();
+      });
     });
 
-    it('should display EOL description', () => {
+    it('should display EOL description', async () => {
       render(<SettingsModal />);
-      expect(
-        screen.getByText(/新規入力時の改行コード.*LF: Unix\/Mac.*CRLF: Windows.*Auto: OSに従う/)
-      ).toBeTruthy();
+      await waitFor(() => {
+        expect(
+          screen.getByText(/新規入力時の改行コード.*LF: Unix\/Mac.*CRLF: Windows.*Auto: OSに従う/)
+        ).toBeTruthy();
+      });
     });
 
-    it('should display language mode description', () => {
+    it('should display language mode description', async () => {
       render(<SettingsModal />);
-      expect(
-        screen.getByText(/シンタックスハイライトに使用する言語.*コードの構文に応じた色分け/)
-      ).toBeTruthy();
+      await waitFor(() => {
+        expect(
+          screen.getByText(/シンタックスハイライトに使用する言語.*コードの構文に応じた色分け/)
+        ).toBeTruthy();
+      });
     });
   });
 
@@ -497,13 +523,15 @@ describe('SettingsModal', () => {
       vi.spyOn(window, 'confirm');
     });
 
-    it('should render reset button', () => {
+    it('should render reset button', async () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
 
-      const resetButton = screen.getByText('デフォルトにリセット');
-      expect(resetButton).toBeTruthy();
-      expect(resetButton.getAttribute('title')).toBe('すべての設定をデフォルト値にリセットします');
+      await waitFor(() => {
+        const resetButton = screen.getByText('デフォルトにリセット');
+        expect(resetButton).toBeTruthy();
+        expect(resetButton.getAttribute('title')).toBe('すべての設定をデフォルト値にリセットします');
+      });
     });
 
     it('should show confirmation dialog when reset button is clicked', async () => {
