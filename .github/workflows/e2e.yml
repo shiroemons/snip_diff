@@ -1,5 +1,10 @@
 name: E2E Tests
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 on:
   # 手動実行を許可
   workflow_dispatch:

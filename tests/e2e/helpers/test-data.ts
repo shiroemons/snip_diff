@@ -67,8 +67,8 @@ export const SELECTORS = {
   // Controls
   CLEAR_BUTTON: '[aria-label*="clear"], [aria-label*="クリア"], button:has-text("Clear")',
   SWAP_BUTTON: '[aria-label*="swap"], [aria-label*="入れ替え"], button:has-text("Swap")',
-  MODE_TOGGLE: '[role="radiogroup"]',
-  INLINE_MODE_BUTTON: 'button:has-text("Inline"), button:has-text("Unified")',
+  MODE_TOGGLE: '.view-mode-toggle',
+  INLINE_MODE_BUTTON: 'button:has-text("Unified")',
   SIDE_BY_SIDE_MODE_BUTTON: 'button:has-text("Side by Side")',
 
   // Footer
