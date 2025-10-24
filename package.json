@@ -23,6 +23,11 @@
     "check": "biome check --write .",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "npm run build && playwright test",
+    "test:e2e:ui": "npm run build && playwright test --ui",
+    "test:e2e:debug": "npm run build && playwright test --debug",
+    "test:e2e:headed": "npm run build && playwright test --headed",
+    "test:e2e:report": "playwright show-report",
     "postinstall": "simple-git-hooks"
   },
   "dependencies": {
@@ -38,6 +43,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.6",
+    "@playwright/test": "^1.56.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/diff": "^7.0.2",
