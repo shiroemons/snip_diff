@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  ci:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npm run type-check
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Run test coverage
+        run: npm run test:coverage
+
+      - name: Build
+        run: npm run build
+
+      - name: Build distribution package (no release)
+        run: npm run dist:mac
+        env:
+          # Code signing環境変数（オプション、設定されていない場合はスキップ）
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Verify build artifacts
+        run: |
+          echo "Checking for build artifacts in release directory..."
+          ls -lh release/
+          if [ ! -f release/*.dmg ]; then
+            echo "Error: No .dmg file found in release directory"
+            exit 1
+          fi
+          echo "Build artifacts verified successfully"
