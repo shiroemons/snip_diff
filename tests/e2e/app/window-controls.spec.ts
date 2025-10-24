@@ -52,7 +52,7 @@ test.describe('Window Controls', () => {
     }
   });
 
-  test('should maximize and restore window', async ({ page, electronApp }) => {
+  test('should maximize and restore window', async ({ page }) => {
     const maximizeButton = page.locator(SELECTORS.WINDOW_CONTROLS.MAXIMIZE);
 
     if (await maximizeButton.count() > 0) {
@@ -72,15 +72,18 @@ test.describe('Window Controls', () => {
     }
   });
 
-  test('should handle window resize', async ({ page }) => {
-    // Get initial viewport size
-    const initialSize = await page.viewportSize();
-    expect(initialSize).toBeTruthy();
+  test('should handle window resize', async ({ electronApp }) => {
+    // Note: page.viewportSize() returns null in Electron
+    // Use electronApp.evaluate() to get window bounds instead
+    const bounds = await electronApp.evaluate(async ({ BrowserWindow }) => {
+      const win = BrowserWindow.getAllWindows()[0];
+      return win.getBounds();
+    });
 
-    // We can't programmatically resize Electron windows easily in tests
-    // This test just verifies the viewport is set correctly
-    expect(initialSize?.width).toBeGreaterThan(0);
-    expect(initialSize?.height).toBeGreaterThan(0);
+    // Verify window has valid dimensions
+    expect(bounds).toBeTruthy();
+    expect(bounds.width).toBeGreaterThan(0);
+    expect(bounds.height).toBeGreaterThan(0);
   });
 
   test('should maintain content after window operations', async ({ page }) => {
@@ -120,7 +123,7 @@ test.describe('Window Controls', () => {
       const closeInHeader = await header.locator(SELECTORS.WINDOW_CONTROLS.CLOSE).count();
 
       // If any control is in header, we have custom title bar
-      const hasCustomTitleBar = minimizeInHeader > 0 || maximizeInHeader > 0 || closeInHeader > 0;
+      const _hasCustomTitleBar = minimizeInHeader > 0 || maximizeInHeader > 0 || closeInHeader > 0;
 
       // Test passes either way
       expect(hasHeader).toBeTruthy();

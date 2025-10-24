@@ -24,7 +24,7 @@ test.describe('Theme', () => {
 
     if (await themeToggle.count() > 0) {
       // Get initial theme (by checking body or html class)
-      const initialClass = await page.evaluate(() => {
+      const _initialClass = await page.evaluate(() => {
         return document.documentElement.className || document.body.className;
       });
 
@@ -33,7 +33,7 @@ test.describe('Theme', () => {
       await page.waitForTimeout(500);
 
       // Get new theme
-      const newClass = await page.evaluate(() => {
+      const _newClass = await page.evaluate(() => {
         return document.documentElement.className || document.body.className;
       });
 
@@ -62,7 +62,7 @@ test.describe('Theme', () => {
         await page.waitForTimeout(500);
 
         // Check if theme changed (look for dark class or attribute)
-        const isDark = await page.evaluate(() => {
+        const _isDark = await page.evaluate(() => {
           const className = document.documentElement.className || document.body.className;
           const theme = document.documentElement.getAttribute('data-theme');
           return className.includes('dark') || theme === 'dark';
@@ -89,7 +89,7 @@ test.describe('Theme', () => {
     }
   });
 
-  test('should persist theme after restart', async ({ page, electronApp }) => {
+  test('should persist theme after restart', async ({ page }) => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 

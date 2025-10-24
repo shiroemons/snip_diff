@@ -1,6 +1,6 @@
 import { expect, test } from '../fixtures/electronApp';
 import { setMonacoEditorContent, waitForMonacoEditor } from '../helpers/electron-helpers';
-import { DIFF_MODES, SELECTORS, TEST_TEXT } from '../helpers/test-data';
+import { SELECTORS, TEST_TEXT } from '../helpers/test-data';
 
 test.describe('Diff Display', () => {
   test.beforeEach(async ({ page }) => {
