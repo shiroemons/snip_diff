@@ -66,6 +66,59 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
     }
   }, []);
 
+  // 左エディタのオプションを動的に更新
+  useEffect(() => {
+    if (leftEditorRef.current && activeSession) {
+      leftEditorRef.current.updateOptions({
+        tabSize: activeSession.options.tabSize ?? 4,
+        insertSpaces: activeSession.options.insertSpaces ?? true,
+        fontSize: activeSession.options.fontSize ?? 14,
+        wordWrap: activeSession.options.wordWrap ? 'on' : 'off',
+      });
+    }
+  }, [
+    activeSession?.options.tabSize,
+    activeSession?.options.insertSpaces,
+    activeSession?.options.fontSize,
+    activeSession?.options.wordWrap,
+    activeSession,
+  ]);
+
+  // 右エディタのオプションを動的に更新
+  useEffect(() => {
+    if (rightEditorRef.current && activeSession) {
+      rightEditorRef.current.updateOptions({
+        tabSize: activeSession.options.tabSize ?? 4,
+        insertSpaces: activeSession.options.insertSpaces ?? true,
+        fontSize: activeSession.options.fontSize ?? 14,
+        wordWrap: activeSession.options.wordWrap ? 'on' : 'off',
+      });
+    }
+  }, [
+    activeSession?.options.tabSize,
+    activeSession?.options.insertSpaces,
+    activeSession?.options.fontSize,
+    activeSession?.options.wordWrap,
+    activeSession,
+  ]);
+
+  // Diffエディタのオプションを動的に更新
+  useEffect(() => {
+    if (diffEditorRef.current && activeSession) {
+      diffEditorRef.current.updateOptions({
+        fontSize: activeSession.options.fontSize ?? 14,
+        // @ts-expect-error - Monaco DiffEditorのupdateOptionsでもtabSizeとinsertSpacesは有効
+        tabSize: activeSession.options.tabSize ?? 4,
+        insertSpaces: activeSession.options.insertSpaces ?? true,
+      });
+    }
+  }, [
+    activeSession?.options.tabSize,
+    activeSession?.options.insertSpaces,
+    activeSession?.options.fontSize,
+    activeSession,
+  ]);
+
   // 比較を実行する関数
   const handleCompare = () => {
     const leftValue = leftEditorRef.current?.getValue() || '';
