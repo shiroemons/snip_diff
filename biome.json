@@ -51,7 +51,8 @@
       "!**/test-results",
       "!app/renderer/features/diff/utils/**/*.test.ts",
       "!app/renderer/features/diff/themes/**/*.test.ts",
-      "!app/renderer/features/diff/hooks/useCompactMode.test.ts"
+      "!app/renderer/features/diff/hooks/useCompactMode.test.ts",
+      "!tests/e2e/fixtures"
     ]
   }
 }
