@@ -159,6 +159,11 @@
   padding-left: 80px;
 }
 
+/* アプリウィンドウが最大化されている場合（ウィンドウコントロールボタンが消えるため） */
+.compare-panel.fullscreen.maximized .compare-panel-header {
+  padding-left: 12px;
+}
+
 .compare-panel-content {
   flex: 1;
   overflow: hidden;

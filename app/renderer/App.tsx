@@ -11,6 +11,7 @@ const App: React.FC = () => {
   const { initializeSession, theme, updateOptions, loadSettings } = useDiffStore();
   const diffEditorRef = useRef<DiffEditorRef>(null);
   const [actualTheme, setActualTheme] = React.useState<'light' | 'dark'>('dark');
+  const [isWindowMaximized, setIsWindowMaximized] = React.useState(false);
   const initialized = useRef(false);
   const settingsLoaded = useRef(false);
 
@@ -130,6 +131,32 @@ const App: React.FC = () => {
     };
   }, [updateOptions]);
 
+  // ウィンドウの最大化状態を監視
+  useEffect(() => {
+    if (!window.electron) return;
+
+    // 初期状態を取得
+    const initMaximizedState = async () => {
+      try {
+        const maximized = await window.electron.window.isMaximized();
+        setIsWindowMaximized(maximized);
+      } catch (error) {
+        console.error('Failed to get window maximized state:', error);
+      }
+    };
+
+    initMaximizedState();
+
+    // 最大化状態の変更を監視
+    window.electron.window.onMaximizedChanged((state) => {
+      setIsWindowMaximized(state.isMaximized);
+    });
+
+    return () => {
+      window.electron.window.removeMaximizedListener();
+    };
+  }, []);
+
   const handleCompare = () => {
     diffEditorRef.current?.compare();
   };
@@ -214,9 +241,10 @@ const App: React.FC = () => {
         onSwap={handleSwap}
         onClear={handleClear}
         actualTheme={actualTheme}
+        isMaximized={isWindowMaximized}
       />
       <main className="main-content">
-        <DiffEditor ref={diffEditorRef} theme={actualTheme} />
+        <DiffEditor ref={diffEditorRef} theme={actualTheme} isMaximized={isWindowMaximized} />
       </main>
       <Footer />
       <SettingsModal />

@@ -21,6 +21,8 @@ export interface ComparisonPanelProps {
   isMinimized: boolean;
   /** リサイズ中かどうか */
   isResizing: boolean;
+  /** ウィンドウが最大化されているかどうか */
+  isWindowMaximized?: boolean;
   /** Compactモードかどうか */
   compactMode: boolean;
   /** 表示モード */
@@ -57,6 +59,7 @@ export const ComparisonPanel: React.FC<ComparisonPanelProps> = ({
   isFullscreen,
   isMinimized,
   isResizing,
+  isWindowMaximized = false,
   compactMode,
   viewMode,
   ignoreWhitespace,
@@ -75,7 +78,7 @@ export const ComparisonPanel: React.FC<ComparisonPanelProps> = ({
 
   return (
     <div
-      className={`compare-panel ${isFullscreen ? 'fullscreen' : ''} ${isMinimized ? 'minimized' : ''} ${isResizing ? 'resizing' : ''}`}
+      className={`compare-panel ${isFullscreen ? 'fullscreen' : ''} ${isMinimized ? 'minimized' : ''} ${isResizing ? 'resizing' : ''} ${isWindowMaximized ? 'maximized' : ''}`}
       style={panelStyle}
     >
       {/* リサイズハンドル */}

@@ -10,6 +10,11 @@
   -webkit-app-region: drag;
 }
 
+/* ウィンドウ最大化時のパディング調整（ウィンドウコントロールボタンが消えるため） */
+.app-header.maximized {
+  padding-left: 12px;
+}
+
 .app-title {
   font-size: 18px;
   font-weight: 600;

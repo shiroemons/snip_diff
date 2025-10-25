@@ -25,9 +25,11 @@ export interface DiffEditorRef {
 
 interface DiffEditorProps {
   theme?: 'light' | 'dark';
+  isMaximized?: boolean;
 }
 
-const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' }, ref) => {
+const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(
+  ({ theme = 'dark', isMaximized = false }, ref) => {
   const { getActiveSession, updateStats } = useDiffStore();
   const activeSession = getActiveSession();
   const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
@@ -337,6 +339,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(({ theme = 'dark' 
           isFullscreen={isFullscreen}
           isMinimized={isMinimized}
           isResizing={isResizing}
+          isWindowMaximized={isMaximized}
           compactMode={activeSession.options.compactMode ?? false}
           viewMode={activeSession.options.viewMode ?? 'side-by-side'}
           ignoreWhitespace={activeSession.options.ignoreWhitespace ?? false}

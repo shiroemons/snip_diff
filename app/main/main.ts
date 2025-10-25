@@ -130,6 +130,35 @@ function createWindow(): void {
       isMaximized: false,
     });
   });
+
+  // フルスクリーンイベントの監視（macOSで緑ボタンを押すとフルスクリーンになることがある）
+  mainWindow.on('enter-full-screen', () => {
+    mainWindow?.webContents.send(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED, {
+      isMaximized: true,
+    });
+  });
+
+  mainWindow.on('leave-full-screen', () => {
+    mainWindow?.webContents.send(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED, {
+      isMaximized: false,
+    });
+  });
+
+  // ウィンドウのリサイズ時にも最大化状態を確認（macOS対応）
+  mainWindow.on('resize', () => {
+    if (!mainWindow) return;
+    mainWindow.webContents.send(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED, {
+      isMaximized: mainWindow.isMaximized(),
+    });
+  });
+
+  // ウィンドウの準備ができたら初期状態を送信
+  mainWindow.webContents.on('did-finish-load', () => {
+    if (!mainWindow) return;
+    mainWindow.webContents.send(IPC_CHANNELS.WINDOW_MAXIMIZED_CHANGED, {
+      isMaximized: mainWindow.isMaximized(),
+    });
+  });
 }
 
 /**

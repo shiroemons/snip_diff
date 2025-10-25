@@ -131,4 +131,74 @@ test.describe('Window Controls', () => {
       test.skip();
     }
   });
+
+  test('should update header padding when window is maximized', async ({ page, electronApp }) => {
+    const header = page.locator(SELECTORS.HEADER);
+    expect(await header.count()).toBeGreaterThan(0);
+
+    // Get initial state - should not have maximized class
+    const initialClass = await header.first().getAttribute('class');
+    expect(initialClass).not.toContain('maximized');
+
+    // Maximize window using Electron API
+    await electronApp.evaluate(async ({ BrowserWindow }) => {
+      const win = BrowserWindow.getAllWindows()[0];
+      win.maximize();
+    });
+
+    // Wait for UI to update
+    await page.waitForTimeout(500);
+
+    // Check if header has maximized class
+    const maximizedClass = await header.first().getAttribute('class');
+    expect(maximizedClass).toContain('maximized');
+
+    // Unmaximize window
+    await electronApp.evaluate(async ({ BrowserWindow }) => {
+      const win = BrowserWindow.getAllWindows()[0];
+      win.unmaximize();
+    });
+
+    // Wait for UI to update
+    await page.waitForTimeout(500);
+
+    // Check if maximized class is removed
+    const restoredClass = await header.first().getAttribute('class');
+    expect(restoredClass).not.toContain('maximized');
+  });
+
+  test('should detect fullscreen as maximized state', async ({ page, electronApp }) => {
+    const header = page.locator(SELECTORS.HEADER);
+    expect(await header.count()).toBeGreaterThan(0);
+
+    // Get initial state
+    const initialClass = await header.first().getAttribute('class');
+    expect(initialClass).not.toContain('maximized');
+
+    // Enter fullscreen using Electron API
+    await electronApp.evaluate(async ({ BrowserWindow }) => {
+      const win = BrowserWindow.getAllWindows()[0];
+      win.setFullScreen(true);
+    });
+
+    // Wait for fullscreen transition to complete (macOS has an animation)
+    await page.waitForTimeout(1500);
+
+    // Check if header has maximized class (fullscreen should be treated as maximized)
+    const fullscreenClass = await header.first().getAttribute('class');
+    expect(fullscreenClass).toContain('maximized');
+
+    // Exit fullscreen
+    await electronApp.evaluate(async ({ BrowserWindow }) => {
+      const win = BrowserWindow.getAllWindows()[0];
+      win.setFullScreen(false);
+    });
+
+    // Wait for fullscreen transition to complete
+    await page.waitForTimeout(1500);
+
+    // Check if maximized class is removed
+    const restoredClass = await header.first().getAttribute('class');
+    expect(restoredClass).not.toContain('maximized');
+  });
 });

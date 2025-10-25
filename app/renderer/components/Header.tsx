@@ -10,9 +10,15 @@ interface HeaderProps {
   onSwap?: () => void;
   onClear?: () => void;
   actualTheme?: 'light' | 'dark';
+  isMaximized?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ onSwap, onClear, actualTheme = 'dark' }) => {
+const Header: React.FC<HeaderProps> = ({
+  onSwap,
+  onClear,
+  actualTheme = 'dark',
+  isMaximized = false,
+}) => {
   const { getActiveSession, updateOptions, theme, setTheme } = useDiffStore();
   const activeSession = getActiveSession();
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
@@ -121,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({ onSwap, onClear, actualTheme = 'dark' }
   };
 
   return (
-    <header className="app-header">
+    <header className={`app-header ${isMaximized ? 'maximized' : ''}`}>
       <div className="header-section">
         <h1 className="app-title">SnipDiff</h1>
         <span className="app-version">v{__APP_VERSION__}</span>
