@@ -123,7 +123,7 @@ test.describe('Keyboard Shortcuts', () => {
     // Open settings modal
     const settingsButton = page.locator('[aria-label*="settings"], [aria-label*="設定"]');
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 

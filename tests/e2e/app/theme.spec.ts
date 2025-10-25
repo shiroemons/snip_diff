@@ -11,7 +11,7 @@ test.describe('Theme', () => {
   test('should have theme toggle button', async ({ page }) => {
     const themeToggle = page.locator(SELECTORS.THEME_TOGGLE);
 
-    if (await themeToggle.count() > 0) {
+    if ((await themeToggle.count()) > 0) {
       expect(await themeToggle.first().isVisible()).toBeTruthy();
     } else {
       // Theme toggle might be in settings only
@@ -22,7 +22,7 @@ test.describe('Theme', () => {
   test('should toggle theme with button', async ({ page }) => {
     const themeToggle = page.locator(SELECTORS.THEME_TOGGLE);
 
-    if (await themeToggle.count() > 0) {
+    if ((await themeToggle.count()) > 0) {
       // Get initial theme (by checking body or html class)
       const _initialClass = await page.evaluate(() => {
         return document.documentElement.className || document.body.className;
@@ -49,14 +49,14 @@ test.describe('Theme', () => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
       // Find theme select
       const themeSelect = page.locator(SELECTORS.THEME_SELECT);
 
-      if (await themeSelect.count() > 0) {
+      if ((await themeSelect.count()) > 0) {
         // Change to dark theme
         await themeSelect.first().selectOption(THEMES.DARK);
         await page.waitForTimeout(500);
@@ -93,14 +93,14 @@ test.describe('Theme', () => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
       // Find theme select
       const themeSelect = page.locator(SELECTORS.THEME_SELECT);
 
-      if (await themeSelect.count() > 0) {
+      if ((await themeSelect.count()) > 0) {
         // Set to dark theme
         await themeSelect.first().selectOption(THEMES.DARK);
         await page.waitForTimeout(500);
@@ -137,7 +137,9 @@ test.describe('Theme', () => {
 
     // Check if Monaco editor has theme class
     const hasTheme = await monacoEditor.evaluate((el) => {
-      return el.classList.contains('vs-dark') || el.classList.contains('vs') || el.classList.length > 0;
+      return (
+        el.classList.contains('vs-dark') || el.classList.contains('vs') || el.classList.length > 0
+      );
     });
 
     // Monaco should have some theme applied
@@ -148,14 +150,14 @@ test.describe('Theme', () => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
       // Find theme select
       const themeSelect = page.locator(SELECTORS.THEME_SELECT);
 
-      if (await themeSelect.count() > 0) {
+      if ((await themeSelect.count()) > 0) {
         // Set to auto mode
         await themeSelect.first().selectOption(THEMES.AUTO);
         await page.waitForTimeout(500);
@@ -183,7 +185,7 @@ test.describe('Theme', () => {
   test('should update theme smoothly without flickering', async ({ page }) => {
     const themeToggle = page.locator(SELECTORS.THEME_TOGGLE);
 
-    if (await themeToggle.count() > 0) {
+    if ((await themeToggle.count()) > 0) {
       // Quickly toggle theme multiple times
       for (let i = 0; i < 3; i++) {
         await themeToggle.first().click();

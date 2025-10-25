@@ -56,7 +56,10 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './app/renderer'),
       '@shared': path.resolve(__dirname, './app/shared'),
-      'monaco-editor': path.resolve(__dirname, './node_modules/monaco-editor/esm/vs/editor/editor.main.js'),
+      'monaco-editor': path.resolve(
+        __dirname,
+        './node_modules/monaco-editor/esm/vs/editor/editor.main.js'
+      ),
     },
   },
 });
