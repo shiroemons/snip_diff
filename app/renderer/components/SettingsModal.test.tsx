@@ -318,6 +318,35 @@ describe('SettingsModal', () => {
       await user.selectOptions(languageSelect, 'javascript');
       expect(languageSelect.value).toBe('javascript');
     });
+
+    it('should save language setting and update store', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      // Change language to typescript
+      const languageLabel = screen.getByText('デフォルト言語モード');
+      const languageSelect = languageLabel.querySelector('select') as HTMLSelectElement;
+      await user.selectOptions(languageSelect, 'typescript');
+
+      // Save settings
+      const saveButton = screen.getByText('保存');
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        // Verify that settings are saved with the correct language
+        expect(mockElectronAPI.settings.set).toHaveBeenCalledWith(
+          expect.objectContaining({
+            defaultLanguage: 'typescript',
+          })
+        );
+
+        // Verify that store is updated
+        const state = useDiffStore.getState();
+        expect(state.defaultLanguage).toBe('typescript');
+      });
+    });
   });
 
   describe('Description texts', () => {
@@ -520,6 +549,86 @@ describe('SettingsModal', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('EOL settings', () => {
+    it('should change EOL setting', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const eolLabel = screen.getByText('デフォルト改行コード');
+      const eolSelect = eolLabel.querySelector('select') as HTMLSelectElement;
+
+      // Initial value should be 'auto'
+      expect(eolSelect.value).toBe('auto');
+
+      // Change to LF
+      await user.selectOptions(eolSelect, 'LF');
+      expect(eolSelect.value).toBe('LF');
+
+      // Change to CRLF
+      await user.selectOptions(eolSelect, 'CRLF');
+      expect(eolSelect.value).toBe('CRLF');
+
+      // Change back to auto
+      await user.selectOptions(eolSelect, 'auto');
+      expect(eolSelect.value).toBe('auto');
+    });
+
+    it('should save EOL setting', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const eolLabel = screen.getByText('デフォルト改行コード');
+      const eolSelect = eolLabel.querySelector('select') as HTMLSelectElement;
+
+      // Change to LF
+      await user.selectOptions(eolSelect, 'LF');
+
+      // Save settings
+      const saveButton = screen.getByText('保存');
+      await user.click(saveButton);
+
+      expect(mockElectronAPI.settings.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          defaultEOL: 'LF',
+        })
+      );
+    });
+
+    it('should save EOL setting and update store', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+
+      render(<SettingsModal />);
+
+      const eolLabel = screen.getByText('デフォルト改行コード');
+      const eolSelect = eolLabel.querySelector('select') as HTMLSelectElement;
+
+      // Change to CRLF
+      await user.selectOptions(eolSelect, 'CRLF');
+
+      // Save settings
+      const saveButton = screen.getByText('保存');
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        // Verify that settings are saved with the correct EOL
+        expect(mockElectronAPI.settings.set).toHaveBeenCalledWith(
+          expect.objectContaining({
+            defaultEOL: 'CRLF',
+          })
+        );
+
+        // Verify that store is updated
+        const state = useDiffStore.getState();
+        expect(state.defaultEOL).toBe('CRLF');
+      });
     });
   });
 

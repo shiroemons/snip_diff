@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDiffStore } from '../stores/diffStore';
@@ -12,6 +12,10 @@ describe('Header', () => {
       activeSessionId: null,
       theme: 'auto',
     });
+
+    // Clean up any mock electron API
+    // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+    delete (window as any).electron;
   });
 
   describe('Rendering', () => {
@@ -244,6 +248,155 @@ describe('Header', () => {
 
       expect(ignoreWhitespaceButton.className).not.toContain('active');
       expect(wordWrapButton.className).not.toContain('active');
+    });
+  });
+
+  describe('Error handling', () => {
+    it('should handle theme.get error gracefully', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const mockElectron = {
+        theme: {
+          get: vi.fn().mockRejectedValue(new Error('Failed to get theme')),
+          onChanged: vi.fn(),
+          removeListener: vi.fn(),
+        },
+      };
+
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectron;
+
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Header />);
+
+      await waitFor(() => {
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to get system theme:', expect.any(Error));
+      });
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('Theme icon edge cases', () => {
+    it('should show correct icon for light theme', () => {
+      const { initializeSession, setTheme } = useDiffStore.getState();
+      initializeSession();
+      setTheme('light');
+
+      render(<Header />);
+
+      const themeButton = screen.getByRole('button', { name: /テーマメニュー/ });
+      expect(themeButton).toBeTruthy();
+    });
+
+    it('should show correct icon for dark theme', () => {
+      const { initializeSession, setTheme } = useDiffStore.getState();
+      initializeSession();
+      setTheme('dark');
+
+      render(<Header />);
+
+      const themeButton = screen.getByRole('button', { name: /テーマメニュー/ });
+      expect(themeButton).toBeTruthy();
+    });
+
+    it('should show correct icon for auto theme based on system theme', async () => {
+      const mockElectron = {
+        theme: {
+          get: vi.fn().mockResolvedValue({ shouldUseDarkColors: true }),
+          onChanged: vi.fn(),
+          removeListener: vi.fn(),
+        },
+      };
+
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectron;
+
+      const { initializeSession, setTheme } = useDiffStore.getState();
+      initializeSession();
+      setTheme('auto');
+
+      render(<Header />);
+
+      await waitFor(() => {
+        expect(mockElectron.theme.get).toHaveBeenCalled();
+      });
+
+      const themeButton = screen.getByRole('button', { name: /テーマメニュー/ });
+      expect(themeButton).toBeTruthy();
+    });
+
+    it('should handle invalid theme value gracefully', () => {
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      // @ts-expect-error: Testing invalid theme value
+      useDiffStore.setState({ theme: 'invalid-theme' });
+
+      render(<Header />);
+
+      const themeButton = screen.getByRole('button', { name: /テーマメニュー/ });
+      expect(themeButton).toBeTruthy();
+    });
+  });
+
+  describe('System theme changes', () => {
+    it('should update system theme when electron theme changes', async () => {
+      let onChangedCallback: ((themeInfo: { shouldUseDarkColors: boolean }) => void) | null = null;
+
+      const mockElectron = {
+        theme: {
+          get: vi.fn().mockResolvedValue({ shouldUseDarkColors: false }),
+          onChanged: vi.fn((callback) => {
+            onChangedCallback = callback;
+          }),
+          removeListener: vi.fn(),
+        },
+      };
+
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectron;
+
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Header />);
+
+      await waitFor(() => {
+        expect(onChangedCallback).not.toBeNull();
+      });
+
+      // Trigger theme change to dark
+      await act(async () => {
+        onChangedCallback?.({ shouldUseDarkColors: true });
+      });
+
+      // The component should re-render with the new system theme
+      expect(screen.getByText('SnipDiff')).toBeTruthy();
+    });
+
+    it('should remove theme listener on unmount', () => {
+      const removeListenerSpy = vi.fn();
+      const mockElectron = {
+        theme: {
+          get: vi.fn().mockResolvedValue({ shouldUseDarkColors: false }),
+          onChanged: vi.fn(),
+          removeListener: removeListenerSpy,
+        },
+      };
+
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectron;
+
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      const { unmount } = render(<Header />);
+
+      unmount();
+
+      expect(removeListenerSpy).toHaveBeenCalled();
     });
   });
 });

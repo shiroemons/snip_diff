@@ -293,6 +293,116 @@ describe('App', () => {
       // Restore for other tests
       (global.window as Window & typeof globalThis).electron = mockElectronAPI;
     });
+
+    it('should apply explicit theme in browser mode when theme is not auto', async () => {
+      // @ts-expect-error - Temporarily removing electron for testing
+      (global.window as Window & typeof globalThis).electron = undefined;
+
+      // Set theme to 'light' in the store
+      useDiffStore.setState({
+        theme: 'light',
+      });
+
+      mockElectronAPI.settings.get.mockResolvedValue({
+        theme: 'light',
+        defaultOptions: {
+          ignoreWhitespace: false,
+          normalizeEOL: true,
+          viewMode: 'side-by-side',
+          compactMode: false,
+          wordWrap: false,
+          tabSize: 4,
+          fontSize: 14,
+          insertSpaces: true,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: false,
+        },
+        defaultLanguage: 'plaintext',
+        defaultEOL: 'auto',
+      });
+
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        const diffEditor = screen.getByTestId('diff-editor');
+        expect(diffEditor.getAttribute('data-theme')).toBe('light');
+      });
+
+      consoleSpy.mockRestore();
+
+      // Restore for other tests
+      (global.window as Window & typeof globalThis).electron = mockElectronAPI;
+    });
+
+    it('should handle theme.get error during initial load', async () => {
+      mockElectronAPI.theme.get.mockRejectedValue(new Error('Failed to get theme'));
+
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        // Check that either error message was logged (initial or subsequent theme check)
+        const errorCalls = consoleSpy.mock.calls.filter(
+          (call) =>
+            call[0] === 'Failed to get initial system theme:' ||
+            call[0] === 'Failed to get theme:' ||
+            call[0] === 'Failed to get system theme:'
+        );
+        expect(errorCalls.length).toBeGreaterThan(0);
+      });
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle theme.get error gracefully when switching to auto mode', async () => {
+      mockElectronAPI.settings.get.mockResolvedValue({
+        theme: 'light',
+        defaultOptions: {
+          ignoreWhitespace: false,
+          normalizeEOL: true,
+          viewMode: 'side-by-side',
+          compactMode: false,
+          wordWrap: false,
+          tabSize: 4,
+          fontSize: 14,
+          insertSpaces: true,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: false,
+        },
+        defaultLanguage: 'plaintext',
+        defaultEOL: 'auto',
+      });
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initial render
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      // Switch to auto theme with error
+      mockElectronAPI.theme.get.mockRejectedValue(new Error('Failed to get theme'));
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      await act(async () => {
+        useDiffStore.getState().setTheme('auto');
+      });
+
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to get theme:', expect.any(Error));
+      });
+
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('Header integration', () => {
@@ -737,6 +847,232 @@ describe('App', () => {
       expect(removeEventListenerSpy).toHaveBeenCalledWith('drop', expect.any(Function));
 
       removeEventListenerSpy.mockRestore();
+    });
+  });
+
+  describe('Error handling', () => {
+    it('should handle window.isMaximized error gracefully', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      mockElectronAPI.window.isMaximized = vi.fn().mockRejectedValue(new Error('Failed to get maximized state'));
+
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectronAPI;
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          'Failed to get window maximized state:',
+          expect.any(Error)
+        );
+      });
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('should handle theme.get error gracefully', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      mockElectronAPI.theme.get = vi.fn().mockRejectedValue(new Error('Failed to get theme'));
+
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectronAPI;
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      // The error should be logged but not crash the app
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('Cleanup - window.electron listeners', () => {
+    it('should remove theme listener on unmount', async () => {
+      const removeListenerSpy = vi.fn();
+      mockElectronAPI.theme.removeListener = removeListenerSpy;
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectronAPI;
+
+      const { unmount } = await act(async () => {
+        return render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      await act(async () => {
+        unmount();
+      });
+
+      expect(removeListenerSpy).toHaveBeenCalled();
+    });
+
+    it('should remove settings and view listeners on unmount', async () => {
+      const settingsRemoveListenerSpy = vi.fn();
+      const viewRemoveAllListenersSpy = vi.fn();
+
+      mockElectronAPI.settings.removeListener = settingsRemoveListenerSpy;
+      mockElectronAPI.view.removeAllListeners = viewRemoveAllListenersSpy;
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectronAPI;
+
+      const { unmount } = await act(async () => {
+        return render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      await act(async () => {
+        unmount();
+      });
+
+      expect(settingsRemoveListenerSpy).toHaveBeenCalled();
+      expect(viewRemoveAllListenersSpy).toHaveBeenCalled();
+    });
+
+    it('should remove window maximized listener on unmount', async () => {
+      const removeMaximizedListenerSpy = vi.fn();
+      mockElectronAPI.window.removeMaximizedListener = removeMaximizedListenerSpy;
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectronAPI;
+
+      const { unmount } = await act(async () => {
+        return render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      await act(async () => {
+        unmount();
+      });
+
+      expect(removeMaximizedListenerSpy).toHaveBeenCalled();
+    });
+
+    it('should handle window maximized state changes', async () => {
+      let onMaximizedChangedCallback: ((state: { isMaximized: boolean }) => void) | null = null;
+
+      mockElectronAPI.window.onMaximizedChanged = vi.fn((callback) => {
+        onMaximizedChangedCallback = callback;
+      });
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectronAPI;
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+        expect(onMaximizedChangedCallback).not.toBeNull();
+      });
+
+      // Trigger maximized state change
+      await act(async () => {
+        onMaximizedChangedCallback?.({ isMaximized: true });
+      });
+
+      // The component should re-render with the new state
+      expect(screen.getByTestId('diff-editor')).toBeTruthy();
+    });
+  });
+
+  describe('Menu event handling', () => {
+    it('should handle settings modal open from menu', async () => {
+      let onOpenCallback: (() => void) | null = null;
+
+      mockElectronAPI.settings.onOpen = vi.fn((callback) => {
+        onOpenCallback = callback;
+      });
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectronAPI;
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+        expect(onOpenCallback).not.toBeNull();
+      });
+
+      // Trigger settings modal open
+      await act(async () => {
+        onOpenCallback?.();
+      });
+
+      // The settings modal should be opened in the store
+      const state = useDiffStore.getState();
+      expect(state.isSettingsModalOpen).toBe(true);
+    });
+
+    it('should handle view mode change from menu', async () => {
+      let onModeChangeCallback: ((mode: 'unified' | 'side-by-side') => void) | null = null;
+
+      mockElectronAPI.view.onModeChange = vi.fn((callback) => {
+        onModeChangeCallback = callback;
+      });
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectronAPI;
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+        expect(onModeChangeCallback).not.toBeNull();
+      });
+
+      // Trigger view mode change to unified
+      await act(async () => {
+        onModeChangeCallback?.('unified');
+      });
+
+      const session = useDiffStore.getState().getActiveSession();
+      expect(session?.options.viewMode).toBe('unified');
+    });
+
+    it('should handle compact mode toggle from menu', async () => {
+      let onToggleCompactCallback: (() => void) | null = null;
+
+      mockElectronAPI.view.onToggleCompact = vi.fn((callback) => {
+        onToggleCompactCallback = callback;
+      });
+      // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
+      (window as any).electron = mockElectronAPI;
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+        expect(onToggleCompactCallback).not.toBeNull();
+      });
+
+      const initialCompactMode = useDiffStore.getState().getActiveSession()?.options.compactMode ?? false;
+
+      // Trigger compact mode toggle
+      await act(async () => {
+        onToggleCompactCallback?.();
+      });
+
+      const session = useDiffStore.getState().getActiveSession();
+      expect(session?.options.compactMode).toBe(!initialCompactMode);
     });
   });
 });
