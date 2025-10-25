@@ -23,3 +23,9 @@ export const SUPPORTED_LANGUAGES = [
   { value: 'sql', label: 'SQL' },
   { value: 'shell', label: 'Shell' },
 ];
+
+/**
+ * 自動更新チェックの間隔（ミリ秒）
+ * 12時間 = 12 * 60 * 60 * 1000 = 43,200,000ms
+ */
+export const UPDATE_CHECK_INTERVAL = 12 * 60 * 60 * 1000;

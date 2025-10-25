@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SUPPORTED_LANGUAGES } from './constants';
+import { SUPPORTED_LANGUAGES, UPDATE_CHECK_INTERVAL } from './constants';
 
 describe('constants', () => {
   describe('SUPPORTED_LANGUAGES', () => {
@@ -55,6 +55,19 @@ describe('constants', () => {
     it('should have correct count of languages', () => {
       // 現在23言語がサポートされている
       expect(SUPPORTED_LANGUAGES).toHaveLength(23);
+    });
+  });
+
+  describe('UPDATE_CHECK_INTERVAL', () => {
+    it('should be 12 hours in milliseconds', () => {
+      const TWELVE_HOURS_IN_MS = 12 * 60 * 60 * 1000;
+      expect(UPDATE_CHECK_INTERVAL).toBe(TWELVE_HOURS_IN_MS);
+      expect(UPDATE_CHECK_INTERVAL).toBe(43200000);
+    });
+
+    it('should be a positive number', () => {
+      expect(UPDATE_CHECK_INTERVAL).toBeGreaterThan(0);
+      expect(typeof UPDATE_CHECK_INTERVAL).toBe('number');
     });
   });
 });

@@ -8,6 +8,7 @@ import {
   IPC_CHANNELS,
   type UpdateInfo,
 } from '../shared/types';
+import { UPDATE_CHECK_INTERVAL } from '../shared/constants';
 
 let mainWindow: BrowserWindow | null = null;
 const isDev = process.env.NODE_ENV === 'development';
@@ -20,6 +21,9 @@ let store: any;
 
 // メニューから更新チェックを実行した場合のダイアログ表示フラグ
 let shouldShowUpdateDialog = false;
+
+// 定期更新チェックのインターバルID
+let updateCheckInterval: NodeJS.Timeout | null = null;
 
 // アプリケーション名を早期に設定（メニューバー表示用）
 app.setName('SnipDiff');
@@ -204,6 +208,9 @@ app.whenReady().then(async () => {
       checkForUpdates();
     }, 3000);
   }
+
+  // 定期的な更新チェックを開始
+  startPeriodicUpdateCheck();
 });
 
 /**
@@ -213,6 +220,14 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+/**
+ * アプリケーション終了時の処理
+ */
+app.on('will-quit', () => {
+  // 定期更新チェックのクリーンアップ
+  stopPeriodicUpdateCheck();
 });
 
 /**
@@ -481,6 +496,38 @@ async function checkForUpdates(showDialog = false): Promise<void> {
 }
 
 /**
+ * 定期的な更新チェックを開始
+ */
+function startPeriodicUpdateCheck(): void {
+  // 既存のインターバルをクリア
+  stopPeriodicUpdateCheck();
+
+  // 設定で自動更新が有効な場合のみ定期チェックを開始
+  const settings = store.store as AppSettings;
+  if (!settings.autoUpdate || isDev) {
+    console.log('Periodic update check is disabled');
+    return;
+  }
+
+  console.log(`Starting periodic update check (interval: ${UPDATE_CHECK_INTERVAL}ms)`);
+  updateCheckInterval = setInterval(() => {
+    console.log('Periodic update check triggered');
+    checkForUpdates(false); // ダイアログは表示しない
+  }, UPDATE_CHECK_INTERVAL);
+}
+
+/**
+ * 定期的な更新チェックを停止
+ */
+function stopPeriodicUpdateCheck(): void {
+  if (updateCheckInterval) {
+    console.log('Stopping periodic update check');
+    clearInterval(updateCheckInterval);
+    updateCheckInterval = null;
+  }
+}
+
+/**
  * IPCハンドラを登録
  */
 function registerIpcHandlers(): void {
@@ -598,6 +645,11 @@ function registerIpcHandlers(): void {
       }
 
       store.store = updatedStore;
+
+      // autoUpdate設定が変更された場合、定期チェックを再起動
+      if (settings.autoUpdate !== undefined) {
+        startPeriodicUpdateCheck();
+      }
 
       return { success: true };
     } catch (error) {
