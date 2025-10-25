@@ -11,19 +11,19 @@ test.describe('Window Controls', () => {
   test('should display window control buttons', async ({ page }) => {
     // Check if minimize button exists
     const minimizeButton = page.locator(SELECTORS.WINDOW_CONTROLS.MINIMIZE);
-    if (await minimizeButton.count() > 0) {
+    if ((await minimizeButton.count()) > 0) {
       expect(await minimizeButton.first().isVisible()).toBeTruthy();
     }
 
     // Check if maximize button exists
     const maximizeButton = page.locator(SELECTORS.WINDOW_CONTROLS.MAXIMIZE);
-    if (await maximizeButton.count() > 0) {
+    if ((await maximizeButton.count()) > 0) {
       expect(await maximizeButton.first().isVisible()).toBeTruthy();
     }
 
     // Check if close button exists
     const closeButton = page.locator(SELECTORS.WINDOW_CONTROLS.CLOSE);
-    if (await closeButton.count() > 0) {
+    if ((await closeButton.count()) > 0) {
       expect(await closeButton.first().isVisible()).toBeTruthy();
     }
 
@@ -34,7 +34,7 @@ test.describe('Window Controls', () => {
   test('should minimize window', async ({ page, electronApp }) => {
     const minimizeButton = page.locator(SELECTORS.WINDOW_CONTROLS.MINIMIZE);
 
-    if (await minimizeButton.count() > 0) {
+    if ((await minimizeButton.count()) > 0) {
       // Get window state before
       const windowBefore = await electronApp.firstWindow();
       const isVisibleBefore = await windowBefore.isVisible();
@@ -55,7 +55,7 @@ test.describe('Window Controls', () => {
   test('should maximize and restore window', async ({ page }) => {
     const maximizeButton = page.locator(SELECTORS.WINDOW_CONTROLS.MAXIMIZE);
 
-    if (await maximizeButton.count() > 0) {
+    if ((await maximizeButton.count()) > 0) {
       // Click maximize
       await maximizeButton.first().click();
       await page.waitForTimeout(500);
@@ -89,7 +89,7 @@ test.describe('Window Controls', () => {
   test('should maintain content after window operations', async ({ page }) => {
     const maximizeButton = page.locator(SELECTORS.WINDOW_CONTROLS.MAXIMIZE);
 
-    if (await maximizeButton.count() > 0) {
+    if ((await maximizeButton.count()) > 0) {
       // Maximize window
       await maximizeButton.first().click();
       await page.waitForTimeout(500);
@@ -112,7 +112,7 @@ test.describe('Window Controls', () => {
   test('should have custom title bar (if implemented)', async ({ page }) => {
     // Check if header contains window controls
     const header = page.locator(SELECTORS.HEADER);
-    const hasHeader = await header.count() > 0;
+    const hasHeader = (await header.count()) > 0;
 
     if (hasHeader) {
       expect(await header.first().isVisible()).toBeTruthy();

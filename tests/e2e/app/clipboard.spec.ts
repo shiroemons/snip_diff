@@ -18,7 +18,7 @@ test.describe('Clipboard Operations', () => {
 
     // Click paste left button
     const pasteLeftButton = page.locator(SELECTORS.PASTE_LEFT_BUTTON);
-    if (await pasteLeftButton.count() > 0) {
+    if ((await pasteLeftButton.count()) > 0) {
       await pasteLeftButton.first().click();
       await page.waitForTimeout(500);
 
@@ -40,7 +40,7 @@ test.describe('Clipboard Operations', () => {
 
     // Click paste right button
     const pasteRightButton = page.locator(SELECTORS.PASTE_RIGHT_BUTTON);
-    if (await pasteRightButton.count() > 0) {
+    if ((await pasteRightButton.count()) > 0) {
       await pasteRightButton.first().click();
       await page.waitForTimeout(500);
 
@@ -56,13 +56,13 @@ test.describe('Clipboard Operations', () => {
     // Try to find and click clipboard history button
     const historyButton = page.locator(SELECTORS.CLIPBOARD_HISTORY_BUTTON);
 
-    if (await historyButton.count() > 0) {
+    if ((await historyButton.count()) > 0) {
       await historyButton.first().click();
       await page.waitForTimeout(500);
 
       // Check if history modal is displayed
       const historyModal = page.locator(SELECTORS.CLIPBOARD_HISTORY_MODAL);
-      if (await historyModal.count() > 0) {
+      if ((await historyModal.count()) > 0) {
         expect(await historyModal.first().isVisible()).toBeTruthy();
 
         // Close the modal
@@ -89,14 +89,14 @@ test.describe('Clipboard Operations', () => {
     // Open clipboard history
     const historyButton = page.locator(SELECTORS.CLIPBOARD_HISTORY_BUTTON);
 
-    if (await historyButton.count() > 0) {
+    if ((await historyButton.count()) > 0) {
       await historyButton.first().click();
       await page.waitForTimeout(500);
 
       // Try to click on a history item
       const historyItem = page.locator(SELECTORS.CLIPBOARD_HISTORY_ITEM).first();
 
-      if (await historyItem.count() > 0) {
+      if ((await historyItem.count()) > 0) {
         await historyItem.click();
         await page.waitForTimeout(500);
 
@@ -149,7 +149,7 @@ test.describe('Clipboard Operations', () => {
     // Open clipboard history if available
     const historyButton = page.locator(SELECTORS.CLIPBOARD_HISTORY_BUTTON);
 
-    if (await historyButton.count() > 0) {
+    if ((await historyButton.count()) > 0) {
       await historyButton.first().click();
       await page.waitForTimeout(500);
 

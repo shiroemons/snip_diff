@@ -9,49 +9,55 @@ test.describe('Performance Tests', () => {
 
   // Note: Large volume tests (10k+ lines) are skipped as they exceed reasonable E2E test timeouts
   // These tests should be covered by unit tests or manual testing
-  test.skip('should handle 20,000 lines of text (skipped - too slow for E2E)', { timeout: 180000 }, async ({ page }) => {
-    // Generate 20,000 lines of text for left editor
-    const leftLines = Array(20000)
-      .fill(0)
-      .map((_, i) => `Line ${i + 1}: Original content for testing large file handling`)
-      .join('\n');
+  test.skip(
+    'should handle 20,000 lines of text (skipped - too slow for E2E)',
+    { timeout: 180000 },
+    async ({ page }) => {
+      // Generate 20,000 lines of text for left editor
+      const leftLines = Array(20000)
+        .fill(0)
+        .map((_, i) => `Line ${i + 1}: Original content for testing large file handling`)
+        .join('\n');
 
-    // Generate 20,000 lines of text for right editor with some differences
-    const rightLines = Array(20000)
-      .fill(0)
-      .map((_, i) => {
-        if (i % 100 === 0) {
-          return `Line ${i + 1}: Modified content for testing large file handling`;
-        }
-        return `Line ${i + 1}: Original content for testing large file handling`;
-      })
-      .join('\n');
+      // Generate 20,000 lines of text for right editor with some differences
+      const rightLines = Array(20000)
+        .fill(0)
+        .map((_, i) => {
+          if (i % 100 === 0) {
+            return `Line ${i + 1}: Modified content for testing large file handling`;
+          }
+          return `Line ${i + 1}: Original content for testing large file handling`;
+        })
+        .join('\n');
 
-    // Set content for left editor
-    const startTime = Date.now();
-    await setMonacoEditorContent(page, leftLines, 0);
-    await page.waitForTimeout(500);
+      // Set content for left editor
+      const startTime = Date.now();
+      await setMonacoEditorContent(page, leftLines, 0);
+      await page.waitForTimeout(500);
 
-    // Set content for right editor
-    await setMonacoEditorContent(page, rightLines, 1);
+      // Set content for right editor
+      await setMonacoEditorContent(page, rightLines, 1);
 
-    // Wait for diff calculation to complete
-    await page.waitForTimeout(5000);
-    const endTime = Date.now();
+      // Wait for diff calculation to complete
+      await page.waitForTimeout(5000);
+      const endTime = Date.now();
 
-    const elapsedTime = endTime - startTime;
+      const elapsedTime = endTime - startTime;
 
-    // Test should complete in reasonable time
-    // According to spec.md: 2×20,000行の差分計算: 初回 < 1.5秒
-    // But we allow more time for E2E test (including UI rendering and setting content)
-    expect(elapsedTime).toBeLessThan(30000); // 30 seconds max for E2E
+      // Test should complete in reasonable time
+      // According to spec.md: 2×20,000行の差分計算: 初回 < 1.5秒
+      // But we allow more time for E2E test (including UI rendering and setting content)
+      expect(elapsedTime).toBeLessThan(30000); // 30 seconds max for E2E
 
-    // Check if Monaco editor is still responsive
-    const monacoEditor = page.locator('.monaco-editor').first();
-    expect(await monacoEditor.isVisible()).toBeTruthy();
-  });
+      // Check if Monaco editor is still responsive
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    }
+  );
 
-  test.skip('should handle 10,000 lines of text efficiently (skipped - too slow for E2E)', async ({ page }) => {
+  test.skip('should handle 10,000 lines of text efficiently (skipped - too slow for E2E)', async ({
+    page,
+  }) => {
     // Generate 10,000 lines of text
     const leftLines = Array(10000)
       .fill(0)
@@ -178,7 +184,7 @@ test.describe('Performance Tests', () => {
     await page.waitForTimeout(500);
 
     // Switch to small content
-    const smallText = 'Small content\nJust a few lines\nThat\'s all';
+    const smallText = "Small content\nJust a few lines\nThat's all";
     await setMonacoEditorContent(page, smallText, 0);
     await page.waitForTimeout(300);
 

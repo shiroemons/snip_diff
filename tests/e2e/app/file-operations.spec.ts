@@ -1,9 +1,9 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { expect, test } from '../fixtures/electronApp';
 import { setMonacoEditorContent, waitForMonacoEditor } from '../helpers/electron-helpers';
 import { SELECTORS, TEST_TEXT } from '../helpers/test-data';
-import fs from 'node:fs';
-import path from 'node:path';
-import os from 'node:os';
 
 test.describe('File Operations', () => {
   const testDir = path.join(os.tmpdir(), 'snipdiff-e2e-tests');
@@ -46,7 +46,7 @@ test.describe('File Operations', () => {
     // Click save left button
     const saveLeftButton = page.locator(SELECTORS.SAVE_LEFT_BUTTON);
 
-    if (await saveLeftButton.count() > 0) {
+    if ((await saveLeftButton.count()) > 0) {
       // Note: We can't actually interact with native file dialogs in E2E tests
       // We can only verify that clicking the button doesn't cause errors
 
@@ -74,7 +74,7 @@ test.describe('File Operations', () => {
     // Click save right button
     const saveRightButton = page.locator(SELECTORS.SAVE_RIGHT_BUTTON);
 
-    if (await saveRightButton.count() > 0) {
+    if ((await saveRightButton.count()) > 0) {
       // Setup dialog handler (will auto-dismiss)
       page.on('dialog', (dialog) => {
         dialog.dismiss();
@@ -95,7 +95,7 @@ test.describe('File Operations', () => {
     // Click open left button
     const openLeftButton = page.locator(SELECTORS.OPEN_LEFT_BUTTON);
 
-    if (await openLeftButton.count() > 0) {
+    if ((await openLeftButton.count()) > 0) {
       // Setup dialog handler (will auto-dismiss)
       page.on('dialog', (dialog) => {
         dialog.dismiss();
@@ -116,7 +116,7 @@ test.describe('File Operations', () => {
     // Click open right button
     const openRightButton = page.locator(SELECTORS.OPEN_RIGHT_BUTTON);
 
-    if (await openRightButton.count() > 0) {
+    if ((await openRightButton.count()) > 0) {
       // Setup dialog handler (will auto-dismiss)
       page.on('dialog', (dialog) => {
         dialog.dismiss();
@@ -146,7 +146,7 @@ test.describe('File Operations', () => {
 
     for (const selector of buttons) {
       const button = page.locator(selector);
-      if (await button.count() > 0) {
+      if ((await button.count()) > 0) {
         expect(await button.first().isVisible()).toBeTruthy();
       }
     }

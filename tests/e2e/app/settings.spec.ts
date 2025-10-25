@@ -12,7 +12,7 @@ test.describe('Settings', () => {
     // Click settings button
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
@@ -22,7 +22,7 @@ test.describe('Settings', () => {
 
       // Close settings modal
       const closeButton = page.locator(SELECTORS.SETTINGS_CLOSE_BUTTON);
-      if (await closeButton.count() > 0) {
+      if ((await closeButton.count()) > 0) {
         await closeButton.first().click();
         await page.waitForTimeout(300);
       } else {
@@ -34,7 +34,9 @@ test.describe('Settings', () => {
     }
   });
 
-  test.skip('should close settings modal with Escape key (skipped - stopPropagation blocks Escape)', async ({ page }) => {
+  test.skip('should close settings modal with Escape key (skipped - stopPropagation blocks Escape)', async ({
+    page,
+  }) => {
     // Note: The modal's inner div has onKeyDown stopPropagation which prevents
     // Escape key from reaching the overlay's Escape handler when focus is on modal content
     // This test is skipped until the component is fixed to handle Escape properly
@@ -42,7 +44,7 @@ test.describe('Settings', () => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
@@ -52,7 +54,8 @@ test.describe('Settings', () => {
 
       // Check if modal is closed
       const settingsModal = page.locator(SELECTORS.SETTINGS_MODAL);
-      const isVisible = await settingsModal.count() > 0 && (await settingsModal.first().isVisible());
+      const isVisible =
+        (await settingsModal.count()) > 0 && (await settingsModal.first().isVisible());
       expect(isVisible).toBeFalsy();
     } else {
       test.skip();
@@ -63,14 +66,14 @@ test.describe('Settings', () => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
       // Try to find theme select
       const themeSelect = page.locator(SELECTORS.THEME_SELECT);
 
-      if (await themeSelect.count() > 0) {
+      if ((await themeSelect.count()) > 0) {
         // Change to dark theme
         await themeSelect.first().selectOption(THEMES.DARK);
         await page.waitForTimeout(500);
@@ -99,14 +102,14 @@ test.describe('Settings', () => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
       // Try to find whitespace checkbox
       const whitespaceCheckbox = page.locator(SELECTORS.IGNORE_WHITESPACE_CHECKBOX);
 
-      if (await whitespaceCheckbox.count() > 0) {
+      if ((await whitespaceCheckbox.count()) > 0) {
         // Get current state
         const isChecked = await whitespaceCheckbox.first().isChecked();
 
@@ -135,14 +138,14 @@ test.describe('Settings', () => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
       // Try to find case checkbox
       const caseCheckbox = page.locator(SELECTORS.IGNORE_CASE_CHECKBOX);
 
-      if (await caseCheckbox.count() > 0) {
+      if ((await caseCheckbox.count()) > 0) {
         // Get current state
         const isChecked = await caseCheckbox.first().isChecked();
 
@@ -171,14 +174,14 @@ test.describe('Settings', () => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
       // Try to find history limit input
       const historyLimitInput = page.locator(SELECTORS.HISTORY_LIMIT_INPUT);
 
-      if (await historyLimitInput.count() > 0) {
+      if ((await historyLimitInput.count()) > 0) {
         // Change the value
         await historyLimitInput.first().fill('100');
         await page.waitForTimeout(300);
@@ -204,14 +207,14 @@ test.describe('Settings', () => {
     // Open settings
     const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
 
-    if (await settingsButton.count() > 0) {
+    if ((await settingsButton.count()) > 0) {
       await settingsButton.first().click();
       await page.waitForTimeout(500);
 
       // Change a setting
       const themeSelect = page.locator(SELECTORS.THEME_SELECT);
 
-      if (await themeSelect.count() > 0) {
+      if ((await themeSelect.count()) > 0) {
         await themeSelect.first().selectOption(THEMES.DARK);
         await page.waitForTimeout(500);
 

@@ -27,14 +27,14 @@ test.describe('Diff Display', () => {
 
     // Click Unified mode button
     const inlineButton = page.locator(SELECTORS.INLINE_MODE_BUTTON);
-    if (await inlineButton.count() > 0) {
+    if ((await inlineButton.count()) > 0) {
       await inlineButton.first().click();
       await page.waitForTimeout(500);
     }
 
     // Click Side-by-Side mode button
     const sideBySideButton = page.locator(SELECTORS.SIDE_BY_SIDE_MODE_BUTTON);
-    if (await sideBySideButton.count() > 0) {
+    if ((await sideBySideButton.count()) > 0) {
       await sideBySideButton.first().click();
       await page.waitForTimeout(500);
     }
@@ -50,7 +50,7 @@ test.describe('Diff Display', () => {
 
     // Click clear button
     const clearButton = page.locator(SELECTORS.CLEAR_BUTTON);
-    if (await clearButton.count() > 0) {
+    if ((await clearButton.count()) > 0) {
       await clearButton.first().click();
       await page.waitForTimeout(500);
 
@@ -68,7 +68,7 @@ test.describe('Diff Display', () => {
 
     // Click swap button
     const swapButton = page.locator(SELECTORS.SWAP_BUTTON);
-    if (await swapButton.count() > 0) {
+    if ((await swapButton.count()) > 0) {
       await swapButton.first().click();
       await page.waitForTimeout(500);
 

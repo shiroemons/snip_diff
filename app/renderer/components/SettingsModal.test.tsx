@@ -124,7 +124,9 @@ describe('SettingsModal', () => {
       await waitFor(() => {
         expect(screen.getByText('デフォルト値の設定')).toBeTruthy();
         expect(
-          screen.getByText(/アプリケーション起動時や新しく比較を開始する際のデフォルト値を設定します/)
+          screen.getByText(
+            /アプリケーション起動時や新しく比較を開始する際のデフォルト値を設定します/
+          )
         ).toBeTruthy();
       });
     });
@@ -327,14 +329,18 @@ describe('SettingsModal', () => {
       render(<SettingsModal />);
       await waitFor(() => {
         expect(screen.getByText(/エディターの外観を変更します/)).toBeTruthy();
-        expect(screen.getByText(/システムテーマ.*を選択すると、macOSの設定に従います/)).toBeTruthy();
+        expect(
+          screen.getByText(/システムテーマ.*を選択すると、macOSの設定に従います/)
+        ).toBeTruthy();
       });
     });
 
     it('should display font size description', async () => {
       render(<SettingsModal />);
       await waitFor(() => {
-        expect(screen.getByText('エディターで表示されるテキストのサイズを変更します。')).toBeTruthy();
+        expect(
+          screen.getByText('エディターで表示されるテキストのサイズを変更します。')
+        ).toBeTruthy();
       });
     });
 
@@ -530,7 +536,9 @@ describe('SettingsModal', () => {
       await waitFor(() => {
         const resetButton = screen.getByText('デフォルトにリセット');
         expect(resetButton).toBeTruthy();
-        expect(resetButton.getAttribute('title')).toBe('すべての設定をデフォルト値にリセットします');
+        expect(resetButton.getAttribute('title')).toBe(
+          'すべての設定をデフォルト値にリセットします'
+        );
       });
     });
 
