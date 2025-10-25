@@ -311,82 +311,129 @@ npm run dev  # ✅ 正常動作
 
 ---
 
-## Phase 5: Electron 🔴
+## Phase 5: Electron ✅
 
 **リスクレベル**: 高
+**ステータス**: 完了（2025-10-25）
+**ブランチ**: `feature/phase5-electron-update`
 
 ### アップデート対象
 
-| パッケージ | 現在 | 最新 |
-|-----------|------|------|
-| electron | 28.3.3 | 38.4.0 |
-| electron-builder | 24.13.3 | 26.0.12 |
-| electron-store | 11.0.2 | 最新確認 |
-| electron-updater | 6.6.2 | 最新確認 |
+| パッケージ | 現在 | 最新 | 実際 |
+|-----------|------|------|------|
+| electron | 28.3.3 | 38.4.0 | ✅ 38.4.0 |
+| electron-builder | 24.13.3 | 26.0.12 | ✅ 26.0.12 |
+| electron-store | 11.0.2 | 最新確認 | ✅ 11.0.2 (最新) |
+| electron-updater | 6.6.2 | 最新確認 | ✅ 6.6.2 (最新) |
 
-### Electron 29〜38 主要変更点を確認
+### Electron 29〜38 主要変更点
 
-各バージョンの Breaking Changes を確認：
+各バージョンの Breaking Changes を調査：
 - https://www.electronjs.org/docs/latest/breaking-changes
 
-主な確認ポイント：
-- API廃止・変更
-- セキュリティポリシーの変更
-- Node.js/Chromiumバージョン更新の影響
+**主な破壊的変更（v29-v38）:**
+- **v38.0**: macOS 12+必須、webFrame API非推奨
+- **v37.0**: Utility Process動作変更
+- **v36.0**: Protocol API移行、コマンドライン処理変更
+- **v35.0**: Preload scriptでのNode.jsモジュール非推奨
+- **v33.0**: Clipboard API非推奨（webContents.clipboard → clipboard）
+- **v32.0**: Navigation History API移行
+- **v23.0-v27.0**: Windows 7/8/8.1サポート終了、Linux古いディストリサポート終了
+- **v20.0, v22.0**: セキュリティデフォルト（contextIsolation: true、sandbox: true）
 
-### 作業手順
+**結論**: 本プロジェクトは既にElectronのセキュリティベストプラクティスに従っており、すべての破壊的変更の**影響はなし**。
+
+### 実施した作業
 
 ```bash
-# 1. Electron 29〜38の変更内容を確認
+# 1. Electron 29〜38の破壊的変更を調査
+# - 各バージョンのbreaking changesをWebFetchで確認
+# - 10バージョン分の変更内容を記録
 
 # 2. アップデート実行
 npm install -D electron@38.4.0 electron-builder@26.0.12
-npm install electron-store@latest electron-updater@latest
+# electron-storeとelectron-updaterは既に最新版
 
-# 3. 型チェック
-npm run type-check
+# 3. electron-builder 26の設定調整
+# - package.jsonからnotarize設定を削除
+# - 環境変数による自動制御に変更
+# - 開発用ビルドスクリプト追加: dist:mac:dev
 
-# 4. メインプロセスの修正（必要に応じて）
-# app/main/main.ts
+# 4. 型チェック
+npm run type-check  # ✅ 成功
 
-# 5. プリロードスクリプトの確認
-# app/preload/preload.ts
+# 5. テスト実行
+npm run test -- --run  # ✅ 223テスト通過
 
-# 6. 開発モードで起動確認
-npm run dev
+# 6. E2Eテスト実行
+npm run test:e2e  # ✅ 40テスト通過
 
-# 7. 全機能テスト
+# 7. 開発モードで動作確認
+npm run dev  # ✅ 正常動作
 
-# 8. ビルドテスト
-npm run dist:mac
+# 8. 開発用ビルドテスト
+npm run dist:mac:dev  # ✅ 成功（署名スキップ）
 
-# 9. ビルドしたアプリを実際に実行してテスト
+# 9. 本番ビルドテスト（GitHub Actions CI）
+# - コード署名成功（Developer ID Application証明書使用）
+# - Notarization成功（約4分で完了）
 ```
 
 ### 確認項目
 
-- [ ] Electron 29〜38の破壊的変更を確認
-- [ ] API変更に対応
-- [ ] 型エラー修正
-- [ ] 開発モード起動
-- [ ] メインプロセスの動作確認
-- [ ] IPC通信の動作確認
-- [ ] クリップボード機能
-- [ ] ファイルダイアログ
-- [ ] 設定の永続化 (electron-store)
-- [ ] 自動更新機能 (electron-updater)
-- [ ] ウィンドウ制御
-- [ ] システムテーマ取得
-- [ ] ビルド成功
-- [ ] ビルドしたアプリの実行確認
-- [ ] コミット完了
+- [x] Electron 29〜38の破壊的変更を確認（10バージョン分）
+- [x] API変更の影響なし（既存コードは互換性あり）
+- [x] 型エラーなし（型チェック通過）
+- [x] 開発モード起動
+- [x] メインプロセスの動作確認
+- [x] IPC通信の動作確認
+- [x] クリップボード機能
+- [x] ファイルダイアログ
+- [x] 設定の永続化 (electron-store)
+- [x] 自動更新機能 (electron-updater)
+- [x] ウィンドウ制御
+- [x] システムテーマ取得
+- [x] ビルド成功（開発用・本番用）
+- [x] コード署名・Notarization確認（GitHub Actions CI）
+- [x] E2Eテスト全通過（40テスト）
+- [x] コミット完了（3コミット）
+
+### 実施した変更
+
+1. **package.json / package-lock.json**
+   - electron 28.3.3 → 38.4.0 に更新
+   - electron-builder 24.13.3 → 26.0.12 に更新
+   - notarize設定を削除（環境変数による自動制御に変更）
+   - 開発用ビルドスクリプト追加: `dist:mac:dev`
+
+2. **package.json - 新しいスクリプト**
+   ```json
+   "dist:mac:dev": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist:mac"
+   ```
+
+3. **コード変更は不要**
+   - 既存のコードはElectron 38と完全互換
+   - セキュリティ設定（contextIsolation: true、sandbox: true）は既に適用済み
+   - IPC通信、クリップボード、ファイル操作すべて正常動作
+
+### electron-builder 26の主な変更
+
+- **Notarization設定の厳格化**: 環境変数が設定されていない場合、notarize設定があるとエラー
+- **PRビルドでの自動保護**: PRでは自動的にコード署名をスキップ（セキュリティ保護）
+- **解決策**: package.jsonからnotarize設定を削除し、環境変数による自動制御に変更
+
+### コード署名の動作
+
+1. **開発環境**: `npm run dist:mac:dev` → 署名スキップ（CSC_IDENTITY_AUTO_DISCOVERY=false）
+2. **PRビルド**: 自動的に署名スキップ（electron-builderのセキュリティ保護）
+3. **リリースビルド**: 環境変数により自動的に署名＋Notarization実行
 
 ### 注意点
 
-- Electronは最も重要な依存関係のため、慎重に進める
-- 10バージョン分の変更があるため、予期しない動作に注意
-- ビルド後の実機テストを必ず実施
-- セキュリティ設定 (contextIsolation, sandbox) に変更がないか確認
+- Electron 38は10バージョン差分があるが、すべての破壊的変更の影響なし ✅
+- electron-builder 26は設定方法が変更されたが、環境変数による自動制御で解決 ✅
+- コード署名とNotarizationは正常に動作（GitHub Actions CIで確認済み）✅
+- すべてのテストが通過し、実機でも正常動作を確認 ✅
 
 ---
 
@@ -606,7 +653,7 @@ npm run lint:fix
 - [x] Phase 2: テスト環境（✅ 2025-10-25完了）
 - [x] Phase 3: React生態系（✅ 2025-10-25完了）
 - [x] Phase 4: Zustand & Monaco Editor（✅ 2025-10-25完了）
-- [ ] Phase 5: Electron
+- [x] Phase 5: Electron（✅ 2025-10-25完了）
 - [ ] Phase 6: Vite
 - [ ] Phase 7: Node.js型定義とユーティリティ
 - [ ] Phase 8: ESLint対応
@@ -688,4 +735,12 @@ npm run lint:fix
   - monaco-editor 0.45.0 → 0.54.0
   - @monaco-editor/react 4.6.0 → 4.7.0
   - 既存コードは変更不要（Zustand 5互換、Monaco Editor API互換）
+  - 全223テスト通過、E2Eテスト40テスト通過
+- 2025-10-25: Phase 5（Electron）完了
+  - electron 28.3.3 → 38.4.0（10バージョンアップ）
+  - electron-builder 24.13.3 → 26.0.12
+  - Electron 29-38の破壊的変更を調査・記録（影響なし）
+  - electron-builder 26のnotarization設定を環境変数制御に変更
+  - 開発用ビルドスクリプト追加（dist:mac:dev）
+  - コード署名・Notarization動作確認（GitHub Actions CI）
   - 全223テスト通過、E2Eテスト40テスト通過
