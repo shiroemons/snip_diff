@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useDiffStore } from './diffStore';
+import { createBuffer } from '@shared/utils';
 
 describe('diffStore', () => {
   beforeEach(() => {
@@ -525,6 +526,192 @@ describe('diffStore', () => {
       resetSettings();
 
       expect(useDiffStore.getState().defaultEOL).toBe('auto');
+    });
+  });
+
+  describe('Edge cases - no active session', () => {
+    beforeEach(() => {
+      // セッションなし、またはactiveSessionIdがnullの状態
+      useDiffStore.setState({
+        sessions: [],
+        activeSessionId: null,
+      });
+    });
+
+    it('should not update left buffer when no active session', () => {
+      const { updateLeftBuffer } = useDiffStore.getState();
+
+      // activeSessionがnullなので何も起こらない
+      updateLeftBuffer('test content');
+
+      const state = useDiffStore.getState();
+      expect(state.sessions).toHaveLength(0);
+    });
+
+    it('should not update right buffer when no active session', () => {
+      const { updateRightBuffer } = useDiffStore.getState();
+
+      updateRightBuffer('test content');
+
+      const state = useDiffStore.getState();
+      expect(state.sessions).toHaveLength(0);
+    });
+
+    it('should not update options when no active session', () => {
+      const { updateOptions } = useDiffStore.getState();
+
+      updateOptions({ fontSize: 20 });
+
+      const state = useDiffStore.getState();
+      expect(state.sessions).toHaveLength(0);
+    });
+
+    it('should not update stats when no active session', () => {
+      const { updateStats } = useDiffStore.getState();
+
+      updateStats({ adds: 10, dels: 5, hunks: 2, leftLines: 100, rightLines: 105 });
+
+      const state = useDiffStore.getState();
+      expect(state.sessions).toHaveLength(0);
+    });
+
+    it('should not swap buffers when no active session', () => {
+      const { swapBuffers } = useDiffStore.getState();
+
+      swapBuffers();
+
+      const state = useDiffStore.getState();
+      expect(state.sessions).toHaveLength(0);
+    });
+
+    it('should not clear buffers when no active session', () => {
+      const { clearBuffers } = useDiffStore.getState();
+
+      clearBuffers();
+
+      const state = useDiffStore.getState();
+      expect(state.sessions).toHaveLength(0);
+    });
+
+    it('should not update left buffer EOL when no active session', () => {
+      const { updateLeftBufferEOL } = useDiffStore.getState();
+
+      updateLeftBufferEOL('CRLF');
+
+      const state = useDiffStore.getState();
+      expect(state.sessions).toHaveLength(0);
+    });
+
+    it('should not update right buffer EOL when no active session', () => {
+      const { updateRightBufferEOL } = useDiffStore.getState();
+
+      updateRightBufferEOL('CRLF');
+
+      const state = useDiffStore.getState();
+      expect(state.sessions).toHaveLength(0);
+    });
+
+    it('should not update buffers lang when no active session', () => {
+      const { updateBuffersLang } = useDiffStore.getState();
+
+      updateBuffersLang('typescript');
+
+      const state = useDiffStore.getState();
+      expect(state.sessions).toHaveLength(0);
+    });
+
+    it('should return undefined when getting active session with null activeSessionId', () => {
+      const { getActiveSession } = useDiffStore.getState();
+
+      const session = getActiveSession();
+
+      expect(session).toBeUndefined();
+    });
+
+    it('should return undefined when activeSessionId does not match any session', () => {
+      useDiffStore.setState({
+        sessions: [
+          {
+            id: 'session-1',
+            left: { ...createBuffer(''), lang: 'plaintext', eol: 'LF' },
+            right: { ...createBuffer(''), lang: 'plaintext', eol: 'LF' },
+            options: {
+              ignoreWhitespace: false,
+              normalizeEOL: true,
+              viewMode: 'side-by-side',
+              compactMode: false,
+              wordWrap: false,
+              tabSize: 4,
+              fontSize: 14,
+              insertSpaces: true,
+              diffAlgorithm: 'advanced',
+              hideUnchangedRegions: false,
+            },
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          },
+        ],
+        activeSessionId: 'non-existent-id',
+      });
+
+      const { getActiveSession } = useDiffStore.getState();
+      const session = getActiveSession();
+
+      expect(session).toBeUndefined();
+    });
+  });
+
+  describe('devMode setting', () => {
+    it('should default devMode to false when not provided in loadSettings', () => {
+      const { loadSettings } = useDiffStore.getState();
+
+      loadSettings({
+        theme: 'dark',
+        defaultOptions: {
+          ignoreWhitespace: false,
+          normalizeEOL: true,
+          viewMode: 'side-by-side',
+          compactMode: false,
+          wordWrap: false,
+          tabSize: 4,
+          fontSize: 14,
+          insertSpaces: true,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: false,
+        },
+        defaultLanguage: 'plaintext',
+        defaultEOL: 'auto',
+        // devMode not provided
+      });
+
+      const state = useDiffStore.getState();
+      expect(state.devMode).toBe(false);
+    });
+
+    it('should set devMode to true when provided in loadSettings', () => {
+      const { loadSettings } = useDiffStore.getState();
+
+      loadSettings({
+        theme: 'dark',
+        defaultOptions: {
+          ignoreWhitespace: false,
+          normalizeEOL: true,
+          viewMode: 'side-by-side',
+          compactMode: false,
+          wordWrap: false,
+          tabSize: 4,
+          fontSize: 14,
+          insertSpaces: true,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: false,
+        },
+        defaultLanguage: 'plaintext',
+        defaultEOL: 'auto',
+        devMode: true,
+      });
+
+      const state = useDiffStore.getState();
+      expect(state.devMode).toBe(true);
     });
   });
 });
