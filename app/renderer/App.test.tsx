@@ -293,6 +293,116 @@ describe('App', () => {
       // Restore for other tests
       (global.window as Window & typeof globalThis).electron = mockElectronAPI;
     });
+
+    it('should apply explicit theme in browser mode when theme is not auto', async () => {
+      // @ts-expect-error - Temporarily removing electron for testing
+      (global.window as Window & typeof globalThis).electron = undefined;
+
+      // Set theme to 'light' in the store
+      useDiffStore.setState({
+        theme: 'light',
+      });
+
+      mockElectronAPI.settings.get.mockResolvedValue({
+        theme: 'light',
+        defaultOptions: {
+          ignoreWhitespace: false,
+          normalizeEOL: true,
+          viewMode: 'side-by-side',
+          compactMode: false,
+          wordWrap: false,
+          tabSize: 4,
+          fontSize: 14,
+          insertSpaces: true,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: false,
+        },
+        defaultLanguage: 'plaintext',
+        defaultEOL: 'auto',
+      });
+
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        const diffEditor = screen.getByTestId('diff-editor');
+        expect(diffEditor.getAttribute('data-theme')).toBe('light');
+      });
+
+      consoleSpy.mockRestore();
+
+      // Restore for other tests
+      (global.window as Window & typeof globalThis).electron = mockElectronAPI;
+    });
+
+    it('should handle theme.get error during initial load', async () => {
+      mockElectronAPI.theme.get.mockRejectedValue(new Error('Failed to get theme'));
+
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      await waitFor(() => {
+        // Check that either error message was logged (initial or subsequent theme check)
+        const errorCalls = consoleSpy.mock.calls.filter(
+          (call) =>
+            call[0] === 'Failed to get initial system theme:' ||
+            call[0] === 'Failed to get theme:' ||
+            call[0] === 'Failed to get system theme:'
+        );
+        expect(errorCalls.length).toBeGreaterThan(0);
+      });
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle theme.get error gracefully when switching to auto mode', async () => {
+      mockElectronAPI.settings.get.mockResolvedValue({
+        theme: 'light',
+        defaultOptions: {
+          ignoreWhitespace: false,
+          normalizeEOL: true,
+          viewMode: 'side-by-side',
+          compactMode: false,
+          wordWrap: false,
+          tabSize: 4,
+          fontSize: 14,
+          insertSpaces: true,
+          diffAlgorithm: 'advanced',
+          hideUnchangedRegions: false,
+        },
+        defaultLanguage: 'plaintext',
+        defaultEOL: 'auto',
+      });
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Wait for initial render
+      await waitFor(() => {
+        expect(screen.getByTestId('diff-editor')).toBeTruthy();
+      });
+
+      // Switch to auto theme with error
+      mockElectronAPI.theme.get.mockRejectedValue(new Error('Failed to get theme'));
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      await act(async () => {
+        useDiffStore.getState().setTheme('auto');
+      });
+
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to get theme:', expect.any(Error));
+      });
+
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('Header integration', () => {

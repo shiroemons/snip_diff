@@ -217,6 +217,45 @@ describe('usePanelResize', () => {
       expect(result.current.isResizing).toBe(false);
       expect(document.body.classList.contains('resizing-panel')).toBe(false);
     });
+
+    it('should cancel previous animation frame on rapid mouse movements', () => {
+      const { result } = renderHook(() => usePanelResize({ initialHeight: 400 }));
+      const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
+
+      // Start resize
+      act(() => {
+        result.current.startResize(500);
+      });
+
+      // Dispatch multiple rapid mouse move events
+      // The first event will trigger requestAnimationFrame
+      // Subsequent events should cancel the previous frame before requesting a new one
+      act(() => {
+        // First move - will request animation frame (id = 0)
+        const mouseMoveEvent1 = new MouseEvent('mousemove', { clientY: 450 });
+        document.dispatchEvent(mouseMoveEvent1);
+
+        // Second move - should cancel previous frame (0) before requesting new one
+        const mouseMoveEvent2 = new MouseEvent('mousemove', { clientY: 400 });
+        document.dispatchEvent(mouseMoveEvent2);
+
+        // Third move - should cancel previous frame before requesting new one
+        const mouseMoveEvent3 = new MouseEvent('mousemove', { clientY: 350 });
+        document.dispatchEvent(mouseMoveEvent3);
+      });
+
+      // Verify that cancelAnimationFrame was called during rapid mouse movements
+      expect(cancelAnimationFrameSpy).toHaveBeenCalled();
+      expect(cancelAnimationFrameSpy).toHaveBeenCalledWith(0);
+
+      // Cleanup
+      act(() => {
+        const mouseUpEvent = new MouseEvent('mouseup');
+        document.dispatchEvent(mouseUpEvent);
+      });
+
+      cancelAnimationFrameSpy.mockRestore();
+    });
   });
 
   describe('custom options', () => {
