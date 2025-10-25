@@ -47,15 +47,14 @@
     "@playwright/test": "^1.56.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-    "@types/diff": "^7.0.2",
-    "@types/node": "^20.11.5",
+    "@types/node": "^24.9.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
     "@vitejs/plugin-react": "^5.1.0",
     "@vitest/coverage-v8": "^4.0.3",
-    "concurrently": "^8.2.2",
+    "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^38.4.0",
     "electron-builder": "^26.0.12",
@@ -64,12 +63,12 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "jsdom": "^27.0.1",
     "simple-git-hooks": "^2.13.1",
-    "typescript": "^5.3.3",
+    "typescript": "^5.9.3",
     "vite": "^7.1.12",
     "vite-plugin-electron": "^0.29.0",
     "vite-plugin-monaco-editor": "^1.1.0",
     "vitest": "^4.0.3",
-    "wait-on": "^7.2.0"
+    "wait-on": "^9.0.1"
   },
   "build": {
     "appId": "com.snipdiff.app",
@@ -126,5 +125,8 @@
   "simple-git-hooks": {
     "pre-commit": "npm run type-check && npm run lint && npm run test -- --run",
     "pre-push": "npm run type-check && npm run lint && npm run test -- --run"
+  },
+  "overrides": {
+    "dompurify": "^3.3.0"
   }
 }
