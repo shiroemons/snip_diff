@@ -16,6 +16,7 @@
     "build:preload": "tsc -p tsconfig.preload.json",
     "dist": "npm run build && electron-builder",
     "dist:mac": "npm run build && electron-builder --mac",
+    "dist:mac:dev": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist:mac",
     "type-check": "tsc --noEmit && tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.preload.json --noEmit",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
@@ -56,8 +57,8 @@
     "@vitest/coverage-v8": "^4.0.3",
     "concurrently": "^8.2.2",
     "cross-env": "^10.1.0",
-    "electron": "^28.2.0",
-    "electron-builder": "^24.9.1",
+    "electron": "^38.4.0",
+    "electron-builder": "^26.0.12",
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
@@ -105,10 +106,7 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "resources/entitlements.mac.plist",
-      "entitlementsInherit": "resources/entitlements.mac.plist",
-      "notarize": {
-        "teamId": "U4Y9MKZ4GZ"
-      }
+      "entitlementsInherit": "resources/entitlements.mac.plist"
     },
     "dmg": {
       "contents": [
