@@ -222,66 +222,92 @@ npm run dev  # ✅ 正常動作
 
 ---
 
-## Phase 4: Zustand & Monaco Editor 🟡
+## Phase 4: Zustand & Monaco Editor ✅
 
 **リスクレベル**: 中
+**ステータス**: 完了（2025-10-25）
+**ブランチ**: `feature/phase4-zustand-monaco-update`
 
 ### アップデート対象
 
-| パッケージ | 現在 | 最新 |
-|-----------|------|------|
-| zustand | 4.5.7 | 5.0.8 |
-| monaco-editor | 0.45.0 | 0.54.0 |
-| @monaco-editor/react | 4.6.0 | 最新確認 |
+| パッケージ | 現在 | 最新 | 実際 |
+|-----------|------|------|------|
+| zustand | 4.5.7 | 5.0.8 | ✅ 5.0.8 |
+| monaco-editor | 0.45.0 | 0.54.0 | ✅ 0.54.0 |
+| @monaco-editor/react | 4.6.0 | 4.7.0 | ✅ 4.7.0 |
 
 ### Zustand 5 主要変更点
 
-- ミドルウェアAPIの変更
-- TypeScript型の改善
-- パフォーマンス最適化
+- **React 18+が必須**（React 17以下のサポート終了）
+- **デフォルトエクスポート廃止**（名前付きエクスポートのみ）
+- **カスタム等価関数の変更**
+  - `create`関数では等価関数のカスタマイズが不可
+  - `shallow`等を使う場合は`createWithEqualityFn`（`zustand/traditional`）を使用
+  - または`useShallow`フックでセレクタをラップ
+- **セレクタの安定性が強化**（新しい参照を返すとinfinite loopの可能性）
+- **Persistミドルウェアの挙動変更**（初期状態の自動保存が廃止）
 
-### 作業手順
+### Monaco Editor 0.54.0 主要変更点
+
+- バージョン0.45.0から0.54.0への9マイナーアップデート
+- 多数のバグ修正とパフォーマンス改善
+- `EditorAutoClosingOvertypeStrategy`が`EditorAutoClosingEditStrategy`にリネーム
+- AMD buildのサポート廃止予定（deprecation warning）
+
+### 実施した作業
 
 ```bash
-# 1. Zustand 5の変更内容を確認
-# https://github.com/pmndrs/zustand/releases
+# 1. Zustand 5とMonaco Editorの変更内容を確認
+# - https://zustand.docs.pmnd.rs/migrations/migrating-to-v5
+# - https://github.com/microsoft/monaco-editor/blob/main/CHANGELOG.md
 
-# 2. Monaco Editorの変更内容を確認
-# https://github.com/microsoft/monaco-editor/releases
+# 2. アップデート実行
+npm install zustand@5.0.8 monaco-editor@0.54.0 @monaco-editor/react@4.7.0
 
-# 3. アップデート実行
-npm install zustand@5.0.8 monaco-editor@0.54.0
-npm install @monaco-editor/react@latest
+# 3. 型チェック
+npm run type-check  # ✅ 成功
 
-# 4. 型チェック
-npm run type-check
+# 4. テスト実行
+npm run test -- --run  # ✅ 223テスト通過
 
-# 5. ストア定義の修正（必要に応じて）
-# app/renderer/stores/diffStore.ts
+# 5. E2Eテスト実行
+npm run test:e2e  # ✅ 40テスト通過（22テストは意図的にスキップ）
 
-# 6. テスト実行
-npm run test
-
-# 7. 開発モードで動作確認
-npm run dev
+# 6. 開発モードで動作確認
+npm run dev  # ✅ 正常動作
 ```
 
 ### 確認項目
 
-- [ ] Zustand 5の破壊的変更を確認
-- [ ] Monaco Editorの変更を確認
-- [ ] 型エラー修正
-- [ ] ストアの動作確認 (`diffStore.ts`)
-- [ ] DiffEditorコンポーネント正常動作
-- [ ] 差分表示の視覚的な確認
-- [ ] エディタのオプション変更機能
-- [ ] テスト全通過
-- [ ] コミット完了
+- [x] Zustand 5の破壊的変更を確認
+- [x] Monaco Editorの変更を確認
+- [x] 型エラーなし（型チェック通過）
+- [x] ストアの動作確認（`diffStore.ts`は既にZustand 5互換）
+- [x] DiffEditorコンポーネント正常動作
+- [x] 差分表示の視覚的な確認（E2Eテストで確認）
+- [x] エディタのオプション変更機能（E2Eテストで確認）
+- [x] テスト全通過（223テスト）
+- [x] E2Eテスト全通過（40テスト）
+- [x] コミット完了
+
+### 実施した変更
+
+既存のコードは変更不要でした：
+
+1. **app/renderer/stores/diffStore.ts**
+   - 既にZustand 5互換の記述（カスタム等価関数未使用）
+   - `create`関数の使用方法は変更なし
+
+2. **Monaco Editorの使用箇所**
+   - DiffEditorコンポーネントは問題なく動作
+   - vite.config.tsのmanualChunks設定も互換性あり
+   - vitest.config.mtsのmonaco-editorエイリアスも正常動作
 
 ### 注意点
 
-- Monaco Editorは9マイナーバージョン差分があるため、API変更に注意
-- エディタのレンダリングやパフォーマンスに影響がないか確認
+- Zustand 5は破壊的変更があるが、既存コードは互換性あり ✅
+- Monaco Editorは9マイナーバージョン差分があるが、API変更の影響なし ✅
+- すべてのテストが通過し、実機でも正常動作を確認 ✅
 
 ---
 
@@ -579,7 +605,7 @@ npm run lint:fix
 - [x] Phase 1: 小規模な依存関係（🟡 部分的に完了、lucide-reactは保留中）
 - [x] Phase 2: テスト環境（✅ 2025-10-25完了）
 - [x] Phase 3: React生態系（✅ 2025-10-25完了）
-- [ ] Phase 4: Zustand & Monaco Editor
+- [x] Phase 4: Zustand & Monaco Editor（✅ 2025-10-25完了）
 - [ ] Phase 5: Electron
 - [ ] Phase 6: Vite
 - [ ] Phase 7: Node.js型定義とユーティリティ
@@ -657,3 +683,9 @@ npm run lint:fix
   - @types/react-dom 18.3.7 → 19.2.2
   - React 19のact()警告を修正（14個のテストケース）
   - 全223テスト通過、警告なし
+- 2025-10-25: Phase 4（Zustand & Monaco Editor）完了
+  - zustand 4.5.7 → 5.0.8
+  - monaco-editor 0.45.0 → 0.54.0
+  - @monaco-editor/react 4.6.0 → 4.7.0
+  - 既存コードは変更不要（Zustand 5互換、Monaco Editor API互換）
+  - 全223テスト通過、E2Eテスト40テスト通過
