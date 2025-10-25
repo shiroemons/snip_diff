@@ -31,15 +31,15 @@
     "postinstall": "simple-git-hooks"
   },
   "dependencies": {
-    "@monaco-editor/react": "^4.6.0",
+    "@monaco-editor/react": "^4.7.0",
     "diff": "^8.0.2",
     "electron-store": "^11.0.2",
     "electron-updater": "^6.6.2",
     "lucide-react": "^0.546.0",
-    "monaco-editor": "^0.45.0",
+    "monaco-editor": "^0.54.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "zustand": "^4.5.0"
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.6",
