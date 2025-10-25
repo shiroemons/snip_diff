@@ -327,12 +327,12 @@ app/
 
 | カテゴリ | 技術 |
 |---------|------|
-| **フレームワーク** | Electron 28 |
-| **UI** | React 18 |
+| **フレームワーク** | Electron 38 |
+| **UI** | React 19 |
 | **言語** | TypeScript 5 |
-| **ビルドツール** | Vite 5 |
+| **ビルドツール** | Vite 7 |
 | **エディタ** | Monaco Editor (VS Code engine) |
-| **状態管理** | Zustand 4 |
+| **状態管理** | Zustand 5 |
 | **自動更新** | electron-updater |
 | **設定永続化** | electron-store |
 | **アイコン** | Lucide React |
