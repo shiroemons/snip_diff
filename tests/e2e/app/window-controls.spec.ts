@@ -136,6 +136,17 @@ test.describe('Window Controls', () => {
     const header = page.locator(SELECTORS.HEADER);
     expect(await header.count()).toBeGreaterThan(0);
 
+    // Ensure window starts in unmaximized state (important for CI)
+    await electronApp.evaluate(async ({ BrowserWindow }) => {
+      const win = BrowserWindow.getAllWindows()[0];
+      if (win.isMaximized()) {
+        win.unmaximize();
+      }
+    });
+
+    // Wait for UI to update
+    await page.waitForTimeout(500);
+
     // Get initial state - should not have maximized class
     const initialClass = await header.first().getAttribute('class');
     expect(initialClass).not.toContain('maximized');
@@ -170,6 +181,20 @@ test.describe('Window Controls', () => {
   test('should detect fullscreen as maximized state', async ({ page, electronApp }) => {
     const header = page.locator(SELECTORS.HEADER);
     expect(await header.count()).toBeGreaterThan(0);
+
+    // Ensure window starts in normal state (important for CI)
+    await electronApp.evaluate(async ({ BrowserWindow }) => {
+      const win = BrowserWindow.getAllWindows()[0];
+      if (win.isMaximized()) {
+        win.unmaximize();
+      }
+      if (win.isFullScreen()) {
+        win.setFullScreen(false);
+      }
+    });
+
+    // Wait for UI to update
+    await page.waitForTimeout(500);
 
     // Get initial state
     const initialClass = await header.first().getAttribute('class');
