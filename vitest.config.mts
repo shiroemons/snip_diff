@@ -42,7 +42,6 @@ export default defineConfig({
         'app/renderer/features/diff/utils/**', // Monaco Editor依存 (モックの問題でテスト除外)
         'app/renderer/features/diff/themes/**', // Monaco Editor依存
         'app/renderer/features/diff/hooks/useCompactMode.ts', // Monaco Editor依存
-        'app/renderer/features/diff/components/**', // Monaco Editor依存
       ],
       thresholds: {
         lines: 0, // Start with no threshold, can be increased later
