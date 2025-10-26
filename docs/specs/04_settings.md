@@ -244,7 +244,7 @@ Tabキーを押したときにスペースを挿入するかタブ文字を挿�
 ### 5. 自動更新（autoUpdate）
 
 **型**: `boolean`
-**デフォルト**: `false`
+**デフォルト**: `true`
 
 アプリ起動時の自動更新チェック
 
@@ -507,7 +507,7 @@ const handleReset = () => {
   },
   "defaultLanguage": "plaintext",
   "defaultEOL": "auto",
-  "autoUpdate": false,
+  "autoUpdate": true,
   "devMode": false
 }
 ```

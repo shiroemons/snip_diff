@@ -171,7 +171,7 @@ const SettingsModal: React.FC = () => {
     setLocalOptions({ ...INITIAL_DEFAULT_OPTIONS });
     setLocalLanguage(INITIAL_DEFAULT_LANGUAGE);
     setLocalEOL(INITIAL_DEFAULT_EOL);
-    setLocalAutoUpdate(false);
+    setLocalAutoUpdate(true);
     // 開発環境の場合のみdevModeをリセット
     if (isDev) {
       setLocalDevMode(false);
@@ -280,6 +280,7 @@ const SettingsModal: React.FC = () => {
               type="checkbox"
               checked={localAutoUpdate}
               onChange={(e) => setLocalAutoUpdate(e.target.checked)}
+              aria-label="自動更新チェック"
             />
           </label>
         </div>

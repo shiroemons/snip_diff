@@ -887,6 +887,13 @@ describe('SettingsModal', () => {
       const eolSection = eolLabel.closest('.settings-section') as HTMLElement;
       const eolSelect = eolSection.querySelector('select') as HTMLSelectElement;
       expect(eolSelect.value).toBe('auto');
+
+      // 一般カテゴリに戻って自動更新チェックを確認
+      const generalButton = screen.getByRole('button', { name: '一般' });
+      await user.click(generalButton);
+
+      const autoUpdateCheckbox = screen.getByLabelText('自動更新チェック') as HTMLInputElement;
+      expect(autoUpdateCheckbox.checked).toBe(true);
     });
 
     it('should require save button click to persist reset changes', async () => {
