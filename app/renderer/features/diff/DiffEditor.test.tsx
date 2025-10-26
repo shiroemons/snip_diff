@@ -36,7 +36,11 @@ vi.mock('@monaco-editor/react', () => ({
       }
     }, [onMount, defaultValue]);
 
-    return React.createElement('div', { 'data-testid': 'monaco-editor' }, `Editor: ${defaultValue}`);
+    return React.createElement(
+      'div',
+      { 'data-testid': 'monaco-editor' },
+      `Editor: ${defaultValue}`
+    );
   }),
   DiffEditor: vi.fn(({ original, modified, onMount }) => {
     // Simulate diff editor mount
@@ -51,7 +55,11 @@ vi.mock('@monaco-editor/react', () => ({
       }
     }, [onMount]);
 
-    return React.createElement('div', { 'data-testid': 'monaco-diff-editor' }, `Diff: ${original} vs ${modified}`);
+    return React.createElement(
+      'div',
+      { 'data-testid': 'monaco-diff-editor' },
+      `Diff: ${original} vs ${modified}`
+    );
   }),
 }));
 
@@ -83,12 +91,20 @@ vi.mock('./components/InputEditorPanel', () => ({
       onRightEditorMount(rightEditor);
     }, [onLeftEditorMount, onRightEditorMount]);
 
-    return React.createElement('div', { 'data-testid': 'input-editor-panel' }, 'Input Editor Panel');
+    return React.createElement(
+      'div',
+      { 'data-testid': 'input-editor-panel' },
+      'Input Editor Panel'
+    );
   },
 }));
 
 vi.mock('./components/ComparisonPanel', () => ({
-  ComparisonPanel: ({ onDiffEditorMount }: { onDiffEditorMount: (editor: editor.IStandaloneDiffEditor) => void }) => {
+  ComparisonPanel: ({
+    onDiffEditorMount,
+  }: {
+    onDiffEditorMount: (editor: editor.IStandaloneDiffEditor) => void;
+  }) => {
     React.useEffect(() => {
       const diffEditor = {
         updateOptions: vi.fn(),
@@ -148,6 +164,7 @@ describe('DiffEditor', () => {
             insertSpaces: true,
             diffAlgorithm: 'advanced',
             hideUnchangedRegions: false,
+            renderWhitespace: 'none',
           },
           stats: { adds: 0, dels: 0, hunks: 0, leftLines: 0, rightLines: 0 },
           createdAt: Date.now(),
@@ -282,6 +299,7 @@ describe('DiffEditor', () => {
               insertSpaces: true,
               diffAlgorithm: 'advanced',
               hideUnchangedRegions: false,
+              renderWhitespace: 'none',
             },
             stats: { adds: 0, dels: 0, hunks: 0, leftLines: 0, rightLines: 0 },
             createdAt: Date.now(),
@@ -372,6 +390,7 @@ describe('DiffEditor', () => {
               insertSpaces: true,
               diffAlgorithm: 'advanced',
               hideUnchangedRegions: false,
+              renderWhitespace: 'none',
             },
             stats: { adds: 0, dels: 0, hunks: 0, leftLines: 0, rightLines: 0 },
             createdAt: Date.now(),

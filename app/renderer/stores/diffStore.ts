@@ -66,6 +66,7 @@ export const INITIAL_DEFAULT_OPTIONS: DiffOptions = {
   insertSpaces: true,
   diffAlgorithm: 'advanced',
   hideUnchangedRegions: false,
+  renderWhitespace: 'none',
 };
 
 export const INITIAL_DEFAULT_THEME: Theme = 'auto';

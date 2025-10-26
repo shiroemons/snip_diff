@@ -6,13 +6,7 @@ import type { editor } from 'monaco-editor';
 
 // Mock @monaco-editor/react
 vi.mock('@monaco-editor/react', () => ({
-  Editor: ({
-    onMount,
-    theme,
-  }: {
-    onMount: (editor: unknown) => void;
-    theme: string;
-  }) => {
+  Editor: ({ onMount, theme }: { onMount: (editor: unknown) => void; theme: string }) => {
     const mockEditor = { theme } as unknown as editor.IStandaloneCodeEditor;
     if (onMount) {
       setTimeout(() => onMount(mockEditor), 0);

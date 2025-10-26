@@ -854,7 +854,9 @@ describe('App', () => {
     it('should handle window.isMaximized error gracefully', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      mockElectronAPI.window.isMaximized = vi.fn().mockRejectedValue(new Error('Failed to get maximized state'));
+      mockElectronAPI.window.isMaximized = vi
+        .fn()
+        .mockRejectedValue(new Error('Failed to get maximized state'));
 
       // biome-ignore lint/suspicious/noExplicitAny: need to mock window.electron in tests
       (window as any).electron = mockElectronAPI;
@@ -1064,7 +1066,8 @@ describe('App', () => {
         expect(onToggleCompactCallback).not.toBeNull();
       });
 
-      const initialCompactMode = useDiffStore.getState().getActiveSession()?.options.compactMode ?? false;
+      const initialCompactMode =
+        useDiffStore.getState().getActiveSession()?.options.compactMode ?? false;
 
       // Trigger compact mode toggle
       await act(async () => {

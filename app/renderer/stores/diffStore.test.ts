@@ -46,6 +46,7 @@ describe('diffStore', () => {
       expect(session.options.normalizeEOL).toBe(true);
       expect(session.options.viewMode).toBe('side-by-side');
       expect(session.options.fontSize).toBe(14);
+      expect(session.options.renderWhitespace).toBe('none');
     });
   });
 
@@ -285,6 +286,30 @@ describe('diffStore', () => {
       const afterUpdate = getActiveSession()?.updatedAt || 0;
       expect(afterUpdate).toBeGreaterThanOrEqual(beforeUpdate);
     });
+
+    it('should update renderWhitespace option', () => {
+      const { initializeSession, updateOptions, getActiveSession } = useDiffStore.getState();
+
+      initializeSession();
+      updateOptions({ renderWhitespace: 'all' });
+
+      const session = getActiveSession();
+      expect(session?.options.renderWhitespace).toBe('all');
+    });
+
+    it('should update multiple options including renderWhitespace', () => {
+      const { initializeSession, updateOptions, getActiveSession } = useDiffStore.getState();
+
+      initializeSession();
+      updateOptions({
+        renderWhitespace: 'trailing',
+        fontSize: 16,
+      });
+
+      const session = getActiveSession();
+      expect(session?.options.renderWhitespace).toBe('trailing');
+      expect(session?.options.fontSize).toBe(16);
+    });
   });
 
   describe('updateStats', () => {
@@ -411,6 +436,7 @@ describe('diffStore', () => {
           insertSpaces: false,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: true,
+          renderWhitespace: 'none',
         },
         defaultLanguage: 'typescript',
         defaultEOL: 'LF',
@@ -444,6 +470,7 @@ describe('diffStore', () => {
           insertSpaces: false,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: true,
+          renderWhitespace: 'all',
         },
         defaultLanguage: 'javascript',
         defaultEOL: 'CRLF',
@@ -463,6 +490,7 @@ describe('diffStore', () => {
       expect(state.defaultOptions.tabSize).toBe(4);
       expect(state.defaultOptions.fontSize).toBe(14);
       expect(state.defaultOptions.insertSpaces).toBe(true);
+      expect(state.defaultOptions.renderWhitespace).toBe('none');
       expect(state.defaultLanguage).toBe('plaintext');
       expect(state.defaultEOL).toBe('auto');
     });
@@ -492,6 +520,7 @@ describe('diffStore', () => {
           insertSpaces: true,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
+          renderWhitespace: 'none',
         },
         defaultLanguage: 'typescript',
         defaultEOL: 'auto',
@@ -518,6 +547,7 @@ describe('diffStore', () => {
           insertSpaces: true,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
+          renderWhitespace: 'none',
         },
         defaultLanguage: 'plaintext',
         defaultEOL: 'CRLF',
@@ -646,6 +676,7 @@ describe('diffStore', () => {
               insertSpaces: true,
               diffAlgorithm: 'advanced',
               hideUnchangedRegions: false,
+              renderWhitespace: 'none',
             },
             createdAt: Date.now(),
             updatedAt: Date.now(),
@@ -678,6 +709,7 @@ describe('diffStore', () => {
           insertSpaces: true,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
+          renderWhitespace: 'none',
         },
         defaultLanguage: 'plaintext',
         defaultEOL: 'auto',
@@ -704,6 +736,7 @@ describe('diffStore', () => {
           insertSpaces: true,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
+          renderWhitespace: 'none',
         },
         defaultLanguage: 'plaintext',
         defaultEOL: 'auto',

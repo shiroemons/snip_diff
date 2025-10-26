@@ -37,6 +37,8 @@ export interface ComparisonPanelProps {
   insertSpaces: boolean;
   /** 変更されていない領域を隠すかどうか */
   hideUnchangedRegions: boolean;
+  /** 空白文字の表示方法 */
+  renderWhitespace: 'none' | 'boundary' | 'selection' | 'trailing' | 'all';
   /** Diffエディタがマウントされたときのコールバック */
   onDiffEditorMount: (editor: editor.IStandaloneDiffEditor) => void;
   /** 全画面トグルハンドラ */
@@ -67,6 +69,7 @@ export const ComparisonPanel: React.FC<ComparisonPanelProps> = ({
   tabSize,
   insertSpaces,
   hideUnchangedRegions,
+  renderWhitespace,
   onDiffEditorMount,
   onToggleFullscreen,
   onToggleMinimize,
@@ -172,7 +175,7 @@ export const ComparisonPanel: React.FC<ComparisonPanelProps> = ({
                 insertSpaces,
                 diffAlgorithm: 'advanced',
                 renderIndicators: !compactMode,
-                renderWhitespace: 'none',
+                renderWhitespace,
                 renderOverviewRuler: !compactMode,
                 scrollBeyondLastLine: false,
                 scrollBeyondLastColumn: 0,

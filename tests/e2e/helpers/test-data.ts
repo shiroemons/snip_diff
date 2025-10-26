@@ -52,6 +52,7 @@ export const SELECTORS = {
   TITLE: 'header h1',
   THEME_TOGGLE: '[aria-label*="theme"]',
   SETTINGS_BUTTON: '[aria-label*="settings"], [aria-label*="設定"]',
+  RENDER_WHITESPACE_SELECT: 'select:near(:text("空白文字の表示"))',
   WINDOW_CONTROLS: {
     MINIMIZE: '[aria-label*="minimize"], [aria-label*="最小化"]',
     MAXIMIZE: '[aria-label*="maximize"], [aria-label*="最大化"]',
@@ -73,6 +74,8 @@ export const SELECTORS = {
 
   // Footer
   FOOTER: 'footer',
+  FOOTER_RENDER_WHITESPACE_SELECT:
+    'footer select[title="空白文字の表示（スペースやタブを可視化）"]',
   PASTE_LEFT_BUTTON:
     '[aria-label*="paste left"], [aria-label*="左に貼り付け"], button:has-text("Paste Left")',
   PASTE_RIGHT_BUTTON:
@@ -90,6 +93,7 @@ export const SELECTORS = {
   SETTINGS_MODAL: '[role="dialog"], .settings-modal',
   SETTINGS_CLOSE_BUTTON: '[aria-label*="close"], button:has-text("Close")',
   THEME_SELECT: 'select[name="theme"], #theme',
+  SETTINGS_RENDER_WHITESPACE_SELECT: '.settings-modal select:near(:text("空白文字の表示"))',
   IGNORE_WHITESPACE_CHECKBOX: 'input[type="checkbox"][name*="whitespace"]',
   IGNORE_CASE_CHECKBOX: 'input[type="checkbox"][name*="case"]',
   HISTORY_LIMIT_INPUT: 'input[type="number"][name*="history"]',
@@ -115,4 +119,12 @@ export const THEMES = {
 export const DIFF_MODES = {
   INLINE: 'inline',
   SIDE_BY_SIDE: 'side-by-side',
+};
+
+export const RENDER_WHITESPACE = {
+  NONE: 'none',
+  BOUNDARY: 'boundary',
+  SELECTION: 'selection',
+  TRAILING: 'trailing',
+  ALL: 'all',
 };
