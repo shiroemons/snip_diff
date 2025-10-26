@@ -78,7 +78,7 @@
 
 | 一般 | デフォルト設定（エディタ） |
 |:---:|:---:|
-| <img src=".github/images/settings1.png" alt="設定モーダル - 一般" height="400"><br>*テーマ、自動更新* | <img src=".github/images/settings2.png" alt="設定モーダル - デフォルト設定（エディタ）" height="400"><br>*フォントサイズ、空白文字の表示* |
+| <img src=".github/images/settings1.png" alt="設定モーダル - 一般" height="400"><br>*テーマ、アクセントカラー、自動更新* | <img src=".github/images/settings2.png" alt="設定モーダル - デフォルト設定（エディタ）" height="400"><br>*フォントサイズ、空白文字の表示* |
 | **デフォルト設定（エディタ）** | **デフォルト設定（差分）** |
 | <img src=".github/images/settings3.png" alt="設定モーダル - デフォルト設定（エディタ）" height="400"><br>*インデント方式、インデントサイズ、デフォルト改行コード、デフォルト言語モード* | <img src=".github/images/settings4.png" alt="設定モーダル - デフォルト設定（差分）" height="400"><br>*比較の方式、Compactモード* |
 
