@@ -1,8 +1,9 @@
-import type { DiffOptions, Theme } from '@shared/types';
+import type { AccentColor, DiffOptions, Theme } from '@shared/types';
 import type React from 'react';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { ClipboardList, Settings as SettingsIcon, Wrench } from 'lucide-react';
 import {
+  INITIAL_DEFAULT_ACCENT_COLOR,
   INITIAL_DEFAULT_EOL,
   INITIAL_DEFAULT_LANGUAGE,
   INITIAL_DEFAULT_OPTIONS,
@@ -25,12 +26,14 @@ const SettingsModal: React.FC = () => {
     isSettingsModalOpen,
     closeSettingsModal,
     theme,
+    accentColor,
     defaultOptions,
     defaultLanguage,
     defaultEOL,
     devMode,
     isUpdateAvailable,
     setTheme,
+    setAccentColor,
     updateOptions,
     updateBuffersLang,
     updateLeftBufferEOL,
@@ -51,6 +54,7 @@ const SettingsModal: React.FC = () => {
 
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>('general');
   const [localTheme, setLocalTheme] = useState<Theme>(theme);
+  const [localAccentColor, setLocalAccentColor] = useState<AccentColor>(accentColor);
   const [localOptions, setLocalOptions] = useState<DiffOptions>(defaultOptions);
   const [localLanguage, setLocalLanguage] = useState(defaultLanguage);
   const [localEOL, setLocalEOL] = useState<'LF' | 'CRLF' | 'auto'>(defaultEOL);
@@ -62,10 +66,31 @@ const SettingsModal: React.FC = () => {
   const [updateCheckMessage, setUpdateCheckMessage] = useState('');
   const [lastUpdateCheck, setLastUpdateCheck] = useState<string>('');
 
-  // モーダルが開かれたら現在の設定を読み込む
+  // キャンセル時に復元するための初期値を保存
+  const [initialTheme, setInitialTheme] = useState<Theme>(theme);
+  const [initialAccentColor, setInitialAccentColor] = useState<AccentColor>(accentColor);
+
+  // モーダルが開いているかどうかを追跡（初期値のキャプチャ用）
+  const isModalOpenRef = useRef(false);
+
+  // モーダルが開かれたときに初期値をキャプチャ（一度だけ）
+  useEffect(() => {
+    if (isSettingsModalOpen && !isModalOpenRef.current) {
+      // モーダルが開かれた瞬間の値を保存
+      isModalOpenRef.current = true;
+      setInitialTheme(theme);
+      setInitialAccentColor(accentColor);
+    } else if (!isSettingsModalOpen) {
+      // モーダルが閉じられたらフラグをリセット
+      isModalOpenRef.current = false;
+    }
+  }, [isSettingsModalOpen, theme, accentColor]);
+
+  // モーダルが開かれたら現在の設定をローカル状態に読み込む
   useEffect(() => {
     if (isSettingsModalOpen) {
       setLocalTheme(theme);
+      setLocalAccentColor(accentColor);
       setLocalOptions(defaultOptions);
       setLocalLanguage(defaultLanguage);
       setLocalEOL(defaultEOL);
@@ -82,7 +107,7 @@ const SettingsModal: React.FC = () => {
         setLastUpdateCheck(savedLastCheck);
       }
     }
-  }, [isSettingsModalOpen, theme, defaultOptions, defaultLanguage, defaultEOL, devMode]);
+  }, [isSettingsModalOpen, theme, accentColor, defaultOptions, defaultLanguage, defaultEOL, devMode]);
 
   // 更新チェック結果のイベントリスナー
   useEffect(() => {
@@ -121,6 +146,7 @@ const SettingsModal: React.FC = () => {
 
       const settings = {
         theme: localTheme,
+        accentColor: localAccentColor,
         defaultOptions: localOptions,
         defaultLanguage: safeLocalLanguage,
         defaultEOL: safeLocalEOL,
@@ -140,6 +166,7 @@ const SettingsModal: React.FC = () => {
 
       // 現在のセッションにも即座に反映
       setTheme(localTheme);
+      setAccentColor(localAccentColor);
       updateOptions(localOptions);
       updateBuffersLang(safeLocalLanguage);
       updateLeftBufferEOL(safeLocalEOL);
@@ -153,6 +180,9 @@ const SettingsModal: React.FC = () => {
   };
 
   const handleCancel = () => {
+    // テーマとアクセントカラーを初期値に戻す（プレビューをキャンセル）
+    setTheme(initialTheme);
+    setAccentColor(initialAccentColor);
     closeSettingsModal();
   };
 
@@ -168,6 +198,7 @@ const SettingsModal: React.FC = () => {
 
     // ローカル状態をデフォルト値に更新（プレビュー表示）
     setLocalTheme(INITIAL_DEFAULT_THEME);
+    setLocalAccentColor(INITIAL_DEFAULT_ACCENT_COLOR);
     setLocalOptions({ ...INITIAL_DEFAULT_OPTIONS });
     setLocalLanguage(INITIAL_DEFAULT_LANGUAGE);
     setLocalEOL(INITIAL_DEFAULT_EOL);
@@ -260,7 +291,11 @@ const SettingsModal: React.FC = () => {
           <select
             className="settings-select"
             value={localTheme}
-            onChange={(e) => setLocalTheme(e.target.value as Theme)}
+            onChange={(e) => {
+              const newTheme = e.target.value as Theme;
+              setLocalTheme(newTheme);
+              setTheme(newTheme); // 即座にプレビュー
+            }}
           >
             <option value="light">ライトテーマ</option>
             <option value="dark">ダークテーマ</option>
@@ -269,6 +304,27 @@ const SettingsModal: React.FC = () => {
         </div>
         <span className="settings-description">
           エディターの外観を変更します。「システムテーマ」を選択すると、macOSの設定に従います。
+        </span>
+      </div>
+
+      <div className="settings-section">
+        <span className="settings-label">アクセントカラー</span>
+        <div className="settings-control">
+          <select
+            className="settings-select"
+            value={localAccentColor}
+            onChange={(e) => {
+              const newAccentColor = e.target.value as AccentColor;
+              setLocalAccentColor(newAccentColor);
+              setAccentColor(newAccentColor); // 即座にプレビュー
+            }}
+          >
+            <option value="blue">青 (デフォルト値)</option>
+            <option value="green">緑</option>
+          </select>
+        </div>
+        <span className="settings-description">
+          ボタンやチェックボックスなどのUIパーツの色を変更します。
         </span>
       </div>
 

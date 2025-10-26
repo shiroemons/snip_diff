@@ -8,7 +8,7 @@ import DiffEditor, { type DiffEditorRef } from './features/diff/DiffEditor';
 import { useDiffStore } from './stores/diffStore';
 
 const App: React.FC = () => {
-  const { initializeSession, theme, updateOptions, loadSettings } = useDiffStore();
+  const { initializeSession, theme, accentColor, updateOptions, loadSettings } = useDiffStore();
   const diffEditorRef = useRef<DiffEditorRef>(null);
   const [actualTheme, setActualTheme] = React.useState<'light' | 'dark'>('dark');
   const [isWindowMaximized, setIsWindowMaximized] = React.useState(false);
@@ -28,6 +28,7 @@ const App: React.FC = () => {
           const settings = (await window.electron.settings.get()) as AppSettings;
           loadSettings({
             theme: settings.theme,
+            accentColor: settings.accentColor,
             defaultOptions: settings.defaultOptions,
             defaultLanguage: settings.defaultLanguage,
             defaultEOL: settings.defaultEOL,
@@ -65,6 +66,11 @@ const App: React.FC = () => {
   useEffect(() => {
     document.body.dataset.theme = actualTheme;
   }, [actualTheme]);
+
+  // accentColorをbodyのdata-accent属性に反映
+  useEffect(() => {
+    document.body.dataset.accent = accentColor;
+  }, [accentColor]);
 
   // テーマ適用とシステムテーマ監視
   useEffect(() => {

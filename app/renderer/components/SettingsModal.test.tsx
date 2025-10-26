@@ -19,6 +19,7 @@ const mockElectronAPI = {
   settings: {
     get: vi.fn().mockResolvedValue({
       theme: 'auto',
+      accentColor: 'blue',
       defaultOptions: {
         ignoreWhitespace: false,
         normalizeEOL: true,
@@ -1277,6 +1278,134 @@ describe('SettingsModal', () => {
       await waitFor(() => {
         expect(developerButton.classList.contains('active')).toBe(true);
       });
+    });
+  });
+
+  describe('Accent Color', () => {
+    it('should display accent color select', async () => {
+      useDiffStore.setState({ isSettingsModalOpen: true });
+      render(<SettingsModal />);
+
+      const accentColorLabel = screen.getByText('アクセントカラー');
+      const accentColorSection = accentColorLabel.closest('.settings-section') as HTMLElement;
+      const accentColorSelect = accentColorSection.querySelector('select') as HTMLSelectElement;
+
+      expect(accentColorSelect).toBeTruthy();
+      expect(accentColorSelect.value).toBe('blue');
+    });
+
+    it('should have blue and green options', async () => {
+      useDiffStore.setState({ isSettingsModalOpen: true });
+      render(<SettingsModal />);
+
+      const accentColorLabel = screen.getByText('アクセントカラー');
+      const accentColorSection = accentColorLabel.closest('.settings-section') as HTMLElement;
+      const accentColorSelect = accentColorSection.querySelector('select') as HTMLSelectElement;
+
+      const options = Array.from(accentColorSelect.querySelectorAll('option')).map(
+        (opt) => opt.textContent
+      );
+
+      expect(options).toContain('青 (デフォルト値)');
+      expect(options).toContain('緑');
+    });
+
+    it('should change accent color immediately on selection (preview)', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true, accentColor: 'blue' });
+      const setAccentColor = vi.fn();
+      useDiffStore.setState({ setAccentColor });
+
+      render(<SettingsModal />);
+
+      const accentColorLabel = screen.getByText('アクセントカラー');
+      const accentColorSection = accentColorLabel.closest('.settings-section') as HTMLElement;
+      const accentColorSelect = accentColorSection.querySelector('select') as HTMLSelectElement;
+
+      // 緑に変更
+      await user.selectOptions(accentColorSelect, 'green');
+
+      // setAccentColorが即座に呼ばれることを確認（プレビュー）
+      expect(setAccentColor).toHaveBeenCalledWith('green');
+    });
+
+    it('should revert to initial accent color on cancel', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true, accentColor: 'blue' });
+      const setAccentColor = vi.fn();
+      useDiffStore.setState({ setAccentColor });
+
+      render(<SettingsModal />);
+
+      const accentColorLabel = screen.getByText('アクセントカラー');
+      const accentColorSection = accentColorLabel.closest('.settings-section') as HTMLElement;
+      const accentColorSelect = accentColorSection.querySelector('select') as HTMLSelectElement;
+
+      // 緑に変更（プレビュー）
+      await user.selectOptions(accentColorSelect, 'green');
+      expect(setAccentColor).toHaveBeenCalledWith('green');
+
+      // キャンセルボタンをクリック
+      const cancelButton = screen.getByRole('button', { name: 'キャンセル' });
+      await user.click(cancelButton);
+
+      // 初期値（blue）に戻ることを確認
+      expect(setAccentColor).toHaveBeenCalledWith('blue');
+    });
+
+    it('should include accent color in saved settings', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true, accentColor: 'blue' });
+
+      render(<SettingsModal />);
+
+      const accentColorLabel = screen.getByText('アクセントカラー');
+      const accentColorSection = accentColorLabel.closest('.settings-section') as HTMLElement;
+      const accentColorSelect = accentColorSection.querySelector('select') as HTMLSelectElement;
+
+      // 緑に変更
+      await user.selectOptions(accentColorSelect, 'green');
+
+      // 保存ボタンをクリック
+      const saveButton = screen.getByRole('button', { name: '保存' });
+      await user.click(saveButton);
+
+      // settings.setが呼ばれることを確認
+      await waitFor(() => {
+        expect(mockElectronAPI.settings.set).toHaveBeenCalledWith(
+          expect.objectContaining({
+            accentColor: 'green',
+          })
+        );
+      });
+    });
+
+    it('should reset accent color to default (blue) on reset', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true, accentColor: 'green' });
+
+      // confirmをモック
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+      render(<SettingsModal />);
+
+      const accentColorLabel = screen.getByText('アクセントカラー');
+      const accentColorSection = accentColorLabel.closest('.settings-section') as HTMLElement;
+      const accentColorSelect = accentColorSection.querySelector('select') as HTMLSelectElement;
+
+      // 現在緑になっているはず
+      expect(accentColorSelect.value).toBe('green');
+
+      // リセットボタンをクリック
+      const resetButton = screen.getByRole('button', { name: 'デフォルトにリセット' });
+      await user.click(resetButton);
+
+      // アクセントカラーがblue（デフォルト）に戻ることを確認
+      await waitFor(() => {
+        expect(accentColorSelect.value).toBe('blue');
+      });
+
+      confirmSpy.mockRestore();
     });
   });
 });

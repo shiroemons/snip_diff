@@ -1,4 +1,4 @@
-import type { DiffOptions, DiffSession, DiffStats, Theme } from '@shared/types';
+import type { AccentColor, DiffOptions, DiffSession, DiffStats, Theme } from '@shared/types';
 import { createBuffer, generateId } from '@shared/utils';
 import { create } from 'zustand';
 
@@ -9,6 +9,9 @@ export interface DiffStore {
 
   // テーマ
   theme: Theme;
+
+  // アクセントカラー
+  accentColor: AccentColor;
 
   // 設定モーダル
   isSettingsModalOpen: boolean;
@@ -35,6 +38,7 @@ export interface DiffStore {
   swapBuffers: () => void;
   clearBuffers: () => void;
   setTheme: (theme: Theme) => void;
+  setAccentColor: (accentColor: AccentColor) => void;
   updateLeftBufferEOL: (eol: 'LF' | 'CRLF' | 'auto') => void;
   updateRightBufferEOL: (eol: 'LF' | 'CRLF' | 'auto') => void;
   updateBuffersLang: (lang: string) => void;
@@ -43,6 +47,7 @@ export interface DiffStore {
   setIsUpdateAvailable: (isAvailable: boolean) => void;
   loadSettings: (settings: {
     theme: Theme;
+    accentColor: AccentColor;
     defaultOptions: DiffOptions;
     defaultLanguage: string;
     defaultEOL: 'LF' | 'CRLF' | 'auto';
@@ -70,6 +75,7 @@ export const INITIAL_DEFAULT_OPTIONS: DiffOptions = {
 };
 
 export const INITIAL_DEFAULT_THEME: Theme = 'auto';
+export const INITIAL_DEFAULT_ACCENT_COLOR: AccentColor = 'blue';
 export const INITIAL_DEFAULT_LANGUAGE = 'plaintext';
 export const INITIAL_DEFAULT_EOL: 'LF' | 'CRLF' | 'auto' = 'auto';
 
@@ -90,6 +96,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
   sessions: [],
   activeSessionId: null,
   theme: INITIAL_DEFAULT_THEME,
+  accentColor: INITIAL_DEFAULT_ACCENT_COLOR,
   isSettingsModalOpen: false,
   defaultOptions: { ...INITIAL_DEFAULT_OPTIONS },
   defaultLanguage: INITIAL_DEFAULT_LANGUAGE,
@@ -217,6 +224,10 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
     set({ theme });
   },
 
+  setAccentColor: (accentColor: AccentColor) => {
+    set({ accentColor });
+  },
+
   updateLeftBufferEOL: (eol: 'LF' | 'CRLF' | 'auto') => {
     const activeSession = get().getActiveSession();
     if (!activeSession) return;
@@ -278,6 +289,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
   loadSettings: (settings) => {
     set({
       theme: settings.theme,
+      accentColor: settings.accentColor,
       defaultOptions: settings.defaultOptions,
       defaultLanguage: settings.defaultLanguage,
       defaultEOL: settings.defaultEOL,
@@ -288,6 +300,7 @@ export const useDiffStore = create<DiffStore>((set, get) => ({
   resetSettings: () => {
     set({
       theme: INITIAL_DEFAULT_THEME,
+      accentColor: INITIAL_DEFAULT_ACCENT_COLOR,
       defaultOptions: { ...INITIAL_DEFAULT_OPTIONS },
       defaultLanguage: INITIAL_DEFAULT_LANGUAGE,
       defaultEOL: INITIAL_DEFAULT_EOL,

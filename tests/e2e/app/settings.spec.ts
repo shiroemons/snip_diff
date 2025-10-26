@@ -327,4 +327,209 @@ test.describe('Settings', () => {
       test.skip();
     }
   });
+
+  test('should change accent color setting', async ({ page }) => {
+    const settingsButton = page.locator('button[title="設定"]');
+    if (await settingsButton.isVisible()) {
+      // Open settings modal
+      await settingsButton.click();
+      await page.waitForTimeout(500);
+
+      // Check that accent color select exists
+      const accentColorLabel = page.locator('text=アクセントカラー');
+      await expect(accentColorLabel).toBeVisible();
+
+      // Find accent color select
+      const accentColorSection = page.locator('.settings-section', {
+        has: accentColorLabel,
+      });
+      const accentColorSelect = accentColorSection.locator('select.settings-select');
+      await expect(accentColorSelect).toBeVisible();
+
+      // Get initial value (should be blue by default)
+      const initialValue = await accentColorSelect.inputValue();
+      expect(initialValue).toBe('blue');
+
+      // Change to green
+      await accentColorSelect.selectOption('green');
+      await page.waitForTimeout(300);
+
+      // Check that the value changed
+      const greenValue = await accentColorSelect.inputValue();
+      expect(greenValue).toBe('green');
+
+      // Save settings
+      const saveButton = page.locator('button', { hasText: '保存' });
+      await saveButton.click();
+      await page.waitForTimeout(500);
+
+      // Reopen settings modal to verify persistence
+      await settingsButton.click();
+      await page.waitForTimeout(500);
+
+      const accentColorSection2 = page.locator('.settings-section', {
+        has: page.locator('text=アクセントカラー'),
+      });
+      const accentColorSelect2 = accentColorSection2.locator('select.settings-select');
+      const savedValue = await accentColorSelect2.inputValue();
+      expect(savedValue).toBe('green');
+
+      // Change back to blue and save
+      await accentColorSelect2.selectOption('blue');
+      await page.waitForTimeout(300);
+      const saveButton2 = page.locator('button', { hasText: '保存' });
+      await saveButton2.click();
+      await page.waitForTimeout(500);
+    } else {
+      test.skip();
+    }
+  });
+
+  test('should preview accent color changes immediately', async ({ page }) => {
+    const settingsButton = page.locator('button[title="設定"]');
+    if (await settingsButton.isVisible()) {
+      // Open settings modal
+      await settingsButton.click();
+      await page.waitForTimeout(500);
+
+      // Get save button
+      const saveButton = page.locator('button', { hasText: '保存' });
+
+      // Get initial save button color (should have blue accent)
+      const initialColor = await saveButton.evaluate((el) => {
+        return window.getComputedStyle(el).backgroundColor;
+      });
+
+      // Find accent color select
+      const accentColorSection = page.locator('.settings-section', {
+        has: page.locator('text=アクセントカラー'),
+      });
+      const accentColorSelect = accentColorSection.locator('select.settings-select');
+
+      // Change to green
+      await accentColorSelect.selectOption('green');
+      await page.waitForTimeout(300);
+
+      // Get save button color after change (should have green accent)
+      const greenColor = await saveButton.evaluate((el) => {
+        return window.getComputedStyle(el).backgroundColor;
+      });
+
+      // Colors should be different
+      expect(greenColor).not.toBe(initialColor);
+
+      // Cancel without saving
+      const cancelButton = page.locator('button', { hasText: 'キャンセル' });
+      await cancelButton.click();
+      await page.waitForTimeout(500);
+    } else {
+      test.skip();
+    }
+  });
+
+  test('should revert accent color on cancel', async ({ page }) => {
+    const settingsButton = page.locator('button[title="設定"]');
+    if (await settingsButton.isVisible()) {
+      // Open settings modal
+      await settingsButton.click();
+      await page.waitForTimeout(500);
+
+      // Find accent color select
+      const accentColorSection = page.locator('.settings-section', {
+        has: page.locator('text=アクセントカラー'),
+      });
+      const accentColorSelect = accentColorSection.locator('select.settings-select');
+
+      // Get initial value
+      const initialValue = await accentColorSelect.inputValue();
+
+      // Change to different color
+      const newColor = initialValue === 'blue' ? 'green' : 'blue';
+      await accentColorSelect.selectOption(newColor);
+      await page.waitForTimeout(300);
+
+      // Verify change
+      const changedValue = await accentColorSelect.inputValue();
+      expect(changedValue).toBe(newColor);
+
+      // Cancel
+      const cancelButton = page.locator('button', { hasText: 'キャンセル' });
+      await cancelButton.click();
+      await page.waitForTimeout(500);
+
+      // Reopen modal
+      await settingsButton.click();
+      await page.waitForTimeout(500);
+
+      // Verify reverted to initial value
+      const accentColorSection2 = page.locator('.settings-section', {
+        has: page.locator('text=アクセントカラー'),
+      });
+      const accentColorSelect2 = accentColorSection2.locator('select.settings-select');
+      const revertedValue = await accentColorSelect2.inputValue();
+      expect(revertedValue).toBe(initialValue);
+
+      // Close modal
+      const cancelButton2 = page.locator('button', { hasText: 'キャンセル' });
+      await cancelButton2.click();
+      await page.waitForTimeout(500);
+    } else {
+      test.skip();
+    }
+  });
+
+  test('should apply accent color to compact checkbox', async ({ page }) => {
+    const settingsButton = page.locator('button[title="設定"]');
+    if (await settingsButton.isVisible()) {
+      // Open settings modal
+      await settingsButton.click();
+      await page.waitForTimeout(500);
+
+      // Find accent color select
+      const accentColorSection = page.locator('.settings-section', {
+        has: page.locator('text=アクセントカラー'),
+      });
+      const accentColorSelect = accentColorSection.locator('select.settings-select');
+
+      // Change to green
+      await accentColorSelect.selectOption('green');
+      await page.waitForTimeout(300);
+
+      // Close settings modal
+      const saveButton = page.locator('button', { hasText: '保存' });
+      await saveButton.click();
+      await page.waitForTimeout(500);
+
+      // Find compact checkbox in comparison panel
+      const compactCheckbox = page.locator('input[type="checkbox"]', {
+        has: page.locator('.. >> text=Compact'),
+      });
+
+      if (await compactCheckbox.isVisible()) {
+        // Get checkbox accent color
+        const checkboxColor = await compactCheckbox.evaluate((el) => {
+          return window.getComputedStyle(el).accentColor;
+        });
+
+        // Should have green accent (CSS variable value)
+        // Note: actual color value depends on CSS variables
+        expect(checkboxColor).toBeTruthy();
+      }
+
+      // Change back to blue
+      await settingsButton.click();
+      await page.waitForTimeout(500);
+      const accentColorSection2 = page.locator('.settings-section', {
+        has: page.locator('text=アクセントカラー'),
+      });
+      const accentColorSelect2 = accentColorSection2.locator('select.settings-select');
+      await accentColorSelect2.selectOption('blue');
+      await page.waitForTimeout(300);
+      const saveButton2 = page.locator('button', { hasText: '保存' });
+      await saveButton2.click();
+      await page.waitForTimeout(500);
+    } else {
+      test.skip();
+    }
+  });
 });

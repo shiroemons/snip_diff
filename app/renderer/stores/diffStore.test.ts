@@ -425,6 +425,7 @@ describe('diffStore', () => {
 
       loadSettings({
         theme: 'dark',
+        accentColor: 'blue',
         defaultOptions: {
           ignoreWhitespace: true,
           normalizeEOL: false,
@@ -459,6 +460,7 @@ describe('diffStore', () => {
       // まず設定を変更
       loadSettings({
         theme: 'dark',
+        accentColor: 'green',
         defaultOptions: {
           ignoreWhitespace: true,
           normalizeEOL: false,
@@ -509,6 +511,7 @@ describe('diffStore', () => {
 
       loadSettings({
         theme: 'auto',
+        accentColor: 'blue',
         defaultOptions: {
           ignoreWhitespace: false,
           normalizeEOL: true,
@@ -536,6 +539,7 @@ describe('diffStore', () => {
 
       loadSettings({
         theme: 'auto',
+        accentColor: 'blue',
         defaultOptions: {
           ignoreWhitespace: false,
           normalizeEOL: true,
@@ -698,6 +702,7 @@ describe('diffStore', () => {
 
       loadSettings({
         theme: 'dark',
+        accentColor: 'blue',
         defaultOptions: {
           ignoreWhitespace: false,
           normalizeEOL: true,
@@ -725,6 +730,7 @@ describe('diffStore', () => {
 
       loadSettings({
         theme: 'dark',
+        accentColor: 'blue',
         defaultOptions: {
           ignoreWhitespace: false,
           normalizeEOL: true,

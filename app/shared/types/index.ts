@@ -55,10 +55,16 @@ export interface DiffSession {
 export type Theme = 'light' | 'dark' | 'auto';
 
 /**
+ * アクセントカラー設定
+ */
+export type AccentColor = 'blue' | 'green';
+
+/**
  * アプリケーション設定
  */
 export interface AppSettings {
   theme: Theme;
+  accentColor: AccentColor;
   defaultOptions: DiffOptions;
   defaultLanguage: string; // シンタックスハイライトのデフォルト言語
   defaultEOL: 'LF' | 'CRLF' | 'auto'; // デフォルト改行コード

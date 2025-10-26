@@ -22,9 +22,12 @@
   --diff-del-border: #d73a49;
   --diff-del-text: #82071e;
 
-  /* UI colors */
+  /* UI colors - Blue accent (default) */
   --accent-primary: #0969da;
   --accent-hover: #0550ae;
+
+  /* Hover background */
+  --bg-hover: rgba(175, 184, 193, 0.2);
 
   /* Font */
   --font-mono: "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
@@ -50,9 +53,23 @@
   --diff-del-border: #da3633;
   --diff-del-text: #f85149;
 
-  /* UI colors */
+  /* UI colors - Blue accent (default) */
   --accent-primary: #58a6ff;
   --accent-hover: #79c0ff;
+
+  /* Hover background */
+  --bg-hover: rgba(110, 118, 129, 0.4);
+}
+
+/* Green accent color overrides */
+body[data-accent="green"] {
+  --accent-primary: #10a37f;
+  --accent-hover: #0d8c6a;
+}
+
+body[data-accent="green"] .app.dark {
+  --accent-primary: #10a37f;
+  --accent-hover: #0ea370;
 }
 
 html,
