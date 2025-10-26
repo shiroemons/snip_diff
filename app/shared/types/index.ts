@@ -22,6 +22,7 @@ export interface DiffOptions {
   insertSpaces: boolean;
   diffAlgorithm: 'legacy' | 'advanced';
   hideUnchangedRegions: boolean;
+  renderWhitespace: 'none' | 'boundary' | 'selection' | 'trailing' | 'all';
 }
 
 /**

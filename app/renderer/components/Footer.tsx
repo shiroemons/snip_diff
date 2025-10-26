@@ -24,6 +24,7 @@ const Footer: React.FC = () => {
   const fontSize = activeSession.options.fontSize;
   const insertSpaces = activeSession.options.insertSpaces;
   const tabSize = activeSession.options.tabSize;
+  const renderWhitespace = activeSession.options.renderWhitespace;
 
   // サポートする言語リスト
   const supportedLanguages = [
@@ -64,6 +65,12 @@ const Footer: React.FC = () => {
     updateOptions({ tabSize: Number(e.target.value) });
   };
 
+  const handleRenderWhitespaceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateOptions({
+      renderWhitespace: e.target.value as 'none' | 'boundary' | 'selection' | 'trailing' | 'all',
+    });
+  };
+
   return (
     <footer className="app-footer">
       <div className="footer-section">
@@ -98,6 +105,20 @@ const Footer: React.FC = () => {
           <option value="32">32</option>
           <option value="34">34</option>
           <option value="36">36</option>
+        </select>
+
+        <span className="info-label">空白文字:</span>
+        <select
+          className="footer-select"
+          value={renderWhitespace}
+          onChange={handleRenderWhitespaceChange}
+          title="空白文字の表示（スペースやタブを可視化）"
+        >
+          <option value="none">可視化しない</option>
+          <option value="boundary">単語境界のみ可視化</option>
+          <option value="selection">選択時のみ可視化</option>
+          <option value="trailing">行末のみ可視化</option>
+          <option value="all">すべて可視化</option>
         </select>
 
         <span className="separator">|</span>

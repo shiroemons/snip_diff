@@ -66,6 +66,7 @@ describe('ComparisonPanel', () => {
     tabSize: 2,
     insertSpaces: true,
     hideUnchangedRegions: false,
+    renderWhitespace: 'none' as 'none' | 'boundary' | 'selection' | 'trailing' | 'all',
     onDiffEditorMount: vi.fn(),
     onToggleFullscreen: vi.fn(),
     onToggleMinimize: vi.fn(),

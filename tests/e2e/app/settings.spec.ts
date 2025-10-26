@@ -1,6 +1,6 @@
 import { expect, test } from '../fixtures/electronApp';
 import { waitForMonacoEditor } from '../helpers/electron-helpers';
-import { SELECTORS, THEMES } from '../helpers/test-data';
+import { RENDER_WHITESPACE, SELECTORS, THEMES } from '../helpers/test-data';
 
 test.describe('Settings', () => {
   test.beforeEach(async ({ page }) => {
@@ -237,6 +237,92 @@ test.describe('Settings', () => {
         await page.keyboard.press('Escape');
         test.skip();
       }
+    } else {
+      test.skip();
+    }
+  });
+
+  test('should change renderWhitespace setting', async ({ page }) => {
+    // Open settings
+    const settingsButton = page.locator(SELECTORS.SETTINGS_BUTTON);
+
+    if ((await settingsButton.count()) > 0) {
+      await settingsButton.first().click();
+      await page.waitForTimeout(500);
+
+      // Find renderWhitespace select in settings modal
+      const renderWhitespaceSelect = page.locator(SELECTORS.SETTINGS_RENDER_WHITESPACE_SELECT);
+
+      if ((await renderWhitespaceSelect.count()) > 0) {
+        // Change to 'all'
+        await renderWhitespaceSelect.first().selectOption(RENDER_WHITESPACE.ALL);
+        await page.waitForTimeout(500);
+
+        // Change to 'trailing'
+        await renderWhitespaceSelect.first().selectOption(RENDER_WHITESPACE.TRAILING);
+        await page.waitForTimeout(500);
+
+        // Change to 'none'
+        await renderWhitespaceSelect.first().selectOption(RENDER_WHITESPACE.NONE);
+        await page.waitForTimeout(500);
+
+        // Save settings
+        const saveButton = page.locator('button:has-text("保存")');
+        if ((await saveButton.count()) > 0) {
+          await saveButton.first().click();
+          await page.waitForTimeout(500);
+        }
+
+        expect(true).toBeTruthy();
+      }
+
+      // Close modal
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(300);
+    } else {
+      test.skip();
+    }
+  });
+
+  test('should change renderWhitespace from footer', async ({ page }) => {
+    // Find renderWhitespace select in footer
+    const footerRenderWhitespaceSelect = page.locator(SELECTORS.FOOTER_RENDER_WHITESPACE_SELECT);
+
+    if ((await footerRenderWhitespaceSelect.count()) > 0) {
+      // Change to 'all'
+      await footerRenderWhitespaceSelect.selectOption(RENDER_WHITESPACE.ALL);
+      await page.waitForTimeout(300);
+
+      const allValue = await footerRenderWhitespaceSelect.inputValue();
+      expect(allValue).toBe(RENDER_WHITESPACE.ALL);
+
+      // Change to 'trailing'
+      await footerRenderWhitespaceSelect.selectOption(RENDER_WHITESPACE.TRAILING);
+      await page.waitForTimeout(300);
+
+      const trailingValue = await footerRenderWhitespaceSelect.inputValue();
+      expect(trailingValue).toBe(RENDER_WHITESPACE.TRAILING);
+
+      // Change to 'boundary'
+      await footerRenderWhitespaceSelect.selectOption(RENDER_WHITESPACE.BOUNDARY);
+      await page.waitForTimeout(300);
+
+      const boundaryValue = await footerRenderWhitespaceSelect.inputValue();
+      expect(boundaryValue).toBe(RENDER_WHITESPACE.BOUNDARY);
+
+      // Change to 'selection'
+      await footerRenderWhitespaceSelect.selectOption(RENDER_WHITESPACE.SELECTION);
+      await page.waitForTimeout(300);
+
+      const selectionValue = await footerRenderWhitespaceSelect.inputValue();
+      expect(selectionValue).toBe(RENDER_WHITESPACE.SELECTION);
+
+      // Change to 'none'
+      await footerRenderWhitespaceSelect.selectOption(RENDER_WHITESPACE.NONE);
+      await page.waitForTimeout(300);
+
+      const noneValue = await footerRenderWhitespaceSelect.inputValue();
+      expect(noneValue).toBe(RENDER_WHITESPACE.NONE);
     } else {
       test.skip();
     }

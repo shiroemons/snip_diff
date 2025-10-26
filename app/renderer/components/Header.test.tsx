@@ -271,7 +271,10 @@ describe('Header', () => {
       render(<Header />);
 
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to get system theme:', expect.any(Error));
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          'Failed to get system theme:',
+          expect.any(Error)
+        );
       });
 
       consoleErrorSpy.mockRestore();

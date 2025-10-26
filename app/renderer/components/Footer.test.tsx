@@ -48,6 +48,7 @@ describe('Footer', () => {
       render(<Footer />);
 
       expect(screen.getByTitle('フォントサイズ')).toBeTruthy();
+      expect(screen.getByTitle('空白文字の表示（スペースやタブを可視化）')).toBeTruthy();
       expect(screen.getByTitle('インデント方式')).toBeTruthy();
       expect(screen.getByTitle('インデントサイズ')).toBeTruthy();
       expect(screen.getByTitle('Beforeの改行コード')).toBeTruthy();
@@ -281,6 +282,65 @@ describe('Footer', () => {
       expect(options).toContain('python');
       expect(options).toContain('go');
       expect(options).toContain('rust');
+    });
+  });
+
+  describe('Render whitespace selection', () => {
+    it('should display current renderWhitespace value', () => {
+      const { initializeSession, updateOptions } = useDiffStore.getState();
+      initializeSession();
+      updateOptions({ renderWhitespace: 'all' });
+
+      render(<Footer />);
+
+      const renderWhitespaceSelect = screen.getByTitle(
+        '空白文字の表示（スペースやタブを可視化）'
+      ) as HTMLSelectElement;
+      expect(renderWhitespaceSelect.value).toBe('all');
+    });
+
+    it('should default to none', () => {
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Footer />);
+
+      const renderWhitespaceSelect = screen.getByTitle(
+        '空白文字の表示（スペースやタブを可視化）'
+      ) as HTMLSelectElement;
+      expect(renderWhitespaceSelect.value).toBe('none');
+    });
+
+    it('should change renderWhitespace when selected', async () => {
+      const user = userEvent.setup();
+      const { initializeSession, getActiveSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Footer />);
+
+      const renderWhitespaceSelect = screen.getByTitle('空白文字の表示（スペースやタブを可視化）');
+      await user.selectOptions(renderWhitespaceSelect, 'trailing');
+
+      const session = getActiveSession();
+      expect(session?.options.renderWhitespace).toBe('trailing');
+    });
+
+    it('should support all renderWhitespace options', () => {
+      const { initializeSession } = useDiffStore.getState();
+      initializeSession();
+
+      render(<Footer />);
+
+      const renderWhitespaceSelect = screen.getByTitle(
+        '空白文字の表示（スペースやタブを可視化）'
+      ) as HTMLSelectElement;
+      const options = Array.from(renderWhitespaceSelect.options).map((opt) => opt.value);
+
+      expect(options).toContain('none');
+      expect(options).toContain('boundary');
+      expect(options).toContain('selection');
+      expect(options).toContain('trailing');
+      expect(options).toContain('all');
     });
   });
 

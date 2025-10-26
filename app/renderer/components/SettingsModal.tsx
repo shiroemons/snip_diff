@@ -375,6 +375,46 @@ const SettingsModal: React.FC = () => {
 
           <div className="settings-section">
             <label className="settings-label">
+              空白文字の表示
+              <select
+                className="settings-select"
+                value={localOptions.renderWhitespace}
+                onChange={(e) =>
+                  setLocalOptions({
+                    ...localOptions,
+                    renderWhitespace: e.target.value as
+                      | 'none'
+                      | 'boundary'
+                      | 'selection'
+                      | 'trailing'
+                      | 'all',
+                  })
+                }
+              >
+                <option value="none">可視化しない</option>
+                <option value="boundary">単語境界のみ可視化</option>
+                <option value="selection">選択時のみ可視化</option>
+                <option value="trailing">行末のみ可視化</option>
+                <option value="all">すべて可視化</option>
+              </select>
+              <span className="settings-description">
+                空白文字（スペース・タブ）を記号で可視化する方法を選択します：
+                <br />• <strong>可視化しない</strong>
+                ：空白文字を通常通り表示します（記号で表示しない）。通常のテキストエディタと同じ表示です。
+                <br />• <strong>単語境界のみ可視化</strong>
+                ：単語と単語の間のスペースのみを記号で表示します。行頭や行末の空白は表示しません。
+                <br />• <strong>選択時のみ可視化</strong>
+                ：テキストを選択したときだけ空白文字を記号で表示します。
+                <br />• <strong>行末のみ可視化</strong>
+                ：行末の余分なスペースやタブのみを記号で表示します。コードの品質チェックに便利です。
+                <br />• <strong>すべて可視化</strong>
+                ：すべてのスペースとタブを記号で表示します。インデントや空白の問題を確認するときに便利です。
+              </span>
+            </label>
+          </div>
+
+          <div className="settings-section">
+            <label className="settings-label">
               比較の方式
               <select
                 className="settings-select"

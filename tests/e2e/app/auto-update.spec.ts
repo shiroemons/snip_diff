@@ -84,9 +84,7 @@ test.describe('Auto Update', () => {
     test.skip();
   });
 
-  test('should display update notification when update is available (mocked)', async ({
-    page,
-  }) => {
+  test('should display update notification when update is available (mocked)', async ({ page }) => {
     // Note: 実際の更新通知をテストするには、
     // モックサーバーを立ててelectron-updaterに偽の更新情報を返す必要があるため、
     // このテストは将来の実装として残す
@@ -120,9 +118,7 @@ test.describe('Auto Update', () => {
 
     // 開発環境では定期チェックは無効化されているため、
     // "Periodic update check is disabled" というログが出力されるはず
-    const hasDisabledLog = logs.some((log) =>
-      log.includes('Periodic update check is disabled')
-    );
+    const hasDisabledLog = logs.some((log) => log.includes('Periodic update check is disabled'));
 
     // 開発環境なので、定期チェックが無効化されていることを期待
     // （ログが出力されていない場合もあるため、このテストは参考程度）
