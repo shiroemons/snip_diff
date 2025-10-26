@@ -69,21 +69,15 @@
 
 <div align="center">
 
-<img src=".github/images/main.png" alt="SnipDiff メイン画面" width="800">
+| Side-by-sideモード | Unifiedモード | Compactモード |
+|:---:|:---:|:---:|
+| <img src=".github/images/main.png" alt="SnipDiff メイン画面" width="300"><br>*左右並列での差分表示* | <img src=".github/images/unified.png" alt="SnipDiff Unifiedモード" width="300"><br>*統合形式での差分表示* | <img src=".github/images/compact.png" alt="Compactモード" width="300"><br>*変更された文字だけを正確にハイライト* |
 
-*Side-by-sideモードでの差分表示*
-
-<img src=".github/images/unified.png" alt="SnipDiff Unifiedモード" width="800">
-
-*Unifiedモードでの差分表示*
-
-<img src=".github/images/compact.png" alt="Compactモード" width="800">
-
-*Compactモード：変更された文字だけを正確にハイライト*
-
-<img src=".github/images/settings.png" alt="設定モーダル" height="600">
-
-*カスタマイズ可能な設定*
+| 一般 | デフォルト設定（エディタ） |
+|:---:|:---:|
+| <img src=".github/images/settings1.png" alt="設定モーダル - 一般" height="400"><br>*テーマ、自動更新* | <img src=".github/images/settings2.png" alt="設定モーダル - デフォルト設定（エディタ）" height="400"><br>*フォントサイズ、空白文字の表示* |
+| **デフォルト設定（エディタ）** | **デフォルト設定（差分）** |
+| <img src=".github/images/settings3.png" alt="設定モーダル - デフォルト設定（エディタ）" height="400"><br>*インデント方式、インデントサイズ、デフォルト改行コード、デフォルト言語モード* | <img src=".github/images/settings4.png" alt="設定モーダル - デフォルト設定（差分）" height="400"><br>*比較の方式、Compactモード* |
 
 </div>
 
