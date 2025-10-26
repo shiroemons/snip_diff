@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDiffStore } from '../stores/diffStore';
@@ -1090,10 +1090,11 @@ describe('SettingsModal', () => {
       const user = userEvent.setup();
       useDiffStore.setState({ isSettingsModalOpen: true });
 
-      // Mock onUpdateNotAvailable to trigger the callback
+      let updateCallback: ((info: { version: string }) => void) | null = null;
+
+      // Mock onUpdateNotAvailable to save the callback
       mockElectronAPI.updater.onUpdateNotAvailable.mockImplementation((callback) => {
-        // Simulate update not available event (version is arbitrary for this test)
-        setTimeout(() => callback({ version: '1.0.0' }), 100);
+        updateCallback = callback;
       });
 
       render(<SettingsModal />);
@@ -1101,6 +1102,11 @@ describe('SettingsModal', () => {
       // Wait for the button to appear
       const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
+
+      // Trigger the update not available event
+      await act(async () => {
+        updateCallback?.({ version: '1.0.0' });
+      });
 
       // Wait for success message
       await waitFor(
