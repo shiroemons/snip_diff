@@ -178,8 +178,8 @@ app.whenReady().then(async () => {
   if (process.platform === 'darwin') {
     app.setAboutPanelOptions({
       applicationName: 'SnipDiff',
-      applicationVersion: '2025.10.25',
-      version: 'v2025.10.25',
+      applicationVersion: '2025.10.26',
+      version: 'v2025.10.26',
       copyright: '© 2025',
       credits: 'GitHub-like diff viewer for unsaved text',
     });
