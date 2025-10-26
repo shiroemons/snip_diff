@@ -46,7 +46,7 @@ describe('diffStore', () => {
       expect(session.options.normalizeEOL).toBe(true);
       expect(session.options.viewMode).toBe('side-by-side');
       expect(session.options.fontSize).toBe(14);
-      expect(session.options.renderWhitespace).toBe('none');
+      expect(session.options.renderWhitespace).toBe('all');
     });
   });
 
@@ -490,7 +490,7 @@ describe('diffStore', () => {
       expect(state.defaultOptions.tabSize).toBe(4);
       expect(state.defaultOptions.fontSize).toBe(14);
       expect(state.defaultOptions.insertSpaces).toBe(true);
-      expect(state.defaultOptions.renderWhitespace).toBe('none');
+      expect(state.defaultOptions.renderWhitespace).toBe('all');
       expect(state.defaultLanguage).toBe('plaintext');
       expect(state.defaultEOL).toBe('auto');
     });

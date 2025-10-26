@@ -299,7 +299,7 @@ describe('Footer', () => {
       expect(renderWhitespaceSelect.value).toBe('all');
     });
 
-    it('should default to none', () => {
+    it('should default to all', () => {
       const { initializeSession } = useDiffStore.getState();
       initializeSession();
 
@@ -308,7 +308,7 @@ describe('Footer', () => {
       const renderWhitespaceSelect = screen.getByTitle(
         '空白文字の表示（スペースやタブを可視化）'
       ) as HTMLSelectElement;
-      expect(renderWhitespaceSelect.value).toBe('none');
+      expect(renderWhitespaceSelect.value).toBe('all');
     });
 
     it('should change renderWhitespace when selected', async () => {

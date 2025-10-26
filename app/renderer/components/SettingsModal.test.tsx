@@ -30,7 +30,7 @@ const mockElectronAPI = {
         insertSpaces: true,
         diffAlgorithm: 'advanced',
         hideUnchangedRegions: false,
-        renderWhitespace: 'none',
+        renderWhitespace: 'all',
       },
       defaultLanguage: 'plaintext',
       defaultEOL: 'auto',
@@ -92,7 +92,7 @@ describe('SettingsModal', () => {
         insertSpaces: true,
         diffAlgorithm: 'advanced',
         hideUnchangedRegions: false,
-        renderWhitespace: 'none',
+        renderWhitespace: 'all',
       },
       defaultLanguage: 'plaintext',
       defaultEOL: 'auto',
@@ -147,7 +147,7 @@ describe('SettingsModal', () => {
           insertSpaces: true,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
-          renderWhitespace: 'none',
+          renderWhitespace: 'all',
         },
       });
 
@@ -803,7 +803,7 @@ describe('SettingsModal', () => {
           insertSpaces: true,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
-          renderWhitespace: 'none',
+          renderWhitespace: 'all',
         },
       });
 
@@ -841,7 +841,7 @@ describe('SettingsModal', () => {
           insertSpaces: false,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: true,
-          renderWhitespace: 'none',
+          renderWhitespace: 'all',
         },
         defaultLanguage: 'javascript',
         defaultEOL: 'CRLF',
@@ -914,7 +914,7 @@ describe('SettingsModal', () => {
           insertSpaces: true,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
-          renderWhitespace: 'none',
+          renderWhitespace: 'all',
         },
       });
 
@@ -964,7 +964,7 @@ describe('SettingsModal', () => {
           insertSpaces: true,
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
-          renderWhitespace: 'none',
+          renderWhitespace: 'all',
         },
       });
 

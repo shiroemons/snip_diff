@@ -371,11 +371,11 @@ const SettingsModal: React.FC = () => {
               })
             }
           >
-            <option value="none">可視化しない (デフォルト値)</option>
+            <option value="none">可視化しない</option>
             <option value="boundary">単語境界のみ可視化</option>
             <option value="selection">選択時のみ可視化</option>
             <option value="trailing">行末のみ可視化</option>
-            <option value="all">すべて可視化</option>
+            <option value="all">すべて可視化 (デフォルト値)</option>
           </select>
         </div>
         <div className="settings-description">
