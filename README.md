@@ -415,13 +415,14 @@ IPC ハンドラを追加する場合:
    ```
    このコマンドで `package.json` と `package-lock.json` の両方が自動更新されます
 
-2. **README.md と app/main/main.ts のバージョンを更新**
+2. **README.md、CHANGELOG.md、app/main/main.ts のバージョンを更新**
    - `README.md` のバージョンバッジ (例: `version-2025.10.2`)
+   - `CHANGELOG.md` に新バージョンのエントリを追加（主要な変更点をハイライト形式で記載）
    - `app/main/main.ts` の `app.setAboutPanelOptions` 内の `applicationVersion` と `version`
 
 3. **変更をコミット**
    ```bash
-   git add package.json package-lock.json README.md app/main/main.ts
+   git add package.json package-lock.json README.md CHANGELOG.md app/main/main.ts
    git commit -m "chore: bump version to {VERSION}"
    # 例: git commit -m "chore: bump version to 2025.10.2"
    ```
