@@ -43,6 +43,7 @@ async function initializeStore() {
   store = new ElectronStore({
     defaults: {
       theme: 'auto',
+      accentColor: 'blue',
       defaultOptions: {
         ignoreWhitespace: false,
         normalizeEOL: true,
@@ -54,6 +55,7 @@ async function initializeStore() {
         insertSpaces: true,
         diffAlgorithm: 'advanced',
         hideUnchangedRegions: false,
+        renderWhitespace: 'all',
       },
       defaultLanguage: 'plaintext',
       defaultEOL: 'auto',

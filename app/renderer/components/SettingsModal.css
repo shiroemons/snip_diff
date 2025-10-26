@@ -95,13 +95,13 @@
 
 .settings-category-item.active {
   background-color: #ffffff;
-  color: #10a37f;
+  color: var(--accent-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   font-weight: 600;
 }
 
 .settings-category-item:focus {
-  outline: 2px solid #10a37f;
+  outline: 2px solid var(--accent-primary);
   outline-offset: -2px;
 }
 
@@ -248,7 +248,7 @@
 .settings-select:focus {
   outline: none;
   background-color: var(--bg-hover);
-  box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 10%, transparent);
 }
 
 .settings-checkbox-label {
@@ -266,7 +266,7 @@
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #10a37f;
+  accent-color: var(--accent-primary);
 }
 
 .settings-checkbox-label:hover span {
@@ -310,19 +310,19 @@
 }
 
 .settings-button-save {
-  background-color: #10a37f;
+  background-color: var(--accent-primary);
   color: #ffffff;
-  border: 1px solid #10a37f;
+  border: 1px solid var(--accent-primary);
 }
 
 .settings-button-save:hover {
-  background-color: #0d8c6a;
-  border-color: #0d8c6a;
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .settings-button-save:active {
-  background-color: #0a7555;
-  border-color: #0a7555;
+  background-color: color-mix(in srgb, var(--accent-hover) 85%, black);
+  border-color: color-mix(in srgb, var(--accent-hover) 85%, black);
 }
 
 .settings-button-reset {
@@ -350,23 +350,23 @@
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
-  border: 1px solid #10a37f;
+  border: 1px solid var(--accent-primary);
   border-radius: 8px;
   background-color: transparent;
-  color: #10a37f;
+  color: var(--accent-primary);
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .update-check-button:hover:not(:disabled) {
-  background-color: rgba(16, 163, 127, 0.08);
-  border-color: #0d8c6a;
-  color: #0d8c6a;
+  background-color: color-mix(in srgb, var(--accent-primary) 8%, transparent);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
 }
 
 .update-check-button:active:not(:disabled) {
-  background-color: rgba(16, 163, 127, 0.15);
+  background-color: color-mix(in srgb, var(--accent-primary) 15%, transparent);
   transform: translateY(1px);
 }
 
@@ -385,7 +385,7 @@
 }
 
 .update-check-message.success {
-  color: #10a37f;
+  color: var(--accent-primary);
 }
 
 .update-check-message.error {
@@ -417,6 +417,6 @@ body[data-theme="dark"] .settings-category-item:hover {
 
 body[data-theme="dark"] .settings-category-item.active {
   background-color: #2a2b32;
-  color: #10a37f;
+  color: var(--accent-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
