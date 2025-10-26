@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { DiffStore } from '../../../stores/diffStore';
 import { useDiffStore } from '../../../stores/diffStore';
 import { ComparisonPanel } from './ComparisonPanel';
 import type { editor } from 'monaco-editor';
@@ -116,7 +117,7 @@ describe('ComparisonPanel', () => {
     const mockUpdateOptions = vi.fn();
     vi.mocked(useDiffStore.getState).mockReturnValue({
       updateOptions: mockUpdateOptions,
-    } as any);
+    } as Partial<DiffStore> as DiffStore);
 
     render(<ComparisonPanel {...defaultProps} viewMode="side-by-side" />);
 
@@ -131,7 +132,7 @@ describe('ComparisonPanel', () => {
     const mockUpdateOptions = vi.fn();
     vi.mocked(useDiffStore.getState).mockReturnValue({
       updateOptions: mockUpdateOptions,
-    } as any);
+    } as Partial<DiffStore> as DiffStore);
 
     render(<ComparisonPanel {...defaultProps} viewMode="unified" />);
 
@@ -146,7 +147,7 @@ describe('ComparisonPanel', () => {
     const mockUpdateOptions = vi.fn();
     vi.mocked(useDiffStore.getState).mockReturnValue({
       updateOptions: mockUpdateOptions,
-    } as any);
+    } as Partial<DiffStore> as DiffStore);
 
     render(<ComparisonPanel {...defaultProps} compactMode={false} />);
 

@@ -2,7 +2,7 @@ import type { DiffOptions, DiffSession, DiffStats, Theme } from '@shared/types';
 import { createBuffer, generateId } from '@shared/utils';
 import { create } from 'zustand';
 
-interface DiffStore {
+export interface DiffStore {
   // セッション管理
   sessions: DiffSession[];
   activeSessionId: string | null;
