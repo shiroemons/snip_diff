@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDiffStore } from '../stores/diffStore';
@@ -116,26 +116,24 @@ describe('SettingsModal', () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
       await waitFor(() => {
-        expect(screen.getByText('設定')).toBeTruthy();
+        // モーダルが表示されていることを確認（閉じるボタンの存在で確認）
+        expect(screen.getByLabelText('閉じる')).toBeTruthy();
       });
     });
 
-    it('should display default settings section title', async () => {
+    it('should display category navigation', async () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
       await waitFor(() => {
-        expect(screen.getByText('デフォルト値の設定')).toBeTruthy();
-        expect(
-          screen.getByText(
-            /アプリケーション起動時や新しく比較を開始する際のデフォルト値を設定します/
-          )
-        ).toBeTruthy();
+        expect(screen.getByRole('button', { name: '一般' })).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'デフォルト設定' })).toBeTruthy();
       });
     });
   });
 
   describe('Font size selection', () => {
     it('should display current font size', async () => {
+      const user = userEvent.setup();
       useDiffStore.setState({
         isSettingsModalOpen: true,
         defaultOptions: {
@@ -155,6 +153,10 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       await waitFor(() => {
         const fontSizeSelects = screen.getAllByDisplayValue('18');
         expect(fontSizeSelects.length).toBeGreaterThan(0);
@@ -167,9 +169,14 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
-      // フォントサイズのselect要素を取得（ラベルから探す）
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
+      // フォントサイズのselect要素を取得（ラベルから親要素経由で探す）
       const fontSizeLabel = screen.getByText('フォントサイズ');
-      const fontSizeSelect = fontSizeLabel.querySelector('select') as HTMLSelectElement;
+      const fontSizeSection = fontSizeLabel.closest('.settings-section') as HTMLElement;
+      const fontSizeSelect = fontSizeSection.querySelector('select') as HTMLSelectElement;
       expect(fontSizeSelect).toBeTruthy();
 
       // 36を選択
@@ -191,12 +198,18 @@ describe('SettingsModal', () => {
     });
 
     it('should have all font size options from 10 to 36', async () => {
+      const user = userEvent.setup();
       useDiffStore.setState({ isSettingsModalOpen: true });
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       await waitFor(() => {
         const fontSizeLabel = screen.getByText('フォントサイズ');
-        const fontSizeSelect = fontSizeLabel.querySelector('select') as HTMLSelectElement;
+        const fontSizeSection = fontSizeLabel.closest('.settings-section') as HTMLElement;
+        const fontSizeSelect = fontSizeSection.querySelector('select') as HTMLSelectElement;
 
         const expectedSizes = [
           '10',
@@ -234,7 +247,8 @@ describe('SettingsModal', () => {
 
       await waitFor(() => {
         const themeLabel = screen.getByText('テーマ');
-        const themeSelect = themeLabel.querySelector('select') as HTMLSelectElement;
+        const themeSection = themeLabel.closest('.settings-section') as HTMLElement;
+        const themeSelect = themeSection.querySelector('select') as HTMLSelectElement;
         expect(themeSelect.value).toBe('dark');
       });
     });
@@ -246,7 +260,8 @@ describe('SettingsModal', () => {
       render(<SettingsModal />);
 
       const themeLabel = screen.getByText('テーマ');
-      const themeSelect = themeLabel.querySelector('select') as HTMLSelectElement;
+      const themeSection = themeLabel.closest('.settings-section') as HTMLElement;
+      const themeSelect = themeSection.querySelector('select') as HTMLSelectElement;
 
       await user.selectOptions(themeSelect, 'light');
       expect(themeSelect.value).toBe('light');
@@ -300,8 +315,13 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const viewModeLabel = screen.getByText('比較の方式');
-      const viewModeSelect = viewModeLabel.querySelector('select') as HTMLSelectElement;
+      const viewModeSection = viewModeLabel.closest('.settings-section') as HTMLElement;
+      const viewModeSelect = viewModeSection.querySelector('select') as HTMLSelectElement;
 
       await user.selectOptions(viewModeSelect, 'unified');
       expect(viewModeSelect.value).toBe('unified');
@@ -315,8 +335,13 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const languageLabel = screen.getByText('デフォルト言語モード');
-      const languageSelect = languageLabel.querySelector('select') as HTMLSelectElement;
+      const languageSection = languageLabel.closest('.settings-section') as HTMLElement;
+      const languageSelect = languageSection.querySelector('select') as HTMLSelectElement;
 
       await user.selectOptions(languageSelect, 'javascript');
       expect(languageSelect.value).toBe('javascript');
@@ -328,9 +353,14 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       // Change language to typescript
       const languageLabel = screen.getByText('デフォルト言語モード');
-      const languageSelect = languageLabel.querySelector('select') as HTMLSelectElement;
+      const languageSection = languageLabel.closest('.settings-section') as HTMLElement;
+      const languageSelect = languageSection.querySelector('select') as HTMLSelectElement;
       await user.selectOptions(languageSelect, 'typescript');
 
       // Save settings
@@ -359,6 +389,7 @@ describe('SettingsModal', () => {
 
     it('should display theme description', async () => {
       render(<SettingsModal />);
+      // テーマは一般カテゴリにあるのでそのまま表示されます
       await waitFor(() => {
         expect(screen.getByText(/エディターの外観を変更します/)).toBeTruthy();
         expect(
@@ -368,7 +399,13 @@ describe('SettingsModal', () => {
     });
 
     it('should display font size description', async () => {
+      const user = userEvent.setup();
       render(<SettingsModal />);
+
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       await waitFor(() => {
         expect(
           screen.getByText('エディターで表示されるテキストのサイズを変更します。')
@@ -377,7 +414,13 @@ describe('SettingsModal', () => {
     });
 
     it('should display view mode description', async () => {
+      const user = userEvent.setup();
       render(<SettingsModal />);
+
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       await waitFor(() => {
         expect(
           screen.getByText(/Side by Side.*左右並べて表示.*またはUnified.*統合表示/)
@@ -386,18 +429,30 @@ describe('SettingsModal', () => {
     });
 
     it('should display compact mode description', async () => {
+      const user = userEvent.setup();
       render(<SettingsModal />);
+
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       await waitFor(() => {
         expect(
           screen.getByText(
-            '行レベルの背景色を削除し、実際に変更された文字だけを精密にハイライト表示します。'
+            /行レベルの背景色を削除し、実際に変更された文字だけを精密にハイライト表示します/
           )
         ).toBeTruthy();
       });
     });
 
     it('should display indent method description', async () => {
+      const user = userEvent.setup();
       render(<SettingsModal />);
+
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       await waitFor(() => {
         expect(
           screen.getByText(/Tabキーを押したときにスペースまたはタブ文字のどちらを挿入するか/)
@@ -406,7 +461,13 @@ describe('SettingsModal', () => {
     });
 
     it('should display indent size description', async () => {
+      const user = userEvent.setup();
       render(<SettingsModal />);
+
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       await waitFor(() => {
         expect(
           screen.getByText(/インデント1つあたりのスペース数、またはタブ文字の表示幅/)
@@ -415,7 +476,13 @@ describe('SettingsModal', () => {
     });
 
     it('should display EOL description', async () => {
+      const user = userEvent.setup();
       render(<SettingsModal />);
+
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       await waitFor(() => {
         expect(
           screen.getByText(/新規入力時の改行コード.*LF: Unix\/Mac.*CRLF: Windows.*Auto: OSに従う/)
@@ -424,7 +491,13 @@ describe('SettingsModal', () => {
     });
 
     it('should display language mode description', async () => {
+      const user = userEvent.setup();
       render(<SettingsModal />);
+
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       await waitFor(() => {
         expect(
           screen.getByText(/シンタックスハイライトに使用する言語.*コードの構文に応じた色分け/)
@@ -439,6 +512,10 @@ describe('SettingsModal', () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
 
       render(<SettingsModal />);
+
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
 
       const compactCheckbox = screen.getByRole('checkbox', {
         name: /Compactモード/,
@@ -457,6 +534,10 @@ describe('SettingsModal', () => {
       useDiffStore.setState({ isSettingsModalOpen: true });
 
       render(<SettingsModal />);
+
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
 
       const compactCheckbox = screen.getByRole('checkbox', { name: /Compactモード/ });
       await user.click(compactCheckbox);
@@ -481,8 +562,13 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const indentMethodLabel = screen.getByText('インデント方式');
-      const indentMethodSelect = indentMethodLabel.querySelector('select') as HTMLSelectElement;
+      const indentMethodSection = indentMethodLabel.closest('.settings-section') as HTMLElement;
+      const indentMethodSelect = indentMethodSection.querySelector('select') as HTMLSelectElement;
 
       expect(indentMethodSelect.value).toBe('スペース');
 
@@ -496,8 +582,13 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const indentMethodLabel = screen.getByText('インデント方式');
-      const indentMethodSelect = indentMethodLabel.querySelector('select') as HTMLSelectElement;
+      const indentMethodSection = indentMethodLabel.closest('.settings-section') as HTMLElement;
+      const indentMethodSelect = indentMethodSection.querySelector('select') as HTMLSelectElement;
 
       await user.selectOptions(indentMethodSelect, 'タブ');
 
@@ -519,8 +610,13 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const tabSizeLabel = screen.getByText('インデントサイズ');
-      const tabSizeSelect = tabSizeLabel.querySelector('select') as HTMLSelectElement;
+      const tabSizeSection = tabSizeLabel.closest('.settings-section') as HTMLElement;
+      const tabSizeSelect = tabSizeSection.querySelector('select') as HTMLSelectElement;
 
       expect(tabSizeSelect.value).toBe('4');
 
@@ -537,8 +633,13 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const tabSizeLabel = screen.getByText('インデントサイズ');
-      const tabSizeSelect = tabSizeLabel.querySelector('select') as HTMLSelectElement;
+      const tabSizeSection = tabSizeLabel.closest('.settings-section') as HTMLElement;
+      const tabSizeSelect = tabSizeSection.querySelector('select') as HTMLSelectElement;
 
       await user.selectOptions(tabSizeSelect, '2');
 
@@ -562,8 +663,13 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const eolLabel = screen.getByText('デフォルト改行コード');
-      const eolSelect = eolLabel.querySelector('select') as HTMLSelectElement;
+      const eolSection = eolLabel.closest('.settings-section') as HTMLElement;
+      const eolSelect = eolSection.querySelector('select') as HTMLSelectElement;
 
       // Initial value should be 'auto'
       expect(eolSelect.value).toBe('auto');
@@ -587,8 +693,13 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const eolLabel = screen.getByText('デフォルト改行コード');
-      const eolSelect = eolLabel.querySelector('select') as HTMLSelectElement;
+      const eolSection = eolLabel.closest('.settings-section') as HTMLElement;
+      const eolSelect = eolSection.querySelector('select') as HTMLSelectElement;
 
       // Change to LF
       await user.selectOptions(eolSelect, 'LF');
@@ -610,8 +721,13 @@ describe('SettingsModal', () => {
 
       render(<SettingsModal />);
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const eolLabel = screen.getByText('デフォルト改行コード');
-      const eolSelect = eolLabel.querySelector('select') as HTMLSelectElement;
+      const eolSection = eolLabel.closest('.settings-section') as HTMLElement;
+      const eolSelect = eolSection.querySelector('select') as HTMLSelectElement;
 
       // Change to CRLF
       await user.selectOptions(eolSelect, 'CRLF');
@@ -696,9 +812,14 @@ describe('SettingsModal', () => {
       const resetButton = screen.getByText('デフォルトにリセット');
       await user.click(resetButton);
 
+      // デフォルト設定カテゴリに移動してフォントサイズをチェック
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       // UI上のフォントサイズは変更されていないことを確認
       const fontSizeLabel = screen.getByText('フォントサイズ');
-      const fontSizeSelect = fontSizeLabel.querySelector('select') as HTMLSelectElement;
+      const fontSizeSection = fontSizeLabel.closest('.settings-section') as HTMLElement;
+      const fontSizeSelect = fontSizeSection.querySelector('select') as HTMLSelectElement;
       expect(fontSizeSelect.value).toBe('24');
     });
 
@@ -732,29 +853,47 @@ describe('SettingsModal', () => {
       await user.click(resetButton);
 
       // UIがデフォルト値に更新されていることを確認
+      // テーマは一般カテゴリにある（デフォルトで表示されている）
       const themeLabel = screen.getByText('テーマ');
-      const themeSelect = themeLabel.querySelector('select') as HTMLSelectElement;
+      const themeSection = themeLabel.closest('.settings-section') as HTMLElement;
+      const themeSelect = themeSection.querySelector('select') as HTMLSelectElement;
       expect(themeSelect.value).toBe('auto');
 
+      // デフォルト設定カテゴリに移動
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
       const fontSizeLabel = screen.getByText('フォントサイズ');
-      const fontSizeSelect = fontSizeLabel.querySelector('select') as HTMLSelectElement;
+      const fontSizeSection = fontSizeLabel.closest('.settings-section') as HTMLElement;
+      const fontSizeSelect = fontSizeSection.querySelector('select') as HTMLSelectElement;
       expect(fontSizeSelect.value).toBe('14');
 
       const viewModeLabel = screen.getByText('比較の方式');
-      const viewModeSelect = viewModeLabel.querySelector('select') as HTMLSelectElement;
+      const viewModeSection = viewModeLabel.closest('.settings-section') as HTMLElement;
+      const viewModeSelect = viewModeSection.querySelector('select') as HTMLSelectElement;
       expect(viewModeSelect.value).toBe('side-by-side');
 
       const tabSizeLabel = screen.getByText('インデントサイズ');
-      const tabSizeSelect = tabSizeLabel.querySelector('select') as HTMLSelectElement;
+      const tabSizeSection = tabSizeLabel.closest('.settings-section') as HTMLElement;
+      const tabSizeSelect = tabSizeSection.querySelector('select') as HTMLSelectElement;
       expect(tabSizeSelect.value).toBe('4');
 
       const languageLabel = screen.getByText('デフォルト言語モード');
-      const languageSelect = languageLabel.querySelector('select') as HTMLSelectElement;
+      const languageSection = languageLabel.closest('.settings-section') as HTMLElement;
+      const languageSelect = languageSection.querySelector('select') as HTMLSelectElement;
       expect(languageSelect.value).toBe('plaintext');
 
       const eolLabel = screen.getByText('デフォルト改行コード');
-      const eolSelect = eolLabel.querySelector('select') as HTMLSelectElement;
+      const eolSection = eolLabel.closest('.settings-section') as HTMLElement;
+      const eolSelect = eolSection.querySelector('select') as HTMLSelectElement;
       expect(eolSelect.value).toBe('auto');
+
+      // 一般カテゴリに戻って自動更新チェックを確認
+      const generalButton = screen.getByRole('button', { name: '一般' });
+      await user.click(generalButton);
+
+      const autoUpdateCheckbox = screen.getByLabelText('自動更新チェック') as HTMLInputElement;
+      expect(autoUpdateCheckbox.checked).toBe(true);
     });
 
     it('should require save button click to persist reset changes', async () => {
@@ -951,10 +1090,11 @@ describe('SettingsModal', () => {
       const user = userEvent.setup();
       useDiffStore.setState({ isSettingsModalOpen: true });
 
-      // Mock onUpdateNotAvailable to trigger the callback
+      let updateCallback: ((info: { version: string }) => void) | null = null;
+
+      // Mock onUpdateNotAvailable to save the callback
       mockElectronAPI.updater.onUpdateNotAvailable.mockImplementation((callback) => {
-        // Simulate update not available event (version is arbitrary for this test)
-        setTimeout(() => callback({ version: '1.0.0' }), 100);
+        updateCallback = callback;
       });
 
       render(<SettingsModal />);
@@ -962,6 +1102,11 @@ describe('SettingsModal', () => {
       // Wait for the button to appear
       const checkButton = await screen.findByText('今すぐ更新を確認');
       await user.click(checkButton);
+
+      // Trigger the update not available event
+      await act(async () => {
+        updateCallback?.({ version: '1.0.0' });
+      });
 
       // Wait for success message
       await waitFor(
@@ -1013,5 +1158,125 @@ describe('SettingsModal', () => {
 
       consoleErrorSpy.mockRestore();
     }, 10000);
+  });
+
+  describe('Category navigation', () => {
+    it('should display general category by default', async () => {
+      useDiffStore.setState({ isSettingsModalOpen: true });
+      render(<SettingsModal />);
+
+      await waitFor(() => {
+        // 一般カテゴリがアクティブ
+        const generalButton = screen.getByRole('button', { name: '一般' });
+        expect(generalButton.classList.contains('active')).toBe(true);
+
+        // テーマ設定が表示されている（一般カテゴリの内容）
+        expect(screen.getByText('テーマ')).toBeTruthy();
+      });
+    });
+
+    it('should switch to defaults category when clicked', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+      render(<SettingsModal />);
+
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+      await user.click(defaultsButton);
+
+      await waitFor(() => {
+        // デフォルト設定カテゴリがアクティブ
+        expect(defaultsButton.classList.contains('active')).toBe(true);
+
+        // エディター設定セクションが表示されている
+        expect(screen.getByText('エディター設定')).toBeTruthy();
+        expect(screen.getByText('差分設定')).toBeTruthy();
+      });
+    });
+
+    it('should display developer category in development mode', async () => {
+      useDiffStore.setState({ isSettingsModalOpen: true, devMode: true });
+      render(<SettingsModal />);
+
+      await waitFor(() => {
+        // 開発環境なので開発者向けカテゴリが表示される
+        expect(screen.getByRole('button', { name: '開発者向け' })).toBeTruthy();
+      });
+    });
+
+    it('should switch to developer category when clicked', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true, devMode: true });
+      render(<SettingsModal />);
+
+      const developerButton = screen.getByRole('button', { name: '開発者向け' });
+      await user.click(developerButton);
+
+      await waitFor(() => {
+        // 開発者向けカテゴリがアクティブ
+        expect(developerButton.classList.contains('active')).toBe(true);
+
+        // 開発者向け設定が表示されている
+        expect(screen.getByText('開発者向け設定')).toBeTruthy();
+        expect(screen.getByText('開発環境でのみ利用可能な設定です。')).toBeTruthy();
+      });
+    });
+
+    it('should navigate categories with arrow keys', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true });
+      render(<SettingsModal />);
+
+      const generalButton = screen.getByRole('button', { name: '一般' });
+      const defaultsButton = screen.getByRole('button', { name: 'デフォルト設定' });
+
+      // 一般カテゴリをクリックしてフォーカスを当てる
+      await user.click(generalButton);
+
+      // ArrowDownで次のカテゴリへ
+      await user.keyboard('{ArrowDown}');
+
+      await waitFor(() => {
+        expect(defaultsButton.classList.contains('active')).toBe(true);
+      });
+
+      // defaultsButtonをクリックしてフォーカスを確保
+      await user.click(defaultsButton);
+
+      // ArrowUpで前のカテゴリへ
+      await user.keyboard('{ArrowUp}');
+
+      await waitFor(() => {
+        expect(generalButton.classList.contains('active')).toBe(true);
+      });
+    });
+
+    it('should wrap around when navigating with arrow keys', async () => {
+      const user = userEvent.setup();
+      useDiffStore.setState({ isSettingsModalOpen: true, devMode: true });
+      render(<SettingsModal />);
+
+      const generalButton = screen.getByRole('button', { name: '一般' });
+      const developerButton = screen.getByRole('button', { name: '開発者向け' });
+
+      // 開発者向けカテゴリをクリックしてフォーカスを当てる
+      await user.click(developerButton);
+
+      // ArrowDownで最初のカテゴリへ戻る（循環）
+      await user.keyboard('{ArrowDown}');
+
+      await waitFor(() => {
+        expect(generalButton.classList.contains('active')).toBe(true);
+      });
+
+      // generalButtonをクリックしてフォーカスを確保
+      await user.click(generalButton);
+
+      // ArrowUpで最後のカテゴリへ戻る（循環）
+      await user.keyboard('{ArrowUp}');
+
+      await waitFor(() => {
+        expect(developerButton.classList.contains('active')).toBe(true);
+      });
+    });
   });
 });
