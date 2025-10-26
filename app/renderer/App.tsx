@@ -61,6 +61,11 @@ const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 空の依存配列で初回のみ実行
 
+  // actualThemeをbodyのdata-theme属性に反映
+  useEffect(() => {
+    document.body.dataset.theme = actualTheme;
+  }, [actualTheme]);
+
   // テーマ適用とシステムテーマ監視
   useEffect(() => {
     // 設定が読み込まれるまで待つ（初回のみ）
