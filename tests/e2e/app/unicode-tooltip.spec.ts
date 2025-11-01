@@ -131,6 +131,33 @@ test.describe('Unicode文字ツールチップ', () => {
       const monacoEditor = page.locator('.monaco-editor').first();
       expect(await monacoEditor.isVisible()).toBeTruthy();
     });
+
+    test('キリル文字のѕがエディタに表示される', async ({ page }) => {
+      // キリル文字の'ѕ'（U+0455）
+      await setMonacoEditorContent(page, 'microstreamѕ', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('キリル文字のіがエディタに表示される', async ({ page }) => {
+      // キリル文字の'і'（U+0456）
+      await setMonacoEditorContent(page, 'maіl.com', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('キリル文字のјがエディタに表示される', async ({ page }) => {
+      // キリル文字の'ј'（U+0458）
+      await setMonacoEditorContent(page, 'јava.com', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
   });
 
   test.describe('ギリシャ文字', () => {
@@ -205,6 +232,123 @@ test.describe('Unicode文字ツールチップ', () => {
       const monacoEditor = page.locator('.monaco-editor').first();
       expect(await monacoEditor.isVisible()).toBeTruthy();
     });
+
+    test('ギリシャ文字のΑがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Α'（U+0391）
+      await setMonacoEditorContent(page, 'ΑPPLE.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΒがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Β'（U+0392）
+      await setMonacoEditorContent(page, 'ΒMW.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΕがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Ε'（U+0395）
+      await setMonacoEditorContent(page, 'GOOGLΕ.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΖがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Ζ'（U+0396）
+      await setMonacoEditorContent(page, 'ΑMAΖON.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΙがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Ι'（U+0399）
+      await setMonacoEditorContent(page, 'ΜAΙL.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΚがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Κ'（U+039A）
+      await setMonacoEditorContent(page, 'ΒOOΚ.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΜがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Μ'（U+039C）
+      await setMonacoEditorContent(page, 'ΜICROSOFT.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΝがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Ν'（U+039D）
+      await setMonacoEditorContent(page, 'ΝIKE.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΟがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Ο'（U+039F）
+      await setMonacoEditorContent(page, 'GΟΟGLE.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΡがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Ρ'（U+03A1）
+      await setMonacoEditorContent(page, 'ΡAYPAL.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΤがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Τ'（U+03A4）
+      await setMonacoEditorContent(page, 'ΤWITTER.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΥがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Υ'（U+03A5）
+      await setMonacoEditorContent(page, 'ΥOUTUBE.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ギリシャ文字のΧがエディタに表示される', async ({ page }) => {
+      // ギリシャ文字の'Χ'（U+03A7）
+      await setMonacoEditorContent(page, 'ΕΧAMPLE.COM', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
   });
 
   test.describe('不可視文字', () => {
@@ -270,6 +414,105 @@ test.describe('Unicode文字ツールチップ', () => {
       const monacoEditor = page.locator('.monaco-editor').first();
       expect(await monacoEditor.isVisible()).toBeTruthy();
     });
+
+    test('ソフトハイフンがエディタに入力される', async ({ page }) => {
+      // ソフトハイフン（U+00AD）
+      await setMonacoEditorContent(page, 'Hello\u00ADWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('結合グラフィーム結合子がエディタに入力される', async ({ page }) => {
+      // 結合グラフィーム結合子（U+034F）
+      await setMonacoEditorContent(page, 'Hello\u034FWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ハングルチョソンフィラーがエディタに入力される', async ({ page }) => {
+      // ハングルチョソンフィラー（U+115F）
+      await setMonacoEditorContent(page, 'Hello\u115FWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ハングルジュンソンフィラーがエディタに入力される', async ({ page }) => {
+      // ハングルジュンソンフィラー（U+1160）
+      await setMonacoEditorContent(page, 'Hello\u1160World', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('クメール母音継承子Aがエディタに入力される', async ({ page }) => {
+      // クメール母音継承子A（U+17B4）
+      await setMonacoEditorContent(page, 'Hello\u17B4World', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('クメール母音継承子AAがエディタに入力される', async ({ page }) => {
+      // クメール母音継承子AA（U+17B5）
+      await setMonacoEditorContent(page, 'Hello\u17B5World', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ENクァッドがエディタに入力される', async ({ page }) => {
+      // ENクァッド（U+2000）
+      await setMonacoEditorContent(page, 'Hello\u2000World', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('EMクァッドがエディタに入力される', async ({ page }) => {
+      // EMクァッド（U+2001）
+      await setMonacoEditorContent(page, 'Hello\u2001World', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ENスペースがエディタに入力される', async ({ page }) => {
+      // ENスペース（U+2002）
+      await setMonacoEditorContent(page, 'Hello\u2002World', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ナローノーブレークスペースがエディタに入力される', async ({ page }) => {
+      // ナローノーブレークスペース（U+202F）
+      await setMonacoEditorContent(page, 'Hello\u202FWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('中程度の数学用空白がエディタに入力される', async ({ page }) => {
+      // 中程度の数学用空白（U+205F）
+      await setMonacoEditorContent(page, 'Hello\u205FWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
   });
 
   test.describe('制御文字', () => {
@@ -321,6 +564,125 @@ test.describe('Unicode文字ツールチップ', () => {
     test('RTL OVERRIDE文字がエディタに入力される', async ({ page }) => {
       // RTL OVERRIDE（U+202E）
       await setMonacoEditorContent(page, 'report\u202Efdp.exe', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('LEFT-TO-RIGHT MARKがエディタに入力される', async ({ page }) => {
+      // LRM（U+200E）
+      await setMonacoEditorContent(page, 'Hello\u200EWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('RIGHT-TO-LEFT MARKがエディタに入力される', async ({ page }) => {
+      // RLM（U+200F）
+      await setMonacoEditorContent(page, 'Hello\u200FWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('LEFT-TO-RIGHT EMBEDDINGがエディタに入力される', async ({ page }) => {
+      // LRE（U+202A）
+      await setMonacoEditorContent(page, 'Hello\u202AWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('RIGHT-TO-LEFT EMBEDDINGがエディタに入力される', async ({ page }) => {
+      // RLE（U+202B）
+      await setMonacoEditorContent(page, 'Hello\u202BWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('POP DIRECTIONAL FORMATTINGがエディタに入力される', async ({ page }) => {
+      // PDF（U+202C）
+      await setMonacoEditorContent(page, 'Hello\u202CWorld', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+  });
+
+  test.describe('紛らわしい文字', () => {
+    test('乗算記号がエディタに表示される', async ({ page }) => {
+      // 乗算記号（U+00D7）
+      await setMonacoEditorContent(page, '5×3=15', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('マイナス記号がエディタに表示される', async ({ page }) => {
+      // マイナス記号（U+2212）
+      await setMonacoEditorContent(page, '10−5=5', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ラテン小文字合字ffがエディタに表示される', async ({ page }) => {
+      // ラテン小文字合字ff（U+FB00）
+      await setMonacoEditorContent(page, 'oﬀice', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ラテン小文字合字fiがエディタに表示される', async ({ page }) => {
+      // ラテン小文字合字fi（U+FB01）
+      await setMonacoEditorContent(page, 'ﬁle', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ラテン小文字合字flがエディタに表示される', async ({ page }) => {
+      // ラテン小文字合字fl（U+FB02）
+      await setMonacoEditorContent(page, 'ﬂag', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ラテン小文字合字ffiがエディタに表示される', async ({ page }) => {
+      // ラテン小文字合字ffi（U+FB03）
+      await setMonacoEditorContent(page, 'eﬃcient', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ラテン小文字合字fflがエディタに表示される', async ({ page }) => {
+      // ラテン小文字合字ffl（U+FB04）
+      await setMonacoEditorContent(page, 'scaﬄold', 0);
+      await page.waitForTimeout(1000);
+
+      const monacoEditor = page.locator('.monaco-editor').first();
+      expect(await monacoEditor.isVisible()).toBeTruthy();
+    });
+
+    test('ラテン小文字合字stがエディタに表示される', async ({ page }) => {
+      // ラテン小文字合字st（U+FB06）
+      await setMonacoEditorContent(page, 'teﬆ', 0);
       await page.waitForTimeout(1000);
 
       const monacoEditor = page.locator('.monaco-editor').first();

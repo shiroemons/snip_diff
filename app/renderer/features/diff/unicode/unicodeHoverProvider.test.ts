@@ -203,6 +203,42 @@ describe('unicodeHoverProvider', () => {
       expect(hover?.contents[0].value).toContain('キリル文字');
       expect(hover?.contents[0].value).toContain('U+0425');
     });
+
+    it('キリル文字の ѕ (U+0455) に対してツールチップを返す', () => {
+      const model = createMockModel('microstreamѕ'); // ѕ はキリル文字
+      const position = createMockPosition(12);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+0455');
+    });
+
+    it('キリル文字の і (U+0456) に対してツールチップを返す', () => {
+      const model = createMockModel('lіnkedin'); // і はキリル文字
+      const position = createMockPosition(2);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+0456');
+    });
+
+    it('キリル文字の ј (U+0458) に対してツールチップを返す', () => {
+      const model = createMockModel('јavascript'); // ј はキリル文字
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+0458');
+    });
   });
 
   describe('ギリシャ文字', () => {
@@ -301,6 +337,162 @@ describe('unicodeHoverProvider', () => {
       expect(hover?.contents[0].value).toContain('ギリシャ文字');
       expect(hover?.contents[0].value).toContain('U+03C4');
     });
+
+    it('ギリシャ文字の Α (U+0391) に対してツールチップを返す', () => {
+      const model = createMockModel('ΑPPLE.COM');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+0391');
+    });
+
+    it('ギリシャ文字の Β (U+0392) に対してツールチップを返す', () => {
+      const model = createMockModel('ΒMW.COM');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+0392');
+    });
+
+    it('ギリシャ文字の Ε (U+0395) に対してツールチップを返す', () => {
+      const model = createMockModel('GOOGLΕ.COM');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+0395');
+    });
+
+    it('ギリシャ文字の Ζ (U+0396) に対してツールチップを返す', () => {
+      const model = createMockModel('ΑMAΖON.COM');
+      const position = createMockPosition(4);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+0396');
+    });
+
+    it('ギリシャ文字の Ι (U+0399) に対してツールチップを返す', () => {
+      const model = createMockModel('ΙBM.COM');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+0399');
+    });
+
+    it('ギリシャ文字の Κ (U+039A) に対してツールチップを返す', () => {
+      const model = createMockModel('ΚDDI.COM');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+039A');
+    });
+
+    it('ギリシャ文字の Μ (U+039C) に対してツールチップを返す', () => {
+      const model = createMockModel('ΜICROSOFT.COM');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+039C');
+    });
+
+    it('ギリシャ文字の Ν (U+039D) に対してツールチップを返す', () => {
+      const model = createMockModel('ΝETFLIX.COM');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+039D');
+    });
+
+    it('ギリシャ文字の Ο (U+039F) に対してツールチップを返す', () => {
+      const model = createMockModel('GΟΟGLE.CΟM');
+      const position = createMockPosition(2);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+039F');
+    });
+
+    it('ギリシャ文字の Ρ (U+03A1) に対してツールチップを返す', () => {
+      const model = createMockModel('ΡAYPAL.COM');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+03A1');
+    });
+
+    it('ギリシャ文字の Τ (U+03A4) に対してツールチップを返す', () => {
+      const model = createMockModel('ΤWITTER.COM');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+03A4');
+    });
+
+    it('ギリシャ文字の Υ (U+03A5) に対してツールチップを返す', () => {
+      const model = createMockModel('ΥAHOO.COM');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+03A5');
+    });
+
+    it('ギリシャ文字の Χ (U+03A7) に対してツールチップを返す', () => {
+      const model = createMockModel('EΧAMPLE.COM');
+      const position = createMockPosition(2);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ギリシャ文字');
+      expect(hover?.contents[0].value).toContain('U+03A7');
+    });
   });
 
   describe('不可視文字', () => {
@@ -387,6 +579,138 @@ describe('unicodeHoverProvider', () => {
       expect(hover?.contents[0].value).toContain('ワードジョイナー');
       expect(hover?.contents[0].value).toContain('U+2060');
     });
+
+    it('ソフトハイフン (U+00AD) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u00ADWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ソフトハイフン');
+      expect(hover?.contents[0].value).toContain('U+00AD');
+    });
+
+    it('Combining Grapheme Joiner (U+034F) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u034FWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('Combining Grapheme Joiner');
+      expect(hover?.contents[0].value).toContain('U+034F');
+    });
+
+    it('ハングル初声フィラー (U+115F) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u115FWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ハングル初声フィラー');
+      expect(hover?.contents[0].value).toContain('U+115F');
+    });
+
+    it('ハングル中声フィラー (U+1160) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u1160World');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ハングル中声フィラー');
+      expect(hover?.contents[0].value).toContain('U+1160');
+    });
+
+    it('クメール語固有母音Aq (U+17B4) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u17B4World');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('クメール語固有母音Aq');
+      expect(hover?.contents[0].value).toContain('U+17B4');
+    });
+
+    it('クメール語固有母音Aa (U+17B5) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u17B5World');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('クメール語固有母音Aa');
+      expect(hover?.contents[0].value).toContain('U+17B5');
+    });
+
+    it('En Quad (U+2000) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u2000World');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('En Quad');
+      expect(hover?.contents[0].value).toContain('U+2000');
+    });
+
+    it('Em Quad (U+2001) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u2001World');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('Em Quad');
+      expect(hover?.contents[0].value).toContain('U+2001');
+    });
+
+    it('En Space (U+2002) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u2002World');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('En Space');
+      expect(hover?.contents[0].value).toContain('U+2002');
+    });
+
+    it('狭いノーブレークスペース (U+202F) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u202FWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('狭いノーブレークスペース');
+      expect(hover?.contents[0].value).toContain('U+202F');
+    });
+
+    it('中程度の数学用空白 (U+205F) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u205FWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('中程度の数学用空白');
+      expect(hover?.contents[0].value).toContain('U+205F');
+    });
   });
 
   describe('制御文字', () => {
@@ -462,6 +786,164 @@ describe('unicodeHoverProvider', () => {
       expect(hover?.contents[0].value).toContain('RIGHT-TO-LEFT OVERRIDE');
       expect(hover?.contents[0].value).toContain('U+202E');
       expect(hover?.contents[0].value).toContain('RLO攻撃');
+    });
+
+    it('LRM (U+200E) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u200EWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('LEFT-TO-RIGHT MARK');
+      expect(hover?.contents[0].value).toContain('U+200E');
+    });
+
+    it('RLM (U+200F) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u200FWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('RIGHT-TO-LEFT MARK');
+      expect(hover?.contents[0].value).toContain('U+200F');
+    });
+
+    it('LRE (U+202A) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u202AWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('LEFT-TO-RIGHT EMBEDDING');
+      expect(hover?.contents[0].value).toContain('U+202A');
+    });
+
+    it('RLE (U+202B) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u202BWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('RIGHT-TO-LEFT EMBEDDING');
+      expect(hover?.contents[0].value).toContain('U+202B');
+    });
+
+    it('PDF (U+202C) に対してツールチップを返す', () => {
+      const model = createMockModel('Hello\u202CWorld');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('POP DIRECTIONAL FORMATTING');
+      expect(hover?.contents[0].value).toContain('U+202C');
+    });
+  });
+
+  describe('紛らわしい文字', () => {
+    it('乗算記号 (U+00D7) に対してツールチップを返す', () => {
+      const model = createMockModel('ma×imum');
+      const position = createMockPosition(3);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('乗算記号');
+      expect(hover?.contents[0].value).toContain('U+00D7');
+    });
+
+    it('マイナス記号 (U+2212) に対してツールチップを返す', () => {
+      const model = createMockModel('x−y');
+      const position = createMockPosition(2);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('マイナス記号');
+      expect(hover?.contents[0].value).toContain('U+2212');
+    });
+
+    it('ラテン小文字合字 ff (U+FB00) に対してツールチップを返す', () => {
+      const model = createMockModel('oﬀice');
+      const position = createMockPosition(2);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ラテン小文字合字 ff');
+      expect(hover?.contents[0].value).toContain('U+FB00');
+    });
+
+    it('ラテン小文字合字 fi (U+FB01) に対してツールチップを返す', () => {
+      const model = createMockModel('ﬁle');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ラテン小文字合字 fi');
+      expect(hover?.contents[0].value).toContain('U+FB01');
+    });
+
+    it('ラテン小文字合字 fl (U+FB02) に対してツールチップを返す', () => {
+      const model = createMockModel('ﬂag');
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ラテン小文字合字 fl');
+      expect(hover?.contents[0].value).toContain('U+FB02');
+    });
+
+    it('ラテン小文字合字 ffi (U+FB03) に対してツールチップを返す', () => {
+      const model = createMockModel('eﬃcient');
+      const position = createMockPosition(2);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ラテン小文字合字 ffi');
+      expect(hover?.contents[0].value).toContain('U+FB03');
+    });
+
+    it('ラテン小文字合字 ffl (U+FB04) に対してツールチップを返す', () => {
+      const model = createMockModel('scaﬄold');
+      const position = createMockPosition(4);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ラテン小文字合字 ffl');
+      expect(hover?.contents[0].value).toContain('U+FB04');
+    });
+
+    it('ラテン小文字合字 st (U+FB06) に対してツールチップを返す', () => {
+      const model = createMockModel('teﬆ');
+      const position = createMockPosition(3);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('ラテン小文字合字 st');
+      expect(hover?.contents[0].value).toContain('U+FB06');
     });
   });
 
