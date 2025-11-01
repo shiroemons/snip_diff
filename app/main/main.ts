@@ -2,13 +2,13 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, nativeTheme } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import { UPDATE_CHECK_INTERVAL } from '../shared/constants';
 import {
   type AppSettings,
   type DownloadProgress,
   IPC_CHANNELS,
   type UpdateInfo,
 } from '../shared/types';
-import { UPDATE_CHECK_INTERVAL } from '../shared/constants';
 
 let mainWindow: BrowserWindow | null = null;
 const isDev = process.env.NODE_ENV === 'development';
