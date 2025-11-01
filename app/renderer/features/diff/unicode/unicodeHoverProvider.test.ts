@@ -119,6 +119,90 @@ describe('unicodeHoverProvider', () => {
       expect(hover?.contents[0].value).toContain('キリル文字');
       expect(hover?.contents[0].value).toContain('U+0445');
     });
+
+    it('キリル文字の А (U+0410) に対してツールチップを返す', () => {
+      const model = createMockModel('АPPLE.COM'); // А はキリル文字
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+0410');
+    });
+
+    it('キリル文字の В (U+0412) に対してツールチップを返す', () => {
+      const model = createMockModel('ВMW.COM'); // В はキリル文字
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+0412');
+    });
+
+    it('キリル文字の Е (U+0415) に対してツールチップを返す', () => {
+      const model = createMockModel('GOOGLЕ.COM'); // Е はキリル文字
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+0415');
+    });
+
+    it('キリル文字の О (U+041E) に対してツールチップを返す', () => {
+      const model = createMockModel('GООGLE.COM'); // О はキリル文字
+      const position = createMockPosition(2);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+041E');
+    });
+
+    it('キリル文字の Р (U+0420) に対してツールチップを返す', () => {
+      const model = createMockModel('РAYPAL.COM'); // Р はキリル文字
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+0420');
+    });
+
+    it('キリル文字の С (U+0421) に対してツールチップを返す', () => {
+      const model = createMockModel('MIСROSOFT.COM'); // С はキリル文字
+      const position = createMockPosition(3);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+0421');
+    });
+
+    it('キリル文字の Х (U+0425) に対してツールチップを返す', () => {
+      const model = createMockModel('ХELLO.COM'); // Х はキリル文字
+      const position = createMockPosition(1);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('キリル文字');
+      expect(hover?.contents[0].value).toContain('U+0425');
+    });
   });
 
   describe('ギリシャ文字', () => {
@@ -268,6 +352,32 @@ describe('unicodeHoverProvider', () => {
       expect(hover).not.toBeNull();
       expect(hover?.contents[0].value).toContain('ESC');
       expect(hover?.contents[0].value).toContain('U+001B');
+    });
+
+    it('LTR OVERRIDE (U+202D) に対してツールチップを返す', () => {
+      const model = createMockModel('photo\u202Dgpj.exe');
+      const position = createMockPosition(6);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('LEFT-TO-RIGHT OVERRIDE');
+      expect(hover?.contents[0].value).toContain('U+202D');
+      expect(hover?.contents[0].value).toContain('ファイル名の偽装');
+    });
+
+    it('RTL OVERRIDE (U+202E) に対してツールチップを返す', () => {
+      const model = createMockModel('report\u202Efdp.exe');
+      const position = createMockPosition(7);
+      const token = createMockToken();
+
+      const hover = provider.provideHover(model, position, token) as monaco.languages.Hover;
+
+      expect(hover).not.toBeNull();
+      expect(hover?.contents[0].value).toContain('RIGHT-TO-LEFT OVERRIDE');
+      expect(hover?.contents[0].value).toContain('U+202E');
+      expect(hover?.contents[0].value).toContain('RLO攻撃');
     });
   });
 
