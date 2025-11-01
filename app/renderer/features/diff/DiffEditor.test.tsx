@@ -1,11 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { editor } from 'monaco-editor';
-import { act } from 'react';
-import DiffEditor, { type DiffEditorRef } from './DiffEditor';
-import { useDiffStore } from '../../stores/diffStore';
 import { createBuffer } from '@shared/utils';
-import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import type { editor } from 'monaco-editor';
+import React, { act } from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useDiffStore } from '../../stores/diffStore';
+import DiffEditor, { type DiffEditorRef } from './DiffEditor';
 
 // Mock monaco-editor
 vi.mock('monaco-editor', () => ({
@@ -13,7 +12,12 @@ vi.mock('monaco-editor', () => ({
   editor: {
     defineTheme: vi.fn(),
   },
-  languages: {},
+  languages: {
+    registerHoverProvider: vi.fn(() => ({
+      dispose: vi.fn(),
+    })),
+  },
+  Range: vi.fn(),
   Uri: {},
 }));
 

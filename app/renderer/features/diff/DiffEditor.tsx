@@ -9,6 +9,7 @@ import { InputEditorPanel } from './components/InputEditorPanel';
 import { useCompactMode } from './hooks/useCompactMode';
 import { usePanelResize } from './hooks/usePanelResize';
 import { defineCompactThemes, getThemeName } from './themes/compactThemes';
+import { registerUnicodeHoverProvider } from './unicode/unicodeHoverProvider';
 import './DiffEditor.css';
 
 // Monaco Editor のローダー設定 - ローカルから読み込み
@@ -66,6 +67,15 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(
         defineCompactThemes();
         themesInitialized = true;
       }
+    }, []);
+
+    // Unicode Hover Providerの登録
+    useEffect(() => {
+      const disposable = registerUnicodeHoverProvider(monaco);
+
+      return () => {
+        disposable.dispose();
+      };
     }, []);
 
     // 左エディタのオプションを動的に更新
