@@ -449,15 +449,24 @@
 
 /* Unicode文字ツールチップのスタイル調整 */
 .monaco-hover {
-  max-width: 800px !important;
+  max-width: 600px !important;
   width: auto !important;
+  z-index: 9999 !important;
+  position: fixed !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  background-color: var(--bg-secondary) !important;
 }
 
 .monaco-hover-content {
-  max-width: 800px !important;
+  max-width: 600px !important;
   padding: 12px !important;
   font-size: 13px !important;
   line-height: 1.6 !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
 }
 
 /* ツールチップ内のMarkdownスタイル */
