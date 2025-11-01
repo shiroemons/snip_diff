@@ -446,3 +446,44 @@
   .cmdr.gutter-insert {
   background-color: transparent !important;
 }
+
+/* Unicode文字ツールチップのスタイル調整 */
+.monaco-hover {
+  max-width: 800px !important;
+  width: auto !important;
+}
+
+.monaco-hover-content {
+  max-width: 800px !important;
+  padding: 12px !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+
+/* ツールチップ内のMarkdownスタイル */
+.monaco-hover-content p {
+  margin: 0.5em 0;
+}
+
+.monaco-hover-content h1,
+.monaco-hover-content h2,
+.monaco-hover-content h3 {
+  margin: 0.8em 0 0.4em 0;
+}
+
+.monaco-hover-content code {
+  background-color: rgba(110, 118, 129, 0.2);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.monaco-hover-content ul,
+.monaco-hover-content ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.monaco-hover-content li {
+  margin: 0.3em 0;
+}

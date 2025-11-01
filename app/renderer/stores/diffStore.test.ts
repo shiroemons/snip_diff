@@ -1,6 +1,6 @@
+import { createBuffer } from '@shared/utils';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useDiffStore } from './diffStore';
-import { createBuffer } from '@shared/utils';
 
 describe('diffStore', () => {
   beforeEach(() => {

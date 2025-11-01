@@ -1,7 +1,7 @@
 import type { AccentColor, DiffOptions, Theme } from '@shared/types';
+import { ClipboardList, Settings as SettingsIcon, Wrench } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
-import { ClipboardList, Settings as SettingsIcon, Wrench } from 'lucide-react';
 import {
   INITIAL_DEFAULT_ACCENT_COLOR,
   INITIAL_DEFAULT_EOL,
@@ -107,7 +107,15 @@ const SettingsModal: React.FC = () => {
         setLastUpdateCheck(savedLastCheck);
       }
     }
-  }, [isSettingsModalOpen, theme, accentColor, defaultOptions, defaultLanguage, defaultEOL, devMode]);
+  }, [
+    isSettingsModalOpen,
+    theme,
+    accentColor,
+    defaultOptions,
+    defaultLanguage,
+    defaultEOL,
+    devMode,
+  ]);
 
   // 更新チェック結果のイベントリスナー
   useEffect(() => {

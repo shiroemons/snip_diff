@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import type { editor } from 'monaco-editor';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DiffStore } from '../../../stores/diffStore';
 import { useDiffStore } from '../../../stores/diffStore';
 import { ComparisonPanel } from './ComparisonPanel';
-import type { editor } from 'monaco-editor';
 
 // Mock @monaco-editor/react
 vi.mock('@monaco-editor/react', () => ({

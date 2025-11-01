@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import type { editor } from 'monaco-editor';
 import { describe, expect, it, vi } from 'vitest';
 import { InputEditorPanel } from './InputEditorPanel';
-import type { editor } from 'monaco-editor';
 
 // Mock @monaco-editor/react
 vi.mock('@monaco-editor/react', () => ({

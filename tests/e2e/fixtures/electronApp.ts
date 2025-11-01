@@ -14,12 +14,25 @@ export const test = base.extend<{
     const projectRoot = path.join(__dirname, '../../..');
 
     // Launch Electron app with project root as cwd
+    // headlessモードで実行（CI/ローカルともに）
+    // ヘッドレスを無効にする場合は環境変数 HEADED=true を設定
+    const isHeaded = process.env.HEADED === 'true';
     const electronApp = await electron.launch({
-      args: ['.'],
+      args: isHeaded
+        ? ['.']
+        : [
+            '--headless',
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--disable-software-rasterizer',
+            '--no-sandbox',
+            '.',
+          ],
       cwd: projectRoot,
       env: {
         ...process.env,
         NODE_ENV: 'production',
+        ELECTRON_ENABLE_LOGGING: '0', // Suppress Electron logs in headless mode
       },
     });
 
