@@ -287,6 +287,14 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(
       tabSize: activeSession?.options.tabSize ?? 4,
       insertSpaces: activeSession?.options.insertSpaces ?? true,
       renderWhitespace: activeSession?.options.renderWhitespace ?? 'none',
+      renderControlCharacters: activeSession?.options.renderControlCharacters ?? true,
+      unicodeHighlight: activeSession?.options.unicodeHighlight ?? {
+        invisibleCharacters: true,
+        ambiguousCharacters: true,
+        nonBasicASCII: false,
+        includeComments: true,
+        includeStrings: true,
+      },
       automaticLayout: true,
       scrollBeyondLastLine: false,
       scrollBeyondLastColumn: 0,
@@ -349,6 +357,16 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(
             insertSpaces={activeSession.options.insertSpaces ?? true}
             hideUnchangedRegions={activeSession.options.hideUnchangedRegions ?? false}
             renderWhitespace={activeSession.options.renderWhitespace ?? 'none'}
+            renderControlCharacters={activeSession.options.renderControlCharacters ?? true}
+            unicodeHighlight={
+              activeSession.options.unicodeHighlight ?? {
+                invisibleCharacters: true,
+                ambiguousCharacters: true,
+                nonBasicASCII: false,
+                includeComments: true,
+                includeStrings: true,
+              }
+            }
             onDiffEditorMount={handleDiffEditorDidMount}
             onToggleFullscreen={toggleFullscreen}
             onToggleMinimize={toggleMinimize}

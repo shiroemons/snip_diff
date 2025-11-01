@@ -23,6 +23,14 @@ export interface DiffOptions {
   diffAlgorithm: 'legacy' | 'advanced';
   hideUnchangedRegions: boolean;
   renderWhitespace: 'none' | 'boundary' | 'selection' | 'trailing' | 'all';
+  renderControlCharacters: boolean;
+  unicodeHighlight: {
+    nonBasicASCII?: boolean;
+    invisibleCharacters?: boolean;
+    ambiguousCharacters?: boolean;
+    includeComments?: boolean;
+    includeStrings?: boolean;
+  };
 }
 
 /**
