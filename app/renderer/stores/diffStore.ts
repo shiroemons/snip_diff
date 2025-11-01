@@ -72,6 +72,14 @@ export const INITIAL_DEFAULT_OPTIONS: DiffOptions = {
   diffAlgorithm: 'advanced',
   hideUnchangedRegions: false,
   renderWhitespace: 'all',
+  renderControlCharacters: true,
+  unicodeHighlight: {
+    invisibleCharacters: true,
+    ambiguousCharacters: true,
+    nonBasicASCII: false, // 警告が多すぎる可能性があるため無効
+    includeComments: true,
+    includeStrings: true,
+  },
 };
 
 export const INITIAL_DEFAULT_THEME: Theme = 'auto';

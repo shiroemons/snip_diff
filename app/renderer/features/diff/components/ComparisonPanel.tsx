@@ -39,6 +39,16 @@ export interface ComparisonPanelProps {
   hideUnchangedRegions: boolean;
   /** 空白文字の表示方法 */
   renderWhitespace: 'none' | 'boundary' | 'selection' | 'trailing' | 'all';
+  /** 制御文字を表示するかどうか */
+  renderControlCharacters: boolean;
+  /** Unicode文字のハイライト設定 */
+  unicodeHighlight: {
+    nonBasicASCII?: boolean;
+    invisibleCharacters?: boolean;
+    ambiguousCharacters?: boolean;
+    includeComments?: boolean;
+    includeStrings?: boolean;
+  };
   /** Diffエディタがマウントされたときのコールバック */
   onDiffEditorMount: (editor: editor.IStandaloneDiffEditor) => void;
   /** 全画面トグルハンドラ */
@@ -70,6 +80,8 @@ export const ComparisonPanel: React.FC<ComparisonPanelProps> = ({
   insertSpaces,
   hideUnchangedRegions,
   renderWhitespace,
+  renderControlCharacters,
+  unicodeHighlight,
   onDiffEditorMount,
   onToggleFullscreen,
   onToggleMinimize,
@@ -176,6 +188,8 @@ export const ComparisonPanel: React.FC<ComparisonPanelProps> = ({
                 diffAlgorithm: 'advanced',
                 renderIndicators: !compactMode,
                 renderWhitespace,
+                renderControlCharacters,
+                unicodeHighlight,
                 renderOverviewRuler: !compactMode,
                 scrollBeyondLastLine: false,
                 scrollBeyondLastColumn: 0,

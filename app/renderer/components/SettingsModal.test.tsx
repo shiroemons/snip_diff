@@ -32,6 +32,14 @@ const mockElectronAPI = {
         diffAlgorithm: 'advanced',
         hideUnchangedRegions: false,
         renderWhitespace: 'all',
+        renderControlCharacters: true,
+        unicodeHighlight: {
+          invisibleCharacters: true,
+          ambiguousCharacters: true,
+          nonBasicASCII: false,
+          includeComments: true,
+          includeStrings: true,
+        },
       },
       defaultLanguage: 'plaintext',
       defaultEOL: 'auto',
@@ -94,6 +102,14 @@ describe('SettingsModal', () => {
         diffAlgorithm: 'advanced',
         hideUnchangedRegions: false,
         renderWhitespace: 'all',
+        renderControlCharacters: true,
+        unicodeHighlight: {
+          invisibleCharacters: true,
+          ambiguousCharacters: true,
+          nonBasicASCII: false,
+          includeComments: true,
+          includeStrings: true,
+        },
       },
       defaultLanguage: 'plaintext',
       defaultEOL: 'auto',
@@ -149,6 +165,14 @@ describe('SettingsModal', () => {
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
           renderWhitespace: 'all',
+          renderControlCharacters: true,
+          unicodeHighlight: {
+            invisibleCharacters: true,
+            ambiguousCharacters: true,
+            nonBasicASCII: false,
+            includeComments: true,
+            includeStrings: true,
+          },
         },
       });
 
@@ -805,6 +829,14 @@ describe('SettingsModal', () => {
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
           renderWhitespace: 'all',
+          renderControlCharacters: true,
+          unicodeHighlight: {
+            invisibleCharacters: true,
+            ambiguousCharacters: true,
+            nonBasicASCII: false,
+            includeComments: true,
+            includeStrings: true,
+          },
         },
       });
 
@@ -843,6 +875,14 @@ describe('SettingsModal', () => {
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: true,
           renderWhitespace: 'all',
+          renderControlCharacters: true,
+          unicodeHighlight: {
+            invisibleCharacters: true,
+            ambiguousCharacters: true,
+            nonBasicASCII: false,
+            includeComments: true,
+            includeStrings: true,
+          },
         },
         defaultLanguage: 'javascript',
         defaultEOL: 'CRLF',
@@ -916,6 +956,14 @@ describe('SettingsModal', () => {
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
           renderWhitespace: 'all',
+          renderControlCharacters: true,
+          unicodeHighlight: {
+            invisibleCharacters: true,
+            ambiguousCharacters: true,
+            nonBasicASCII: false,
+            includeComments: true,
+            includeStrings: true,
+          },
         },
       });
 
@@ -966,6 +1014,14 @@ describe('SettingsModal', () => {
           diffAlgorithm: 'advanced',
           hideUnchangedRegions: false,
           renderWhitespace: 'all',
+          renderControlCharacters: true,
+          unicodeHighlight: {
+            invisibleCharacters: true,
+            ambiguousCharacters: true,
+            nonBasicASCII: false,
+            includeComments: true,
+            includeStrings: true,
+          },
         },
       });
 
