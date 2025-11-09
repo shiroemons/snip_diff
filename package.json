@@ -1,6 +1,6 @@
 {
   "name": "snip-diff",
-  "version": "2025.11.1",
+  "version": "2025.11.2",
   "description": "未保存テキスト差分ビューア - GitHub-like diff viewer for unsaved text",
   "main": "dist/main/main/main.js",
   "author": "shiroemons",
