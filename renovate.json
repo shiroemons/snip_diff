@@ -3,7 +3,7 @@
   "extends": ["config:recommended"],
   "allowedPostUpgradeCommands": [
     "^npm exec --yes @biomejs/biome -- migrate --write$",
-    "^sed -E -i '' 's\\|https://biomejs\\.dev/schemas/[0-9]+\\.[0-9]+\\.[0-9]+/schema\\.json\\|https://biomejs\\.dev/schemas/.*/schema\\.json\\|' biome\\.json$"
+    "^sed -E -i '' 's\\|https://biomejs\\.dev/schemas/.*\\.json\\|https://biomejs\\.dev/schemas/.*\\.json\\|' biome\\.json$"
   ],
   "packageRules": [
     {
