@@ -1,9 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
+  "platform": "github",
+  "repositories": ["shiroemons/snip_diff"],
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "onboarding": false,
+  "requireConfig": "optional",
   "allowedPostUpgradeCommands": [
     "^npm exec --yes @biomejs/biome -- migrate --write$",
-    "^sed -E -i '' 's\\|https://biomejs\\.dev/schemas/.*\\.json\\|https://biomejs\\.dev/schemas/.*\\.json\\|' biome\\.json$"
+    "^sed -E 's\\|https://biomejs\\.dev/schemas/.*\\.json\\|https://biomejs\\.dev/schemas/.*\\.json\\|' biome\\.json > biome\\.json\\.tmp && mv biome\\.json\\.tmp biome\\.json$"
   ],
   "packageRules": [
     {
@@ -11,7 +16,7 @@
       "postUpgradeTasks": {
         "commands": [
           "npm exec --yes @biomejs/biome -- migrate --write",
-          "sed -E -i '' 's|https://biomejs.dev/schemas/[0-9]+\\.[0-9]+\\.[0-9]+/schema.json|https://biomejs.dev/schemas/{{{newVersion}}}/schema.json|' biome.json"
+          "sed -E 's|https://biomejs.dev/schemas/[0-9]+\\.[0-9]+\\.[0-9]+/schema.json|https://biomejs.dev/schemas/{{{newVersion}}}/schema.json|' biome.json > biome.json.tmp && mv biome.json.tmp biome.json"
         ],
         "fileFilters": ["biome.json"],
         "executionMode": "update"
