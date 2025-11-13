@@ -9,6 +9,8 @@ export interface UseCompactModeOptions {
   compactMode: boolean;
   /** 表示モード（unified/side-by-side） */
   viewMode: 'unified' | 'side-by-side';
+  /** エディターがマウントされたかどうか */
+  editorMounted?: boolean;
 }
 
 /**
@@ -342,6 +344,8 @@ export const useCompactMode = (
     fixUnifiedModeCharHighlights();
   }, [options.compactMode, clearCompactDecorations, fixUnifiedModeCharHighlights, diffEditorRef]);
 
+  // diff更新時と設定変更時に装飾を再適用
+  // biome-ignore lint/correctness/useExhaustiveDependencies: editorMountedはエディターマウント時の再実行トリガーとして必要
   useEffect(() => {
     const diffEditor = diffEditorRef.current;
     if (!diffEditor) return;
@@ -350,11 +354,18 @@ export const useCompactMode = (
       updateCompactDecorations();
     });
 
+    // 初回マウント時とcompactMode変更時に装飾を適用
     updateCompactDecorations();
 
     return () => {
       listener.dispose();
       clearCompactDecorations();
     };
-  }, [updateCompactDecorations, clearCompactDecorations, diffEditorRef]);
+  }, [
+    updateCompactDecorations,
+    clearCompactDecorations,
+    diffEditorRef,
+    options.compactMode,
+    options.editorMounted,
+  ]);
 };

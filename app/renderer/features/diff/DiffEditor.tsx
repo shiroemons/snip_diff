@@ -40,6 +40,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(
     const [showComparePanel, setShowComparePanel] = useState(true);
     const [leftContent, setLeftContent] = useState('');
     const [rightContent, setRightContent] = useState('');
+    const [editorMounted, setEditorMounted] = useState(false);
 
     // usePanelResizeフックを使用
     const {
@@ -56,6 +57,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(
     useCompactMode(diffEditorRef, {
       compactMode: activeSession?.options.compactMode ?? false,
       viewMode: activeSession?.options.viewMode ?? 'side-by-side',
+      editorMounted,
     });
 
     // storeから言語を取得
@@ -279,6 +281,7 @@ const DiffEditor = forwardRef<DiffEditorRef, DiffEditorProps>(
     // Diffエディタのマウント処理
     const handleDiffEditorDidMount = (editor: editor.IStandaloneDiffEditor) => {
       diffEditorRef.current = editor;
+      setEditorMounted(true);
     };
 
     // 共通エディタオプション
