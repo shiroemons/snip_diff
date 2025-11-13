@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useCompactMode } from './useCompactMode';
 import type { editor } from 'monaco-editor';
+import * as monaco from 'monaco-editor';
 
 // Monaco Editorのモック型定義
 interface MockDecorationCollection {
@@ -28,25 +29,34 @@ interface MockDiffEditor {
   getContainerDomNode: ReturnType<typeof vi.fn>;
 }
 
-class MockRange {
-  constructor(
-    public startLineNumber: number,
-    public startColumn: number,
-    public endLineNumber: number,
-    public endColumn: number,
-  ) {}
-}
-
-class MockPosition {
-  constructor(
-    public lineNumber: number,
-    public column: number,
-  ) {}
-}
-
 // Monaco Editorのモック
-vi.mock('monaco-editor', () => ({
-  default: {
+vi.mock('monaco-editor', () => {
+  class MockRange {
+    constructor(
+      public startLineNumber: number,
+      public startColumn: number,
+      public endLineNumber: number,
+      public endColumn: number,
+    ) {}
+  }
+
+  class MockPosition {
+    constructor(
+      public lineNumber: number,
+      public column: number,
+    ) {}
+  }
+
+  return {
+    default: {
+      Range: MockRange,
+      Position: MockPosition,
+      editor: {
+        TrackedRangeStickiness: {
+          NeverGrowsWhenTypingAtEdges: 0,
+        },
+      },
+    },
     Range: MockRange,
     Position: MockPosition,
     editor: {
@@ -54,15 +64,8 @@ vi.mock('monaco-editor', () => ({
         NeverGrowsWhenTypingAtEdges: 0,
       },
     },
-  },
-  Range: MockRange,
-  Position: MockPosition,
-  editor: {
-    TrackedRangeStickiness: {
-      NeverGrowsWhenTypingAtEdges: 0,
-    },
-  },
-}));
+  };
+});
 
 // diffライブラリのモック
 vi.mock('diff', () => ({
@@ -98,14 +101,14 @@ describe('useCompactMode', () => {
     mockOriginalModel = {
       getValueInRange: vi.fn().mockReturnValue('test'),
       getLineMaxColumn: vi.fn().mockReturnValue(10),
-      getPositionAt: vi.fn((offset: number) => new MockPosition(1, offset + 1)),
+      getPositionAt: vi.fn((offset: number) => new monaco.Position(1, offset + 1)),
       getOffsetAt: vi.fn(() => 0),
     };
 
     mockModifiedModel = {
       getValueInRange: vi.fn().mockReturnValue('test'),
       getLineMaxColumn: vi.fn().mockReturnValue(10),
-      getPositionAt: vi.fn((offset: number) => new MockPosition(1, offset + 1)),
+      getPositionAt: vi.fn((offset: number) => new monaco.Position(1, offset + 1)),
       getOffsetAt: vi.fn(() => 0),
     };
 
@@ -148,6 +151,7 @@ describe('useCompactMode', () => {
         useCompactMode(diffEditorRef, {
           compactMode: false,
           viewMode: 'side-by-side',
+          editorMounted: true,
         }),
       );
 
@@ -159,6 +163,7 @@ describe('useCompactMode', () => {
         useCompactMode(diffEditorRef, {
           compactMode: false,
           viewMode: 'side-by-side',
+          editorMounted: true,
         }),
       );
 
@@ -175,6 +180,7 @@ describe('useCompactMode', () => {
           useCompactMode(nullRef, {
             compactMode: true,
             viewMode: 'side-by-side',
+            editorMounted: false,
           }),
         );
       }).not.toThrow();
@@ -313,16 +319,26 @@ describe('useCompactMode', () => {
             options: {
               compactMode: true,
               viewMode: 'side-by-side' as const,
+              editorMounted: true,
             },
           },
         },
       );
 
-      // 2回目のレンダリング
+      // 2回目のレンダリング（compactModeを一度falseにしてからtrueに戻す）
+      rerender({
+        options: {
+          compactMode: false,
+          viewMode: 'side-by-side' as const,
+          editorMounted: true,
+        },
+      });
+
       rerender({
         options: {
           compactMode: true,
           viewMode: 'side-by-side' as const,
+          editorMounted: true,
         },
       });
 
@@ -493,6 +509,92 @@ describe('useCompactMode', () => {
 
       expect(mockOriginalEditor.createDecorationsCollection).toHaveBeenCalled();
       expect(mockModifiedEditor.createDecorationsCollection).toHaveBeenCalled();
+    });
+  });
+
+  describe('初期化シナリオ', () => {
+    it('should apply decorations when editor mounts with compactMode enabled from start', () => {
+      // エディターがマウントされていない状態でスタート
+      const nullRef = { current: null };
+
+      mockDiffEditor.getLineChanges.mockReturnValue([
+        {
+          originalStartLineNumber: 1,
+          originalEndLineNumber: 1,
+          modifiedStartLineNumber: 1,
+          modifiedEndLineNumber: 1,
+          charChanges: null,
+        },
+      ]);
+
+      mockOriginalEditor.createDecorationsCollection.mockClear();
+      mockModifiedEditor.createDecorationsCollection.mockClear();
+
+      // compactMode=true でレンダリング（エディターはまだnull）
+      const { rerender } = renderHook(
+        ({ editorRef }) =>
+          useCompactMode(editorRef, {
+            compactMode: true,
+            viewMode: 'side-by-side',
+          }),
+        {
+          initialProps: {
+            editorRef: nullRef,
+          },
+        },
+      );
+
+      // エディターがnullの段階ではデコレーションは作成されない
+      expect(mockOriginalEditor.createDecorationsCollection).not.toHaveBeenCalled();
+      expect(mockModifiedEditor.createDecorationsCollection).not.toHaveBeenCalled();
+
+      // エディターがマウントされた状態に更新
+      const mountedRef = {
+        current: mockDiffEditor as unknown as editor.IStandaloneDiffEditor,
+      };
+
+      rerender({
+        editorRef: mountedRef,
+      });
+
+      // エディターがマウントされた後、装飾が適用されることを期待
+      expect(mockOriginalEditor.createDecorationsCollection).toHaveBeenCalled();
+      expect(mockModifiedEditor.createDecorationsCollection).toHaveBeenCalled();
+    });
+
+    it('should not apply decorations when editor mounts with compactMode disabled', () => {
+      // エディターがマウントされていない状態でスタート
+      const nullRef = { current: null };
+
+      mockOriginalEditor.createDecorationsCollection.mockClear();
+      mockModifiedEditor.createDecorationsCollection.mockClear();
+
+      // compactMode=false でレンダリング
+      const { rerender } = renderHook(
+        ({ editorRef }) =>
+          useCompactMode(editorRef, {
+            compactMode: false,
+            viewMode: 'side-by-side',
+          }),
+        {
+          initialProps: {
+            editorRef: nullRef,
+          },
+        },
+      );
+
+      // エディターがマウントされた状態に更新
+      const mountedRef = {
+        current: mockDiffEditor as unknown as editor.IStandaloneDiffEditor,
+      };
+
+      rerender({
+        editorRef: mountedRef,
+      });
+
+      // compactMode=false なので、マウント後も装飾は作成されない
+      expect(mockOriginalEditor.createDecorationsCollection).not.toHaveBeenCalled();
+      expect(mockModifiedEditor.createDecorationsCollection).not.toHaveBeenCalled();
     });
   });
 });
