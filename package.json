@@ -6,6 +6,9 @@
   "author": "shiroemons",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": "^22.23.4 || ^24.22.1 || >=26.12.1"
+  },
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "vite",
@@ -54,7 +57,7 @@
     "@vitest/coverage-v8": "^4.0.3",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
-    "electron": "^39.0.0",
+    "electron": "46.0.0-alpha.1",
     "electron-builder": "^26.0.12",
     "jsdom": "^27.0.1",
     "simple-git-hooks": "^2.13.1",

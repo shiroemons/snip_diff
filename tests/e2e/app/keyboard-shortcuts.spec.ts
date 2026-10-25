@@ -57,7 +57,7 @@ test.describe('Keyboard Shortcuts', () => {
   test('should paste to left editor with ⌘V', async ({ page, electronApp }) => {
     // Set clipboard content
     await electronApp.evaluate(async ({ clipboard }, text) => {
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
     }, TEST_TEXT.SIMPLE_LEFT);
 
     await page.waitForTimeout(300);
@@ -73,7 +73,7 @@ test.describe('Keyboard Shortcuts', () => {
   test('should paste to right editor with ⌘⇧V', async ({ page, electronApp }) => {
     // Set clipboard content
     await electronApp.evaluate(async ({ clipboard }, text) => {
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
     }, TEST_TEXT.SIMPLE_RIGHT);
 
     await page.waitForTimeout(300);
@@ -89,7 +89,7 @@ test.describe('Keyboard Shortcuts', () => {
   test('should handle multiple shortcuts in sequence', async ({ page, electronApp }) => {
     // Set clipboard content
     await electronApp.evaluate(async ({ clipboard }, text) => {
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
     }, TEST_TEXT.SIMPLE_LEFT);
 
     await page.waitForTimeout(300);
@@ -100,7 +100,7 @@ test.describe('Keyboard Shortcuts', () => {
 
     // Paste to right (different content)
     await electronApp.evaluate(async ({ clipboard }, text) => {
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
     }, TEST_TEXT.SIMPLE_RIGHT);
 
     await page.waitForTimeout(300);

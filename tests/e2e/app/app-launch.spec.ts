@@ -2,6 +2,14 @@ import { expect, test } from '../fixtures/electronApp';
 import { SELECTORS } from '../helpers/test-data';
 
 test.describe('App Launch', () => {
+  test('should include the HTTP2Shell fix in bundled Brotli', async ({ electronApp }) => {
+    const errorCode = await electronApp.evaluate(() => {
+      const { constants } = process.getBuiltinModule('node:zlib');
+      return Reflect.get(constants, 'BROTLI_DECODER_ERROR_FORMAT_BLOCK_SWITCH');
+    });
+    expect(errorCode).toBe(-17);
+  });
+
   test('should launch the app successfully', async ({ electronApp, page }) => {
     // Check if the app is running
     expect(electronApp).toBeTruthy();

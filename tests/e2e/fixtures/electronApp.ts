@@ -1,3 +1,5 @@
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import type { ElectronApplication, Page } from '@playwright/test';
 import { _electron as electron, test as base } from '@playwright/test';
 import path from 'node:path';
@@ -12,45 +14,47 @@ export const test = base.extend<{
   electronApp: async ({}, use) => {
     // Get project root directory (where package.json is located)
     const projectRoot = path.join(__dirname, '../../..');
+    const userDataDir = await mkdtemp(path.join(tmpdir(), 'snip-diff-e2e-'));
 
     // Launch Electron app with project root as cwd
     // headlessモードで実行（CI/ローカルともに）
     // ヘッドレスを無効にする場合は環境変数 HEADED=true を設定
     const isHeaded = process.env.HEADED === 'true';
-    const electronApp = await electron.launch({
-      args: isHeaded
-        ? ['.']
-        : [
-            '--headless',
-            '--disable-gpu',
-            '--disable-dev-shm-usage',
-            '--disable-software-rasterizer',
-            '--no-sandbox',
-            '.',
-          ],
-      cwd: projectRoot,
-      env: {
-        ...process.env,
-        NODE_ENV: 'production',
-        ELECTRON_ENABLE_LOGGING: '0', // Suppress Electron logs in headless mode
-      },
-    });
+    try {
+      const electronApp = await electron.launch({
+        args: isHeaded
+          ? [`--user-data-dir=${userDataDir}`, '.']
+          : [
+              `--user-data-dir=${userDataDir}`,
+              '--headless',
+              '--disable-gpu',
+              '--disable-dev-shm-usage',
+              '--disable-software-rasterizer',
+              '--no-sandbox',
+              '.',
+            ],
+        cwd: projectRoot,
+        env: {
+          ...process.env,
+          NODE_ENV: 'production',
+          ELECTRON_ENABLE_LOGGING: '0',
+        },
+      });
 
-    // Wait for the app to be ready
-    await electronApp.evaluate(async ({ app }) => {
-      return app.whenReady();
-    });
-
-    // Use the app
-    await use(electronApp);
-
-    // Clean up - close the app
-    await electronApp.close();
+      try {
+        await electronApp.evaluate(async ({ app }) => app.whenReady());
+        await use(electronApp);
+      } finally {
+        await electronApp.close();
+      }
+    } finally {
+      await rm(userDataDir, { recursive: true, force: true });
+    }
   },
 
   page: async ({ electronApp }, use) => {
     // Wait for window to be created
-    const page = await electronApp.waitForEvent('window', {
+    const page = await electronApp.firstWindow({
       timeout: 30000,
     });
 

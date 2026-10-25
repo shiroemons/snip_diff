@@ -261,9 +261,11 @@ brew update && brew upgrade shiroemons/tap/snip-diff
 
 ### 必要要件
 
-- **Node.js**: 18以上
-- **macOS**: Apple Silicon / Intel 両対応
+- **Node.js**: 22.23.4以降の22系、24.22.1以降の24系、または26.12.1以上（開発・CIは`.node-version`に合わせる）
+- **macOS**: 13以上、Apple Silicon / Intel 両対応
 - **npm**: 8以上
+
+HTTP2Shell（CVE-2026-111497）への対応として、[修正済みNode.js 24.22.1](https://nodejs.org/en/blog/release/v24.22.1)を内蔵する[Electron 46.0.0-alpha.1](https://releases.electronjs.org/release/v46.0.0-alpha.1)を固定しています。安定版に修正が取り込まれたら移行してください。
 
 ### セットアップ
 
@@ -351,7 +353,7 @@ app/
 
 | カテゴリ | 技術 |
 |---------|------|
-| **フレームワーク** | Electron 39 |
+| **フレームワーク** | Electron 46.0.0-alpha.1 |
 | **UI** | React 19 |
 | **言語** | TypeScript 5 |
 | **ビルドツール** | Vite 7 |

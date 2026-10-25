@@ -536,7 +536,7 @@ function registerIpcHandlers(): void {
   // クリップボード読み取り
   ipcMain.handle(IPC_CHANNELS.CLIPBOARD_READ, async () => {
     try {
-      return clipboard.readText();
+      return await clipboard.readText();
     } catch (error) {
       console.error('Failed to read clipboard:', error);
       throw error;
@@ -546,7 +546,7 @@ function registerIpcHandlers(): void {
   // クリップボード書き込み
   ipcMain.handle(IPC_CHANNELS.CLIPBOARD_WRITE, async (_event, text: string) => {
     try {
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
       return true;
     } catch (error) {
       console.error('Failed to write clipboard:', error);

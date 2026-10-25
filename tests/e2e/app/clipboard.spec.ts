@@ -8,10 +8,22 @@ test.describe('Clipboard Operations', () => {
     await waitForMonacoEditor(page);
   });
 
+  test('should propagate asynchronous clipboard write failures', async ({ page, electronApp }) => {
+    await electronApp.evaluate(({ clipboard }) => {
+      clipboard.writeText = async () => {
+        throw new Error('Clipboard write denied');
+      };
+    });
+
+    await expect(page.evaluate(() => window.electron.clipboard.write('test'))).rejects.toThrow(
+      'Clipboard write denied'
+    );
+  });
+
   test('should paste to left editor', async ({ page, electronApp }) => {
     // Set clipboard content
     await electronApp.evaluate(async ({ clipboard }, text) => {
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
     }, TEST_TEXT.SIMPLE_LEFT);
 
     await page.waitForTimeout(500);
@@ -33,7 +45,7 @@ test.describe('Clipboard Operations', () => {
   test('should paste to right editor', async ({ page, electronApp }) => {
     // Set clipboard content
     await electronApp.evaluate(async ({ clipboard }, text) => {
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
     }, TEST_TEXT.SIMPLE_RIGHT);
 
     await page.waitForTimeout(500);
@@ -81,7 +93,7 @@ test.describe('Clipboard Operations', () => {
 
     for (const text of texts) {
       await electronApp.evaluate(async ({ clipboard }, t) => {
-        clipboard.writeText(t);
+        await clipboard.writeText(t);
       }, text);
       await page.waitForTimeout(100);
     }
@@ -115,7 +127,7 @@ test.describe('Clipboard Operations', () => {
   test('should use keyboard shortcut to paste', async ({ page, electronApp }) => {
     // Set clipboard content
     await electronApp.evaluate(async ({ clipboard }, text) => {
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
     }, TEST_TEXT.SIMPLE_LEFT);
 
     await page.waitForTimeout(500);
@@ -141,7 +153,7 @@ test.describe('Clipboard Operations', () => {
 
     for (const text of texts) {
       await electronApp.evaluate(async ({ clipboard }, t) => {
-        clipboard.writeText(t);
+        await clipboard.writeText(t);
       }, text);
       await page.waitForTimeout(50);
     }
