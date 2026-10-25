@@ -35,11 +35,10 @@ jobs:
         run: npm run type-check
 
       - name: Run tests
-        run: npm run test
-        continue-on-error: true
+        run: npm run test -- --run
 
       - name: Build and package
-        run: npm run dist:mac
+        run: npm run dist:mac -- --publish never --config.forceCodeSigning=true
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           # Code signing環境変数
@@ -49,6 +48,21 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Restrict automatic updates to macOS 13 or later
+        run: |
+          node - release/latest-mac.yml <<'NODE'
+          const assert = require('node:assert/strict');
+          const fs = require('node:fs');
+          const yaml = require('js-yaml');
+          const file = process.argv[2];
+          const info = yaml.load(fs.readFileSync(file, 'utf8'));
+          assert.equal(info.version, require('./package.json').version);
+          assert.ok(info.files.some(file => file.url.endsWith('.zip')));
+          // 既存のelectron-updaterはOSのカーネル版を比較するため、macOS 13に対応するDarwin 22を指定する。
+          info.minimumSystemVersion = '22.0.0';
+          fs.writeFileSync(file, yaml.dump(info));
+          NODE
 
       - name: Verify build artifacts
         run: |
@@ -69,7 +83,7 @@ jobs:
             release/*.dmg
             release/*.zip
             release/*.blockmap
-            release/*.yml
+            release/latest-mac.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
